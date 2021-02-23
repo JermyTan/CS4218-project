@@ -13,8 +13,8 @@ repositories {
 pmd {
     ruleSetFiles = files('PMD.Rules.xml')
     ruleSets = []
-    ignoreFailures = false
-    toolVersion = '6.21.0'
+    ignoreFailures = true
+    toolVersion = '6.31.0'
     consoleOutput = true
 }
 

@@ -8,6 +8,7 @@ public final class StringUtils {
     public static final String STRING_NEWLINE = System.lineSeparator();
     public static final String STRING_CURR_DIR = ".";
     public static final String STRING_PARENT_DIR = "..";
+    public static final String STRING_WHITESPACE = " ";
     public static final char CHAR_FILE_SEP = File.separatorChar;
     public static final char CHAR_TAB = '\t';
     public static final char CHAR_SPACE = ' ';
@@ -48,17 +49,7 @@ public final class StringUtils {
      * 3. string contains only whitespace
      */
     public static boolean isBlank(String str) {
-        if (str == null || str.isEmpty()) {
-            return true;
-        }
-
-        for (int i = 0; i < str.length(); ) {
-            if (Character.isWhitespace(str.charAt(i))) {
-                return false;
-            }
-        }
-
-        return true;
+        return str == null || str.isBlank();
     }
 
     /**

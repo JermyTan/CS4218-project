@@ -49,7 +49,11 @@ public final class IOUtils {
 
         FileOutputStream fileOutputStream;
 
-        fileOutputStream = new FileOutputStream(new File(resolvedFileName));
+        try {
+            fileOutputStream = new FileOutputStream(new File(resolvedFileName));
+        } catch (FileNotFoundException e) {
+            throw new ShellException(ERR_FILE_NOT_FOUND);
+        }
 
         return fileOutputStream;
     }
