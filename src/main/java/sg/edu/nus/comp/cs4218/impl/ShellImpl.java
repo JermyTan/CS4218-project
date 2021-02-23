@@ -26,20 +26,22 @@ public class ShellImpl implements Shell {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Shell shell = new ShellImpl();
 
-        try {
-            String currentDirectory = Environment.currentDirectory;
-            String commandString;
+        while (true) {
             try {
-                commandString = reader.readLine();
-            } catch (IOException e) {
-                break; // Streams are closed, terminate process
-            }
+                String currentDirectory = Environment.currentDirectory;
+                String commandString;
+                try {
+                    commandString = reader.readLine();
+                } catch (IOException e) {
+                    break; // Streams are closed, terminate process
+                }
 
-            if (!StringUtils.isBlank(commandString)) {
-                shell.parseAndEvaluate(commandString, System.out);
+                if (!StringUtils.isBlank(commandString)) {
+                    shell.parseAndEvaluate(commandString, System.out);
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
     }
 
