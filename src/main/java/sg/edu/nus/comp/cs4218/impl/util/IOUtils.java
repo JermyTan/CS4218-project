@@ -9,8 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CLOSING_STREAMS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 
 @SuppressWarnings("PMD.PreserveStackTrace")
 public final class IOUtils {
@@ -53,7 +52,7 @@ public final class IOUtils {
         try {
             fileOutputStream = new FileOutputStream(new File(resolvedFileName));
         } catch (FileNotFoundException e) {
-            throw new ShellException(ERR_FILE_NOT_FOUND);
+            throw new ShellException(ERR_IO_EXCEPTION);
         }
 
         return fileOutputStream;

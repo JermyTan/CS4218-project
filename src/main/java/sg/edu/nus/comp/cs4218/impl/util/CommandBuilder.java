@@ -77,10 +77,14 @@ public final class CommandBuilder {
 
             switch (firstChar) {
                 case CHAR_REDIR_INPUT:
-                    break;
                 case CHAR_REDIR_OUTPUT:
-                    // add as a separate token on its own
-                    tokens.add(String.valueOf(firstChar));
+                    if (tokens.isEmpty()) {
+                        // cannot start a new command with redirection
+                        throw new ShellException(ERR_SYNTAX);
+                    } else {
+                        // add as a separate token on its own
+                        tokens.add(String.valueOf(firstChar));
+                    }
                     break;
 
                 case CHAR_PIPE:

@@ -34,7 +34,7 @@ public class IORedirectionHandler {
     }
 
     public void extractRedirOptions() throws AbstractApplicationException, ShellException {
-        if (argsList == null && argsList.isEmpty()) {
+        if (argsList == null || argsList.isEmpty()) {
             throw new ShellException(ERR_SYNTAX);
         }
 
@@ -51,10 +51,16 @@ public class IORedirectionHandler {
                 continue;
             }
 
+            // no file specified
+            if (!argsIterator.hasNext()) {
+                throw new ShellException(ERR_SYNTAX);
+            }
+
             // if current arg is < or >, fast-forward to the next arg to extract the specified file
             String file = argsIterator.next();
 
             if (isRedirOperator(file)) {
+                throw new ShellException(ERR_SYNTAX);
             }
 
             // handle quoting + globing + command substitution in file arg
@@ -79,6 +85,16 @@ public class IORedirectionHandler {
                 }
                 outputStream = IOUtils.openOutputStream(file);
             }
+
+            // check if there are multiple files specified for redirection
+            if (argsIterator.hasNext()) {
+                String nextArg = argsIterator.next();
+                if (!isRedirOperator(nextArg)) {
+                    throw new ShellException(ERR_SYNTAX);
+                } else {
+                    argsIterator.previous();
+                }
+            }
         }
     }
 
@@ -95,6 +111,6 @@ public class IORedirectionHandler {
     }
 
     private boolean isRedirOperator(String str) {
-        return str.equals(String.valueOf(CHAR_REDIR_INPUT));
+        return str.equals(String.valueOf(CHAR_REDIR_INPUT)) || str.equals(String.valueOf(CHAR_REDIR_OUTPUT));
     }
 }
