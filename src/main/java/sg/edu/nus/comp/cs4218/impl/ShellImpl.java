@@ -9,6 +9,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.CommandBuilder;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,15 +31,18 @@ public class ShellImpl implements Shell {
             try {
                 String currentDirectory = Environment.currentDirectory;
                 String commandString;
+
                 try {
                     commandString = reader.readLine();
                 } catch (IOException e) {
+                    reader.close();
                     break; // Streams are closed, terminate process
                 }
 
                 if (!StringUtils.isBlank(commandString)) {
                     shell.parseAndEvaluate(commandString, System.out);
                 }
+
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }

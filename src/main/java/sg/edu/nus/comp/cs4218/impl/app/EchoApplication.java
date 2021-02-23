@@ -9,6 +9,7 @@ import java.io.OutputStream;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_WHITESPACE;
 
 /**
  * The echo command writes its arguments separated by spaces and terminates by a newline on the
@@ -26,14 +27,7 @@ public class EchoApplication implements EchoInterface {
             throw new EchoException(ERR_NULL_ARGS);
         }
 
-        String result;
-        if (args.length == 0) {
-            result = STRING_NEWLINE;
-        } else {
-            result = String.join(" ", args);
-        }
-
-        return result;
+        return args.length == 0 ? STRING_NEWLINE : String.join(STRING_WHITESPACE, args);
     }
 
     /**
