@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 public final class StringUtils {
+    public static final String STRING_EMPTY = "";
     public static final String STRING_NEWLINE = System.lineSeparator();
     public static final String STRING_CURR_DIR = ".";
     public static final String STRING_PARENT_DIR = "..";

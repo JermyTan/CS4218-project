@@ -27,7 +27,7 @@ public class EchoApplication implements EchoInterface {
             throw new EchoException(ERR_NULL_ARGS);
         }
 
-        return args.length == 0 ? STRING_NEWLINE : String.join(STRING_WHITESPACE, args);
+        return String.join(STRING_WHITESPACE, args) + STRING_NEWLINE;
     }
 
     /**
