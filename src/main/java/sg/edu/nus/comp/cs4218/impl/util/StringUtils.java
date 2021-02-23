@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.util;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.Arrays;
 
 public final class StringUtils {
     public static final String STRING_EMPTY = "";
@@ -24,6 +23,28 @@ public final class StringUtils {
     public static final char CHAR_FLAG_PREFIX = '-';
 
     private StringUtils() {
+    }
+
+    /**
+     * Returns the file extension of file name.
+     *
+     * @param fileName File name whose extension will be retrieved
+     * @return File extension
+     */
+    public static String getFileExtension(String fileName) {
+        if (isBlank(fileName)) {
+            return STRING_EMPTY;
+        }
+
+        String trimmedFileName = fileName.trim();
+        int extensionPeriodIndex = trimmedFileName.lastIndexOf(".");
+
+        // ignore (hidden) file names without extension.
+        if (extensionPeriodIndex <= 0) {
+            return STRING_EMPTY;
+        }
+
+        return trimmedFileName.substring(extensionPeriodIndex + 1);
     }
 
     /**
@@ -61,10 +82,7 @@ public final class StringUtils {
      * @return String result of c * n
      */
     public static String multiplyChar(char character, int num) {
-        int length = num <= 0 ? 0 : num;
-        char[] arr = new char[length];
-        Arrays.fill(arr, character);
-        return new String(arr);
+        return String.valueOf(character).repeat(Math.max(0, num));
     }
 
     /**

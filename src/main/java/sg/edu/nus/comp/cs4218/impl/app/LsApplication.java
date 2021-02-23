@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
@@ -33,7 +34,7 @@ public class LsApplication implements LsInterface {
         }
 
         List<Path> paths;
-        if (folderName.length == 0 && isRecursive) {
+        if (folderName.length == 0) {
             String[] directories = new String[1];
             directories[0] = Environment.currentDirectory;
             paths = resolvePaths(directories);
@@ -151,10 +152,13 @@ public class LsApplication implements LsInterface {
      * @return
      */
     private String formatContents(List<Path> contents, Boolean isSortByExt) {
-        // TODO: To implement sorting by extension
         List<String> fileNames = new ArrayList<>();
         for (Path path : contents) {
             fileNames.add(path.getFileName().toString());
+        }
+
+        if (isSortByExt) {
+            fileNames.sort(Comparator.comparing(StringUtils::getFileExtension).thenComparing(fileName -> fileName));
         }
 
         StringBuilder result = new StringBuilder();
