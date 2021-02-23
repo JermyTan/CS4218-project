@@ -47,55 +47,55 @@ class IORedirectionHandlerTest {
     }
 
     @Test
-    public void extractRedirOptions_nullArgList_throwsException() {
+    public void extractRedirOptions_NullArgList_ThrowsException() {
         IORedirectionHandler redirHandler = constructRedirHandler(null);
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
-    public void extractRedirOptions_emptyArgList_throwsException() {
+    public void extractRedirOptions_EmptyArgList_ThrowsException() {
         IORedirectionHandler redirHandler = constructRedirHandler(new LinkedList<>());
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
-    public void extractRedirOptions_noFileGiven_throwsException() {
+    public void extractRedirOptions_NoFileSpecified_ThrowsException() {
         IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_INPUT));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
-    public void extractRedirOptions_consecutiveRedirOptions_throwsException() {
+    public void extractRedirOptions_ConsecutiveRedirOptions_ThrowsException() {
         IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_INPUT, STRING_REDIR_INPUT));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
-    public void extractRedirOptions_twoInputRedir_throwsException() {
+    public void extractRedirOptions_TwoInputRedir_ThrowsException() {
         IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_INPUT, FILE_1, STRING_REDIR_INPUT, FILE_2));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
-    public void extractRedirOptions_twoOutputRedir_throwsException() {
+    public void extractRedirOptions_TwoOutputRedir_ThrowsException() {
         IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_OUTPUT, FILE_1, STRING_REDIR_OUTPUT, FILE_2));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
-    public void extractRedirOptions_inputRedirFileDoesNotExist_throwsException() {
+    public void extractRedirOptions_InputRedirFileDoesNotExist_ThrowsException() {
         IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_INPUT, FILE_2));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
-    public void extractRedirOptions_outputRedirMultipleFiles_throwsException() {
+    public void extractRedirOptions_OutputRedirMultipleFiles_ThrowsException() {
         IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_OUTPUT, FILE_1, FILE_2));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
-    public void extractRedirOptions_validArgs_removesRedirOptions() {
+    public void extractRedirOptions_ValidArgList_RemovesRedirOptions() {
         IORedirectionHandler redirHandler = constructRedirHandler(List.of("paste", STRING_REDIR_INPUT, FILE_1, STRING_REDIR_OUTPUT, FILE_2));
 
         assertDoesNotThrow(() -> redirHandler.extractRedirOptions());
