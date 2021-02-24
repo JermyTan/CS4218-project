@@ -66,7 +66,7 @@ class ArgumentResolverTest {
     }
 
     @Test
-    public void resolveOneArgument_BackQuoteWithinDoubleQuoteWithinSingleQuote_BothQuotesRemains() {
+    public void resolveOneArgument_BackQuoteWithinDoubleQuoteWithinSingleQuote_BothQuotesRemain() {
         String arg = "'h\"el`lo wo`rl\"d'";
         assertDoesNotThrow(() -> {
             List<String> args = argumentResolver.resolveOneArgument(arg);
