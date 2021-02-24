@@ -43,7 +43,7 @@ public class WcApplication implements WcInterface {
             if (wcArgs.getFiles().isEmpty()) {
                 result = countFromStdin(wcArgs.isBytes(), wcArgs.isLines(), wcArgs.isWords(), stdin);
             } else {
-                result = countFromFiles(wcArgs.isBytes(), wcArgs.isLines(), wcArgs.isWords(), wcArgs.getFiles().toArray(new String[0]));
+                result = countFromFiles(wcArgs.isBytes(), wcArgs.isLines(), wcArgs.isWords(), wcArgs.getFiles().toArray(String[]::new));
             }
         } catch (Exception e) {
             // Will never happen

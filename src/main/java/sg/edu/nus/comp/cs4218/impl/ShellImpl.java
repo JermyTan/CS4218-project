@@ -29,7 +29,6 @@ public class ShellImpl implements Shell {
 
         while (true) {
             try {
-                String currentDirectory = Environment.currentDirectory;
                 String commandString;
 
                 try {

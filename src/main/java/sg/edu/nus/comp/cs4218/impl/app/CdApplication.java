@@ -43,7 +43,7 @@ public class CdApplication implements CdInterface {
 
     private String getNormalizedAbsolutePath(String pathStr) throws CdException {
         if (StringUtils.isBlank(pathStr)) {
-            throw new CdException(ERR_NO_ARGS);
+            throw new CdException(ERR_MISSING_ARG);
         }
 
         Path path = new File(pathStr).toPath();

@@ -1,6 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.LongVariable"})
+@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions"})
 public class ErrorConstants {
 
     // Streams related
@@ -15,8 +15,7 @@ public class ErrorConstants {
     public static final String ERR_NO_FILE_ARGS = "No files provided";
 
     // Arguments related
-    public static final String ERR_MISSING_ARG = "Missing Argument";
-    public static final String ERR_NO_ARGS = "Insufficient arguments";
+    public static final String ERR_MISSING_ARG = "Missing Arguments";
     public static final String ERR_NULL_ARGS = "Null arguments";
     public static final String ERR_TOO_MANY_ARGS = "Too many arguments";
     public static final String ERR_INVALID_FLAG = "Invalid flag option supplied";
@@ -25,7 +24,7 @@ public class ErrorConstants {
     // Files and folders related
     public static final String ERR_FILE_NOT_FOUND = "No such file or directory";
     public static final String ERR_READING_FILE = "Could not read file";
-    public static final String ERR_IS_DIR = "This is a directory";
+    public static final String ERR_IS_DIR = "Is a directory";
     public static final String ERR_IS_NOT_DIR = "Not a directory";
     public static final String ERR_NO_PERM = "Permission denied";
 

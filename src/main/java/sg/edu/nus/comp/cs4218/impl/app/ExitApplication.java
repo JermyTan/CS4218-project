@@ -11,9 +11,9 @@ public class ExitApplication implements ExitInterface {
     /**
      * Runs the exit application.
      *
-     * @param args   Array of arguments for the application, not used.
-     * @param stdin  An InputStream, not used.
-     * @param stdout An OutputStream, not used.
+     * @param args array of arguments for the application, not used.
+     * @param stdin an InputStream, not used.
+     * @param stdout an OutputStream, not used.
      * @throws ExitException
      */
     @Override
@@ -23,9 +23,9 @@ public class ExitApplication implements ExitInterface {
     }
 
     /**
-     * Terminate shell.
+     * Terminates shell.
      *
-     * @throws Exception
+     * @throws ExitException
      */
     @Override
     public void terminateExecution() throws ExitException {

@@ -3,7 +3,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import sg.edu.nus.comp.cs4218.app.EchoInterface;
 import sg.edu.nus.comp.cs4218.exception.EchoException;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -21,23 +20,14 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_WHITESPACE;
  */
 public class EchoApplication implements EchoInterface {
 
-    @Override
-    public String constructResult(String[] args) throws EchoException {
-        if (args == null) {
-            throw new EchoException(ERR_NULL_ARGS);
-        }
-
-        return String.join(STRING_WHITESPACE, args) + STRING_NEWLINE;
-    }
-
     /**
      * Runs the echo application with the specified arguments.
      *
-     * @param args   Array of arguments for the application.
-     * @param stdin  An InputStream, not used.
-     * @param stdout An OutputStream. Elements of args will be output to stdout, separated by a
+     * @param args array of arguments for the application.
+     * @param stdin an InputStream, not used.
+     * @param stdout an OutputStream. Elements of args will be output to stdout, separated by a
      *               space character.
-     * @throws EchoException If an I/O exception occurs.
+     * @throws EchoException
      */
     @SuppressWarnings("PMD.PreserveStackTrace")
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws EchoException {
@@ -46,10 +36,21 @@ public class EchoApplication implements EchoInterface {
         }
 
         String result = constructResult(args);
+
         try {
             stdout.write(result.getBytes());
-        } catch (IOException e) {
-            throw new EchoException(ERR_IO_EXCEPTION);
+            stdout.write(STRING_NEWLINE.getBytes());
+        } catch (Exception e) {
+            throw new EchoException(ERR_WRITE_STREAM);
         }
+    }
+
+    @Override
+    public String constructResult(String[] args) throws EchoException {
+        if (args == null) {
+            throw new EchoException(ERR_NULL_ARGS);
+        }
+
+        return String.join(STRING_WHITESPACE, args);
     }
 }
