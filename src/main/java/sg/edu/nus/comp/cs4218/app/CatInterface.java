@@ -9,11 +9,11 @@ public interface CatInterface extends Application {
      * Returns string containing the content of the specified file
      *
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
-     * @param fileName     Array of String of file names
+     * @param fileNames     Array of String of file names
      * @return
      * @throws Exception
      */
-    String catFiles(Boolean isLineNumber, String... fileName) throws Exception;
+    String catFiles(Boolean isLineNumber, String... fileNames) throws Exception;
 
     /**
      * Returns string containing the content of the standard input
@@ -32,9 +32,9 @@ public interface CatInterface extends Application {
      *
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
      * @param stdin        InputStream containing arguments from Stdin
-     * @param fileName     Array of String of file names
+     * @param fileNames     Array of String of file names
      * @return
      * @throws Exception
      */
-    String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileName) throws Exception;
+    String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileNames) throws Exception;
 }

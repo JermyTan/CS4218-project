@@ -18,8 +18,8 @@ public interface CpInterface extends Application {
      *
      * @param isRecursive Copy folders (directories) recursively
      * @param destFolder of path to destination folder
-     * @param fileName   Array of String of file names
+     * @param fileNames   Array of String of file names
      * @throws Exception
      */
-    String cpFilesToFolder(Boolean isRecursive, String destFolder, String... fileName) throws Exception;
+    String cpFilesToFolder(Boolean isRecursive, String destFolder, String... fileNames) throws Exception;
 }

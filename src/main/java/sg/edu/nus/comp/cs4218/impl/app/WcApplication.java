@@ -63,18 +63,18 @@ public class WcApplication implements WcInterface {
      * @param isBytes  Boolean option to count the number of Bytes
      * @param isLines  Boolean option to count the number of lines
      * @param isWords  Boolean option to count the number of words
-     * @param fileName Array of String of file names
+     * @param fileNames Array of String of file names
      * @throws Exception
      */
     @Override
     public String countFromFiles(Boolean isBytes, Boolean isLines, Boolean isWords, //NOPMD
-                                 String... fileName) throws Exception {
-        if (fileName == null) {
+                                 String... fileNames) throws Exception {
+        if (fileNames == null) {
             throw new Exception(ERR_GENERAL);
         }
         List<String> result = new ArrayList<>();
         long totalBytes = 0, totalLines = 0, totalWords = 0;
-        for (String file : fileName) {
+        for (String file : fileNames) {
             File node = IOUtils.resolveFilePath(file).toFile();
             if (!node.exists()) {
                 result.add("wc: " + ERR_FILE_NOT_FOUND);
@@ -115,7 +115,7 @@ public class WcApplication implements WcInterface {
         }
 
         // Print cumulative counts for all the files
-        if (fileName.length > 1) {
+        if (fileNames.length > 1) {
             StringBuilder sb = new StringBuilder(); //NOPMD
             if (isLines) {
                 sb.append(String.format(NUMBER_FORMAT, totalLines));

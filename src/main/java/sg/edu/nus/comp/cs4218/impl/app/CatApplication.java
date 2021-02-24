@@ -29,17 +29,17 @@ public class CatApplication implements CatInterface {
     }
 
     @Override
-    public String catFiles(Boolean isLineNumber, String... fileName) throws Exception {
+    public String catFiles(Boolean isLineNumber, String... fileNames) throws CatException {
         return null;
     }
 
     @Override
-    public String catStdin(Boolean isLineNumber, InputStream stdin) throws Exception {
+    public String catStdin(Boolean isLineNumber, InputStream stdin) throws CatException {
         return null;
     }
 
     @Override
-    public String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileName) throws Exception {
+    public String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileNames) throws CatException {
         return null;
     }
 }

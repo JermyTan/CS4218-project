@@ -20,18 +20,18 @@ public interface PasteInterface extends Application {
      * specified, echo back the file content.
      *
      * @param isSerial Paste one file at a time instead of in parallel
-     * @param fileName Array of file names to be read and merged
+     * @param fileNames Array of file names to be read and merged
      * @throws Exception
      */
-    String mergeFile(Boolean isSerial, String... fileName) throws Exception;
+    String mergeFile(Boolean isSerial, String... fileNames) throws Exception;
 
     /**
      * Returns string of line-wise concatenated (tab-separated) files and Stdin arguments.
      *
      * @param isSerial Paste one file at a time instead of in parallel
      * @param stdin    InputStream containing arguments from Stdin
-     * @param fileName Array of file names to be read and merged
+     * @param fileNames Array of file names to be read and merged
      * @throws Exception
      */
-    String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws Exception;
+    String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileNames) throws Exception;
 }

@@ -11,9 +11,9 @@ public interface TeeInterface extends Application {
      *
      * @param isAppend Boolean option to append the standard input to the contents of the input files
      * @param stdin    InputStream containing arguments from Stdin
-     * @param fileName Array of String of file names
+     * @param fileNames Array of String of file names
      * @return
      * @throws Exception
      */
-    String teeFromStdin(Boolean isAppend, InputStream stdin, String... fileName) throws Exception;
+    String teeFromStdin(Boolean isAppend, InputStream stdin, String... fileNames) throws Exception;
 }

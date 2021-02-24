@@ -115,7 +115,8 @@
   <rule ref="category/java/codestyle.xml/BooleanGetMethodName" />
   <rule ref="category/java/codestyle.xml/ClassNamingConventions" />
   <rule ref="category/java/codestyle.xml/GenericsNaming" />
-  <rule ref="category/java/codestyle.xml/LongVariable" />
+  <!-- Remove this rule as variable names should be meaningful and reveal intention -->
+  <!-- <rule ref="category/java/codestyle.xml/LongVariable" /> -->
   <rule ref="category/java/codestyle.xml/MethodNamingConventions">
     <properties>
 		<!-- To enforce test[method/feature being tested]When[Scenario]Should[Return/Throw][expected][If throw then must end with Exception] junit method naming convention. Only for Junit 5 -->
