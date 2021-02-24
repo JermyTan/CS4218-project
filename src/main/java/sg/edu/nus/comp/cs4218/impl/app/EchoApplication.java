@@ -39,6 +39,7 @@ public class EchoApplication implements EchoInterface {
      *               space character.
      * @throws EchoException If an I/O exception occurs.
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws EchoException {
         if (stdout == null) {
             throw new EchoException(ERR_NO_OSTREAM);

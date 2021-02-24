@@ -37,7 +37,7 @@ public final class StringUtils {
         }
 
         String trimmedFileName = fileName.trim();
-        int extensionPeriodIndex = trimmedFileName.lastIndexOf(".");
+        int extensionPeriodIndex = trimmedFileName.lastIndexOf('.');
 
         // ignore (hidden) file names without extension.
         if (extensionPeriodIndex <= 0) {

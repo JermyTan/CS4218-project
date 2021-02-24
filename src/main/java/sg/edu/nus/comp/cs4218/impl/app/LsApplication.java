@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -21,12 +22,14 @@ import java.util.List;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 public class LsApplication implements LsInterface {
 
     private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
 
     @Override
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public String listFolderContent(Boolean isFoldersOnly, Boolean isRecursive, Boolean isSortByExt,
                                     String... folderName) throws LsException {
         if (folderName.length == 0 && !isRecursive) {
@@ -46,8 +49,11 @@ public class LsApplication implements LsInterface {
     }
 
     @Override
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public void run(String[] args, InputStream stdin, OutputStream stdout)
             throws LsException {
+        // TODO: Remove before submission
+        System.out.println(Arrays.toString(args));
         if (args == null) {
             throw new LsException(ERR_NULL_ARGS);
         }
@@ -72,7 +78,7 @@ public class LsApplication implements LsInterface {
 
         try {
             stdout.write(result.getBytes());
-            stdout.write(StringUtils.STRING_NEWLINE.getBytes());
+            stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
             throw new LsException(ERR_WRITE_STREAM);
         }
@@ -86,12 +92,13 @@ public class LsApplication implements LsInterface {
      * @param isSortByExt
      * @return
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     private String listCwdContent(Boolean isFoldersOnly, Boolean isSortByExt) throws LsException {
         String cwd = Environment.currentDirectory;
         try {
             return formatContents(getContents(Paths.get(cwd), isFoldersOnly), isSortByExt);
         } catch (InvalidDirectoryException e) {
-            throw new LsException("Unexpected error occurred!");
+            throw new LsException(ERR_UNEXPECTED);
         }
     }
 
@@ -114,14 +121,14 @@ public class LsApplication implements LsInterface {
                 String formatted = formatContents(contents, isSortByExt);
                 String relativePath = getRelativeToCwd(path).toString();
                 result.append(StringUtils.isBlank(relativePath) ? PATH_CURR_DIR : relativePath);
-                result.append(":\n");
+                result.append(String.format(":%s", STRING_NEWLINE));
                 result.append(formatted);
 
                 if (!formatted.isEmpty()) {
                     // Empty directories should not have an additional new line
-                    result.append(StringUtils.STRING_NEWLINE);
+                    result.append(STRING_NEWLINE);
                 }
-                result.append(StringUtils.STRING_NEWLINE);
+                result.append(STRING_NEWLINE);
 
                 // RECURSE!
                 if (isRecursive) {
@@ -136,7 +143,7 @@ public class LsApplication implements LsInterface {
                 // do we do then?
                 if (!isRecursive) {
                     result.append(e.getMessage());
-                    result.append('\n');
+                    result.append(STRING_NEWLINE);
                 }
             }
         }
@@ -164,7 +171,7 @@ public class LsApplication implements LsInterface {
         StringBuilder result = new StringBuilder();
         for (String fileName : fileNames) {
             result.append(fileName);
-            result.append('\n');
+            result.append(STRING_NEWLINE);
         }
 
         return result.toString().trim();
@@ -179,11 +186,11 @@ public class LsApplication implements LsInterface {
     private List<Path> getContents(Path directory, Boolean isFoldersOnly)
             throws InvalidDirectoryException {
         if (!Files.exists(directory)) {
-            throw new InvalidDirectoryException(getRelativeToCwd(directory).toString());
+            throw new InvalidDirectoryException(getRelativeToCwd(directory).toString(), ERR_FILE_NOT_FOUND);
         }
 
         if (!Files.isDirectory(directory)) {
-            throw new InvalidDirectoryException(getRelativeToCwd(directory).toString());
+            throw new InvalidDirectoryException(getRelativeToCwd(directory).toString(), ERR_IS_NOT_DIR);
         }
 
         List<Path> result = new ArrayList<>();
@@ -244,14 +251,9 @@ public class LsApplication implements LsInterface {
         return Paths.get(Environment.currentDirectory).relativize(path);
     }
 
-    private class InvalidDirectoryException extends Exception {
-        InvalidDirectoryException(String directory) {
-            super(String.format("ls: cannot access '%s': No such file or directory", directory));
-        }
-
-        InvalidDirectoryException(String directory, Throwable cause) {
-            super(String.format("ls: cannot access '%s': No such file or directory", directory),
-                    cause);
+    private class InvalidDirectoryException extends LsException {
+        InvalidDirectoryException(String directory, String reason) {
+            super(String.format("cannot access '%s': %s", directory, reason));
         }
     }
 }

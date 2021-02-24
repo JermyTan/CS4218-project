@@ -59,5 +59,5 @@ public class ErrorConstants {
     public static final String ERR_SYNTAX = "Invalid syntax";
     public static final String ERR_GENERAL = "Exception Caught";
     public static final String ERR_IO_EXCEPTION = "IOException";
-
+    public static final String ERR_UNEXPECTED = "Unexpected error occurred";
 }
