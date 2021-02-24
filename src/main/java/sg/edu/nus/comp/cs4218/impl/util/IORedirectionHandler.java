@@ -89,10 +89,10 @@ public class IORedirectionHandler {
             // check if there are multiple files specified for redirection
             if (argsIterator.hasNext()) {
                 String nextArg = argsIterator.next();
-                if (!isRedirOperator(nextArg)) {
-                    throw new ShellException(ERR_SYNTAX);
-                } else {
+                if (isRedirOperator(nextArg)) {
                     argsIterator.previous();
+                } else {
+                    throw new ShellException(ERR_SYNTAX);
                 }
             }
         }
