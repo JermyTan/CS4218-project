@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LsArgsParser extends ArgsParser {
     private final static char FLAG_IS_RECURSIVE = 'R';
@@ -9,6 +10,7 @@ public class LsArgsParser extends ArgsParser {
 
     public LsArgsParser() {
         super();
+
         legalFlags.add(FLAG_IS_FOLDERS);
         legalFlags.add(FLAG_IS_RECURSIVE);
         legalFlags.add(FLAG_IS_SORT_BY_EXT);
@@ -26,7 +28,7 @@ public class LsArgsParser extends ArgsParser {
         return flags.contains(FLAG_IS_SORT_BY_EXT);
     }
 
-    public List<String> getDirectories() {
-        return nonFlagArgs;
+    public List<String> getFolderNames() {
+        return nonFlagArgs.stream().collect(Collectors.toList());
     }
 }

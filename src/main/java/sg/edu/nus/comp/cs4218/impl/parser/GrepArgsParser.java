@@ -2,6 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.parser;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class GrepArgsParser extends ArgsParser {
@@ -13,6 +16,7 @@ public class GrepArgsParser extends ArgsParser {
 
     public GrepArgsParser() {
         super();
+
         legalFlags.add(FLAG_IS_CASE_INSENSITIVE);
         legalFlags.add(FLAG_IS_COUNT_LINES);
         legalFlags.add(FLAG_IS_PREFIX_FILE_NAME);
@@ -34,10 +38,8 @@ public class GrepArgsParser extends ArgsParser {
         return nonFlagArgs.isEmpty() ? null : nonFlagArgs.get(INDEX_PATTERN);
     }
 
-    public String[] getFileNames() {
-        return nonFlagArgs.size() <= 1
-                ? null
-                : nonFlagArgs.subList(INDEX_FILES, nonFlagArgs.size()).toArray(String[]::new);
+    public List<String> getFileNames() {
+        return nonFlagArgs.subList(INDEX_FILES, nonFlagArgs.size()).stream().collect(Collectors.toList());
     }
 
     @Override

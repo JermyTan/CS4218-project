@@ -17,7 +17,7 @@ public interface CpInterface extends Application {
      * copy files to destination folder
      *
      * @param isRecursive Copy folders (directories) recursively
-     * @param destFolder of path to destination folder
+     * @param destFolder  of path to destination folder
      * @param fileNames   Array of String of file names
      * @throws Exception
      */

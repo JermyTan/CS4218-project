@@ -11,9 +11,9 @@ public interface LsInterface extends Application {
      * @param isRecursive   Boolean option to recursively list the folder contents (traversing
      *                      through all folders inside the specified folder)
      * @param isSortByExt   Boolean option to sort folder contents alphabetically by file extension (characters after the last '.' (without quotes)) Files with no extension are sorted first.
-     * @param folderName    Array of String of folder names
+     * @param folderNames   Array of String of folder names
      * @throws Exception
      */
     String listFolderContent(Boolean isFoldersOnly, Boolean isRecursive, Boolean isSortByExt,
-                             String... folderName) throws Exception;
+                             String... folderNames) throws Exception;
 }

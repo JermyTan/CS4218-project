@@ -4,6 +4,7 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.app.LsInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
+import sg.edu.nus.comp.cs4218.impl.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -38,10 +39,6 @@ public class LsApplication implements LsInterface {
     @Override
     @SuppressWarnings("PMD.PreserveStackTrace")
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws LsException {
-        if (args == null) {
-            throw new LsException(ERR_NULL_ARGS);
-        }
-
         if (stdout == null) {
             throw new LsException(ERR_NO_OSTREAM);
         }
@@ -57,9 +54,9 @@ public class LsApplication implements LsInterface {
         Boolean isFoldersOnly = parser.isFoldersOnly();
         Boolean isRecursive = parser.isRecursive();
         Boolean isSortByExt = parser.isSortByExt();
-        String[] directories = parser.getDirectories().toArray(String[]::new);
+        String[] folderNames = parser.getFolderNames().toArray(String[]::new);
 
-        String result = listFolderContent(isFoldersOnly, isRecursive, isSortByExt, directories);
+        String result = listFolderContent(isFoldersOnly, isRecursive, isSortByExt, folderNames);
 
         try {
             stdout.write(result.getBytes());
@@ -72,18 +69,18 @@ public class LsApplication implements LsInterface {
     @Override
     @SuppressWarnings("PMD.PreserveStackTrace")
     public String listFolderContent(Boolean isFoldersOnly, Boolean isRecursive, Boolean isSortByExt,
-                                    String... folderName) throws LsException {
-        if (folderName.length == 0 && !isRecursive) {
+                                    String... folderNames) throws LsException {
+        if (folderNames.length == 0 && !isRecursive) {
             return listCwdContent(isFoldersOnly, isSortByExt);
         }
 
         List<Path> paths;
-        if (folderName.length == 0) {
+        if (folderNames.length == 0) {
             String[] directories = new String[1];
             directories[0] = Environment.currentDirectory;
             paths = resolvePaths(directories);
         } else {
-            paths = resolvePaths(folderName);
+            paths = resolvePaths(folderNames);
         }
 
         return buildResult(paths, isFoldersOnly, isRecursive, isSortByExt);
@@ -100,11 +97,7 @@ public class LsApplication implements LsInterface {
     @SuppressWarnings("PMD.PreserveStackTrace")
     private String listCwdContent(Boolean isFoldersOnly, Boolean isSortByExt) throws LsException {
         String cwd = Environment.currentDirectory;
-        try {
-            return formatContents(getContents(Paths.get(cwd), isFoldersOnly), isSortByExt);
-        } catch (InvalidDirectoryException e) {
-            throw new LsException(ERR_UNEXPECTED);
-        }
+        return formatContents(getContents(Paths.get(cwd), isFoldersOnly), isSortByExt);
     }
 
     /**
@@ -140,7 +133,7 @@ public class LsApplication implements LsInterface {
                 if (isRecursive) {
                     result.append(buildResult(contents, isFoldersOnly, true, isSortByExt));
                 }
-            } catch (InvalidDirectoryException e) {
+            } catch (LsException e) {
                 // NOTE: This is pretty hackish IMO - we should find a way to change this
                 // If the user is in recursive mode, and if we resolve a file that isn't a directory
                 // we should not spew the error message.
@@ -183,22 +176,26 @@ public class LsApplication implements LsInterface {
      * @param directory
      * @return list of files + directories in the passed directory.
      */
-    private List<Path> getContents(Path directory, Boolean isFoldersOnly)
-            throws InvalidDirectoryException {
-        if (!Files.exists(directory)) {
-            throw new InvalidDirectoryException(getRelativeToCwd(directory).toString(), ERR_FILE_NOT_FOUND);
-        }
+    @SuppressWarnings("PMD.PreserveStackTrace")
+    private List<Path> getContents(Path directory, Boolean isFoldersOnly) throws LsException {
+        try {
+            if (!Files.exists(directory)) {
+                throw new InvalidDirectoryException(getRelativeToCwd(directory).toString(), ERR_FILE_NOT_FOUND);
+            }
 
-        if (!Files.isDirectory(directory)) {
-            throw new InvalidDirectoryException(getRelativeToCwd(directory).toString(), ERR_IS_NOT_DIR);
-        }
+            if (!Files.isDirectory(directory)) {
+                throw new InvalidDirectoryException(getRelativeToCwd(directory).toString(), ERR_IS_NOT_DIR);
+            }
 
-        File pwd = directory.toFile();
-        return Arrays.stream(pwd.listFiles())
-                .filter(file -> !file.isHidden() && (!isFoldersOnly || file.isDirectory()))
-                .map(File::toPath)
-                .sorted()
-                .collect(Collectors.toList());
+            File[] files = directory.toFile().listFiles();
+            return Arrays.stream(files == null ? new File[0] : files)
+                    .filter(file -> !file.isHidden() && (!isFoldersOnly || file.isDirectory()))
+                    .map(File::toPath)
+                    .sorted()
+                    .collect(Collectors.toList());
+        } catch (InvalidDirectoryException e) {
+            throw new LsException(e.getMessage());
+        }
     }
 
     /**
@@ -235,11 +232,5 @@ public class LsApplication implements LsInterface {
      */
     private Path getRelativeToCwd(Path path) {
         return Paths.get(Environment.currentDirectory).relativize(path);
-    }
-
-    private static class InvalidDirectoryException extends LsException {
-        InvalidDirectoryException(String directory, String reason) {
-            super(String.format("cannot access '%s': %s", directory, reason));
-        }
     }
 }

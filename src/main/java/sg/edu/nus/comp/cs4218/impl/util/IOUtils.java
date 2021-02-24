@@ -4,6 +4,8 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -11,7 +13,6 @@ import java.util.List;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 
-@SuppressWarnings("PMD.PreserveStackTrace")
 public final class IOUtils {
     private IOUtils() {
     }
@@ -19,51 +20,46 @@ public final class IOUtils {
     /**
      * Open an inputStream based on the file name.
      *
-     * @param fileName String containing file name.
-     * @return InputStream of file opened.
-     * @throws ShellException If file destination is inaccessible.
+     * @param fileName string containing file name.
+     * @return inputStream of file opened.
+     * @throws ShellException if file destination is inaccessible.
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public static InputStream openInputStream(String fileName) throws ShellException {
-        String resolvedFileName = resolveFilePath(fileName).toString();
-
-        FileInputStream fileInputStream;
-
         try {
-            fileInputStream = new FileInputStream(new File(resolvedFileName));
-        } catch (FileNotFoundException e) {
-            throw new ShellException(ERR_FILE_NOT_FOUND);
+            return Files.newInputStream(resolveFilePath(fileName));
+        } catch (SecurityException e) {
+            throw new ShellException(ERR_NO_PERM);
+        } catch (Exception e) {
+            throw new ShellException(e.getMessage());
         }
-
-        return fileInputStream;
     }
 
     /**
      * Open an outputStream based on the file name.
      *
-     * @param fileName String containing file name.
-     * @return OutputStream of file opened.
-     * @throws ShellException If file destination is inaccessible.
+     * @param fileName string containing file name.
+     * @return outputStream of file opened.
+     * @throws ShellException if file destination is inaccessible.
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public static OutputStream openOutputStream(String fileName) throws ShellException {
-        String resolvedFileName = resolveFilePath(fileName).toString();
-
-        FileOutputStream fileOutputStream;
-
         try {
-            fileOutputStream = new FileOutputStream(new File(resolvedFileName));
-        } catch (FileNotFoundException e) {
-            throw new ShellException(ERR_IO_EXCEPTION);
+            return Files.newOutputStream(resolveFilePath(fileName));
+        } catch (SecurityException e) {
+            throw new ShellException(ERR_NO_PERM);
+        } catch (Exception e) {
+            throw new ShellException(e.getMessage());
         }
-
-        return fileOutputStream;
     }
 
     /**
      * Close an inputStream. If inputStream provided is System.in or null, it will be ignored.
      *
-     * @param inputStream InputStream to be closed.
-     * @throws ShellException If inputStream cannot be closed successfully.
+     * @param inputStream inputStream to be closed.
+     * @throws ShellException if inputStream cannot be closed successfully.
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public static void closeInputStream(InputStream inputStream) throws ShellException {
         if (inputStream == null || inputStream.equals(System.in)) {
             return;
@@ -72,16 +68,17 @@ public final class IOUtils {
         try {
             inputStream.close();
         } catch (IOException e) {
-            throw new ShellException(ERR_CLOSING_STREAMS);
+            throw new ShellException(ERR_CLOSING_STREAM);
         }
     }
 
     /**
      * Close an outputStream. If outputStream provided is System.out or null, it will be ignored.
      *
-     * @param outputStream OutputStream to be closed.
-     * @throws ShellException If outputStream cannot be closed successfully.
+     * @param outputStream outputStream to be closed.
+     * @throws ShellException if outputStream cannot be closed successfully.
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public static void closeOutputStream(OutputStream outputStream) throws ShellException {
         if (outputStream == null || outputStream.equals(System.out)) {
             return;
@@ -90,20 +87,28 @@ public final class IOUtils {
         try {
             outputStream.close();
         } catch (IOException e) {
-            throw new ShellException(ERR_CLOSING_STREAMS);
+            throw new ShellException(ERR_CLOSING_STREAM);
         }
     }
 
-    public static Path resolveFilePath(String fileName) {
-        Path currentDirectory = Paths.get(Environment.currentDirectory);
-        return currentDirectory.resolve(fileName);
+    @SuppressWarnings("PMD.PreserveStackTrace")
+    public static Path resolveFilePath(String fileName) throws Exception {
+        if (fileName == null) {
+            throw new Exception(ERR_NO_FILE_ARGS);
+        }
+
+        try {
+            return Paths.get(Environment.currentDirectory).resolve(fileName);
+        } catch (InvalidPathException e) {
+            throw new Exception(ERR_INVALID_FILE);
+        }
     }
 
     /**
      * Returns a list of lines based on the given InputStream.
      *
-     * @param input InputStream containing arguments from System.in or FileInputStream
-     * @throws Exception
+     * @param input inputStream containing arguments from System.in or FileInputStream
+     * @throws Exception if there is error reading from input stream.
      */
     public static List<String> getLinesFromInputStream(InputStream input) throws Exception {
         List<String> output = new ArrayList<>();

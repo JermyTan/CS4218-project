@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 
 /**
@@ -30,8 +31,13 @@ public class ArgsParser {
      * Separates command flags from non-flag arguments given a tokenized command.
      *
      * @param args
+     * @throws InvalidArgsException
      */
     public void parse(String... args) throws InvalidArgsException {
+        if (args == null) {
+            throw new InvalidArgsException(ERR_NULL_ARGS);
+        }
+
         for (String arg : args) {
             if (arg.length() > 1 && arg.charAt(0) == CHAR_FLAG_PREFIX) {
                 // Treat the characters (excluding CHAR_FLAG_PREFIX) as individual flags.

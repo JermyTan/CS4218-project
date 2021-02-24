@@ -2,6 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.util;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 public final class StringUtils {
     public static final String STRING_LABEL_VALUE_PAIR = "%s: %s";
@@ -25,6 +28,23 @@ public final class StringUtils {
     public static final char CHAR_FLAG_PREFIX = '-';
 
     private StringUtils() {
+    }
+
+    /**
+     * Returns the non-null and trimmed strings.
+     *
+     * @param strings strings to be sanitized.
+     * @return an array of non-null and trimmed strings.
+     */
+    public static String[] sanitizeStrings(String... strings) {
+        if (strings == null) {
+            return new String[0];
+        }
+
+        return Arrays.stream(strings)
+                .filter(Predicate.not(Objects::isNull))
+                .map(String::trim)
+                .toArray(String[]::new);
     }
 
     /**
