@@ -7,31 +7,31 @@ import static org.junit.jupiter.api.Assertions.*;
 class StringUtilsTest {
 
     @Test
-    public void isBlank_nullStr_returnsTrue() {
+    public void isBlank_NullStr_ReturnsTrue() {
         String str = null;
         assertTrue(StringUtils.isBlank(str));
     }
 
     @Test
-    public void isBlank_emptyStr_returnsTrue() {
+    public void isBlank_EmptyStr_ReturnsTrue() {
         String str = "";
         assertTrue(StringUtils.isBlank(str));
     }
 
     @Test
-    public void isBlank_strWithWhitespacesOnly_returnsTrue() {
+    public void isBlank_StrWithWhitespacesOnly_ReturnsTrue() {
         String str = "     ";
         assertTrue(StringUtils.isBlank(str));
     }
 
     @Test
-    public void isBlank_strWithoutWhitespaces_returnsFalse() {
+    public void isBlank_StrWithoutWhitespaces_ReturnsFalse() {
         String str = "abc";
         assertFalse(StringUtils.isBlank(str));
     }
 
     @Test
-    public void isBlank_strWithOneWhitespace_returnsFalse() {
+    public void isBlank_StrWithOneWhitespace_ReturnsFalse() {
         String str = "a bc";
         assertFalse(StringUtils.isBlank(str));
     }
