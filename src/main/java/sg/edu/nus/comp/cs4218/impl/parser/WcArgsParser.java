@@ -18,6 +18,7 @@ public class WcArgsParser extends ArgsParser {
         legalFlags.add(FLAG_IS_WORDS);
     }
 
+    // allows null ars
     @Override
     public void parse(String... args) throws InvalidArgsException {
         if (args == null) {

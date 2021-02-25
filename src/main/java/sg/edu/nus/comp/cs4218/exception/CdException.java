@@ -7,4 +7,10 @@ public class CdException extends AbstractApplicationException {
     public CdException(String message) {
         super("cd: " + message);
     }
+
+    public CdException(String message, Throwable cause) {
+        this(message);
+
+        this.initCause(cause);
+    }
 }

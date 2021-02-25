@@ -7,4 +7,10 @@ public class CatException extends AbstractApplicationException {
     public CatException(String message) {
         super("cat: " + message);
     }
+
+    public CatException(String message, Throwable cause) {
+        this(message);
+
+        this.initCause(cause);
+    }
 }

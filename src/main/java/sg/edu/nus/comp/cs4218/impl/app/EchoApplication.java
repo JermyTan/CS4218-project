@@ -41,7 +41,7 @@ public class EchoApplication implements EchoInterface {
             stdout.write(result.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
-            throw new EchoException(ERR_WRITE_STREAM);
+            throw new EchoException(ERR_WRITE_STREAM, e);
         }
     }
 

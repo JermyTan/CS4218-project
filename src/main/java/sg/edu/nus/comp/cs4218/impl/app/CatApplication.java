@@ -1,16 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILE;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READ_STREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_UNEXPECTED;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
@@ -18,7 +8,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import sg.edu.nus.comp.cs4218.app.CatInterface;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.impl.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.parser.CatArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
@@ -55,7 +45,7 @@ public class CatApplication implements CatInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new CatException(e.getMessage());
+            throw new CatException(e.getMessage(), e);
         }
 
         Boolean isLineNumber = parser.isLineNumber();
@@ -71,7 +61,7 @@ public class CatApplication implements CatInterface {
             stdout.write(result.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
-            throw new CatException(ERR_WRITE_STREAM);
+            throw new CatException(ERR_WRITE_STREAM, e);
         }
     }
 
@@ -125,11 +115,11 @@ public class CatApplication implements CatInterface {
                 result = IOUtils.getLinesFromInputStream(Files.newInputStream(filePath));
 
             } catch (Exception e) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_READING_FILE);
+                throw new InvalidDirectoryException(trimmedFileName, ERR_READING_FILE, e);
             }
 
         } catch (Exception e) {
-            result = List.of(new CatException(e.getMessage()).getMessage());
+            result = List.of(new CatException(e.getMessage(), e).getMessage());
         }
 
         return formatLines(result, isLineNumber);
@@ -172,10 +162,8 @@ public class CatApplication implements CatInterface {
 
         try {
             result = IOUtils.getLinesFromInputStream(stdin);
-        } catch (IOException e) {
-            result = List.of(new CatException(ERR_READ_STREAM).getMessage());
         } catch (Exception e) {
-            result = List.of(new CatException(ERR_UNEXPECTED).getMessage());
+            result = List.of(new CatException(ERR_READ_STREAM, e).getMessage());
         }
 
         return formatLines(result, isLineNumber);

@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.util;
 @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions"})
 public final class ErrorConstants {
     // Streams related
+    public static final String ERR_CREATE_STREAM = "Could not create stream";
     public static final String ERR_WRITE_STREAM = "Could not write to output stream";
     public static final String ERR_READ_STREAM = "Could not read from input stream";
     public static final String ERR_CLOSING_STREAM = "Unable to close stream";

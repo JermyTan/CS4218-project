@@ -8,4 +8,9 @@ public class LsException extends AbstractApplicationException {
         super("ls: " + message);
     }
 
+    public LsException(String message, Throwable cause) {
+        this(message);
+
+        this.initCause(cause);
+    }
 }

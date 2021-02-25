@@ -18,6 +18,7 @@ public class LsArgsParser extends ArgsParser {
         legalFlags.add(FLAG_IS_SORT_BY_EXT);
     }
 
+    // allows null args
     @Override
     public void parse(String... args) throws InvalidArgsException {
         if (args == null) {

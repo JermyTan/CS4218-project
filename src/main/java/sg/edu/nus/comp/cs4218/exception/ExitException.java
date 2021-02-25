@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.exception;
 
 public class ExitException extends AbstractApplicationException {
+
     private static final long serialVersionUID = 6517503252362314995L;
 
     /**
@@ -10,5 +11,11 @@ public class ExitException extends AbstractApplicationException {
      */
     public ExitException(String message) {
         super("exit: " + message);
+    }
+
+    public ExitException(String message, Throwable cause) {
+        this(message);
+
+        this.initCause(cause);
     }
 }

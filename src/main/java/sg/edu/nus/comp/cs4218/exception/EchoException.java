@@ -7,4 +7,10 @@ public class EchoException extends AbstractApplicationException {
     public EchoException(String message) {
         super("echo: " + message);
     }
+
+    public EchoException(String message, Throwable cause) {
+        this(message);
+
+        this.initCause(cause);
+    }
 }

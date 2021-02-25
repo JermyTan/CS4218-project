@@ -29,9 +29,11 @@ public final class IOUtils {
         try {
             return Files.newInputStream(resolveFilePath(fileName));
         } catch (SecurityException e) {
-            throw new ShellException(ERR_NO_PERM);
+            throw new ShellException(ERR_NO_PERM, e);
+        } catch (IOException e) {
+            throw new ShellException(ERR_CREATE_STREAM, e);
         } catch (Exception e) {
-            throw new ShellException(e.getMessage());
+            throw new ShellException(e.getMessage(), e);
         }
     }
 
@@ -47,9 +49,11 @@ public final class IOUtils {
         try {
             return Files.newOutputStream(resolveFilePath(fileName));
         } catch (SecurityException e) {
-            throw new ShellException(ERR_NO_PERM);
+            throw new ShellException(ERR_NO_PERM, e);
+        } catch (IOException e) {
+            throw new ShellException(ERR_CREATE_STREAM, e);
         } catch (Exception e) {
-            throw new ShellException(e.getMessage());
+            throw new ShellException(e.getMessage(), e);
         }
     }
 
@@ -68,7 +72,7 @@ public final class IOUtils {
         try {
             inputStream.close();
         } catch (IOException e) {
-            throw new ShellException(ERR_CLOSING_STREAM);
+            throw new ShellException(ERR_CLOSING_STREAM, e);
         }
     }
 
@@ -87,20 +91,20 @@ public final class IOUtils {
         try {
             outputStream.close();
         } catch (IOException e) {
-            throw new ShellException(ERR_CLOSING_STREAM);
+            throw new ShellException(ERR_CLOSING_STREAM, e);
         }
     }
 
     @SuppressWarnings("PMD.PreserveStackTrace")
-    public static Path resolveFilePath(String fileName) throws Exception {
+    public static Path resolveFilePath(String fileName) throws ShellException {
         if (fileName == null) {
-            throw new Exception(ERR_NO_FILE_ARGS);
+            throw new ShellException(ERR_NO_FILE_ARGS);
         }
 
         try {
             return Paths.get(Environment.currentDirectory).resolve(fileName);
         } catch (InvalidPathException e) {
-            throw new Exception(ERR_INVALID_FILE);
+            throw new ShellException(ERR_INVALID_FILE, e);
         }
     }
 
@@ -108,16 +112,27 @@ public final class IOUtils {
      * Returns a list of lines based on the given InputStream.
      *
      * @param input inputStream containing arguments from System.in or FileInputStream
-     * @throws Exception if there is error reading from input stream.
+     * @throws ShellException if there is error reading from input stream.
      */
-    public static List<String> getLinesFromInputStream(InputStream input) throws Exception {
+    public static List<String> getLinesFromInputStream(InputStream input) throws ShellException {
         List<String> output = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         String line;
-        while ((line = reader.readLine()) != null) {
-            output.add(line);
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                output.add(line);
+            }
+        } catch (IOException e) {
+            throw new ShellException(ERR_READ_STREAM, e);
         }
-        reader.close();
+
+        try {
+            reader.close();
+        } catch (IOException e) {
+            throw new ShellException(ERR_CLOSING_STREAM, e);
+        }
+
         return output;
     }
 }

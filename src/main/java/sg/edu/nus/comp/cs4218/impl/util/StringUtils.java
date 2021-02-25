@@ -130,7 +130,7 @@ public final class StringUtils {
         BigInteger bigInt;
         try {
             bigInt = new BigInteger(str);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             return false;
         }
         return !bigInt.toString().isEmpty();

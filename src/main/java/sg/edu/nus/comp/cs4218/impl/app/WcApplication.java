@@ -2,8 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.app.WcInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
-import sg.edu.nus.comp.cs4218.impl.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
@@ -80,7 +81,7 @@ public class WcApplication implements WcInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new WcException(e.getMessage());
+            throw new WcException(e.getMessage(), e);
         }
 
         Boolean isDefault = parser.isDefault();
@@ -105,7 +106,7 @@ public class WcApplication implements WcInterface {
             stdout.write(result.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
-            throw new WcException(ERR_WRITE_STREAM);
+            throw new WcException(ERR_WRITE_STREAM, e);
         }
     }
 
@@ -143,17 +144,23 @@ public class WcApplication implements WcInterface {
             String label,
             InputStream inputStream,
             Path filePath
-    ) throws Exception {
-        List<String> lines = IOUtils.getLinesFromInputStream(inputStream);
+    ) throws WcException {
+        try {
+            List<String> lines = IOUtils.getLinesFromInputStream(inputStream);
 
-        WcStatistics statistics = new WcStatistics(label);
-        statistics.numLines = lines.size();
-        statistics.numWords = lines.stream().map(StringUtils::tokenize).flatMap(Stream::of).count();
-        statistics.numBytes = filePath == null
-                ? lines.stream().mapToInt(line -> line.getBytes().length).sum() + statistics.numLines
-                : Files.size(filePath);
+            WcStatistics statistics = new WcStatistics(label);
+            statistics.numLines = lines.size();
+            statistics.numWords = lines.stream().map(StringUtils::tokenize).flatMap(Stream::of).count();
+            statistics.numBytes = filePath == null
+                    ? lines.stream().mapToInt(line -> line.getBytes().length).sum() + statistics.numLines
+                    : Files.size(filePath);
 
-        return statistics;
+            return statistics;
+        } catch (ShellException e) {
+            throw new WcException(e.getMessage(), e);
+        } catch (Exception e) {
+            throw new WcException(ERR_READ_STREAM, e);
+        }
     }
 
     @SuppressWarnings("PMD.PreserveStackTrace")
@@ -181,11 +188,11 @@ public class WcApplication implements WcInterface {
             try {
                 return computeStatisticsFromInputStream(trimmedFileName, Files.newInputStream(filePath), filePath);
             } catch (Exception e) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_READING_FILE);
+                throw new InvalidDirectoryException(trimmedFileName, ERR_READING_FILE, e);
             }
 
         } catch (Exception e) {
-            return new WcStatistics(new WcException(e.getMessage()).getMessage(), true);
+            return new WcStatistics(new WcException(e.getMessage(), e).getMessage(), true);
         }
     }
 
@@ -198,10 +205,8 @@ public class WcApplication implements WcInterface {
 
         try {
             statistics = computeStatisticsFromInputStream(STDIN_LABEL, stdin, null);
-        } catch (IOException e) {
-            statistics = new WcStatistics(new WcException(ERR_READ_STREAM).getMessage(), true);
         } catch (Exception e) {
-            statistics = new WcStatistics(new WcException(ERR_UNEXPECTED).getMessage(), true);
+            statistics = new WcStatistics(new WcException(ERR_READ_STREAM, e).getMessage(), true);
         }
 
         return statistics;

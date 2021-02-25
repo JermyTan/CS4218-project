@@ -14,6 +14,7 @@ public class CatArgsParser extends ArgsParser {
         legalFlags.add(FLAG_IS_LINE_NUMBER);
     }
 
+    // allows null args
     @Override
     public void parse(String... args) throws InvalidArgsException {
         if (args == null) {

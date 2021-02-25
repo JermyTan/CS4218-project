@@ -3,7 +3,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import sg.edu.nus.comp.cs4218.app.GrepInterface;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.impl.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.GrepArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
@@ -24,6 +25,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 @SuppressWarnings("PMD.GodClass")
 public class GrepApplication implements GrepInterface {
+
     private static final String STDIN_LABEL = "(standard input)";
 
     private static class GrepResult {
@@ -82,7 +84,7 @@ public class GrepApplication implements GrepInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new GrepException(e.getMessage());
+            throw new GrepException(e.getMessage(), e);
         }
 
         Boolean isCaseInsensitive = parser.isCaseInsensitive();
@@ -108,7 +110,7 @@ public class GrepApplication implements GrepInterface {
             stdout.write(result.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
-            throw new GrepException(ERR_WRITE_STREAM);
+            throw new GrepException(ERR_WRITE_STREAM, e);
         }
     }
 
@@ -138,18 +140,22 @@ public class GrepApplication implements GrepInterface {
                     ? Pattern.compile(pattern, Pattern.CASE_INSENSITIVE)
                     : Pattern.compile(pattern);
         } catch (PatternSyntaxException e) {
-            throw new GrepException(ERR_INVALID_REGEX);
+            throw new GrepException(ERR_INVALID_REGEX, e);
         }
     }
 
     private List<String> grepFromInputStream(
             Pattern grepPattern,
             InputStream inputStream
-    ) throws Exception {
-        return IOUtils.getLinesFromInputStream(inputStream)
-                .stream()
-                .filter(line -> grepPattern.matcher(line).find())
-                .collect(Collectors.toList());
+    ) throws GrepException {
+        try {
+            return IOUtils.getLinesFromInputStream(inputStream)
+                    .stream()
+                    .filter(line -> grepPattern.matcher(line).find())
+                    .collect(Collectors.toList());
+        } catch (ShellException e) {
+            throw new GrepException(e.getMessage(), e);
+        }
     }
 
     @SuppressWarnings("PMD.PreserveStackTrace")
@@ -191,11 +197,11 @@ public class GrepApplication implements GrepInterface {
                 result = new GrepResult(trimmedFileName, grepFromInputStream(grepPattern, Files.newInputStream(filePath)));
 
             } catch (Exception e) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_READING_FILE);
+                throw new InvalidDirectoryException(trimmedFileName, ERR_READING_FILE, e);
             }
 
         } catch (Exception e) {
-            result = new GrepResult(trimmedFileName, List.of(new GrepException(e.getMessage()).getMessage()), true);
+            result = new GrepResult(trimmedFileName, List.of(new GrepException(e.getMessage(), e).getMessage()), true);
         }
 
         return result.formatToString(isCountLines, isPrefixFileName).trim();
@@ -265,10 +271,8 @@ public class GrepApplication implements GrepInterface {
 
         try {
             result = new GrepResult(STDIN_LABEL, grepFromInputStream(grepPattern, stdin));
-        } catch (IOException e) {
-            result = new GrepResult(STDIN_LABEL, List.of(new GrepException(ERR_READ_STREAM).getMessage()), true);
         } catch (Exception e) {
-            result = new GrepResult(STDIN_LABEL, List.of(new GrepException(ERR_UNEXPECTED).getMessage()), true);
+            result = new GrepResult(STDIN_LABEL, List.of(new GrepException(ERR_READ_STREAM, e).getMessage()), true);
         }
 
         return result.formatToString(isCountLines, isPrefixFileName).trim();

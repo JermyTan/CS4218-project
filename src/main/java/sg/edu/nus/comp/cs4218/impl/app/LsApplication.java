@@ -4,7 +4,7 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.app.LsInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
-import sg.edu.nus.comp.cs4218.impl.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -48,7 +48,7 @@ public class LsApplication implements LsInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new LsException(e.getMessage());
+            throw new LsException(e.getMessage(), e);
         }
 
         Boolean isFoldersOnly = parser.isFoldersOnly();
@@ -62,7 +62,7 @@ public class LsApplication implements LsInterface {
             stdout.write(result.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
-            throw new LsException(ERR_WRITE_STREAM);
+            throw new LsException(ERR_WRITE_STREAM, e);
         }
     }
 
@@ -112,6 +112,7 @@ public class LsApplication implements LsInterface {
      * @return string to be written to output stream.
      */
     private String buildResult(List<Path> paths, Boolean isFoldersOnly, Boolean isRecursive, Boolean isSortByExt) {
+        // TODO: refactor and redirect error to stderr
         StringBuilder result = new StringBuilder();
         for (Path path : paths) {
             try {
@@ -194,7 +195,7 @@ public class LsApplication implements LsInterface {
                     .sorted()
                     .collect(Collectors.toList());
         } catch (InvalidDirectoryException e) {
-            throw new LsException(e.getMessage());
+            throw new LsException(e.getMessage(), e);
         }
     }
 
