@@ -38,6 +38,18 @@ public class CdApplication implements CdInterface {
         if (args == null) {
             throw new CdException(ERR_NULL_ARGS);
         }
+        if (args.length == 0){
+            throw new CdException(ERR_MISSING_ARG);
+        }
+        if (args.length > 1){
+            throw new CdException(ERR_TOO_MANY_ARGS);
+        }
+        if (stdin == null){
+            throw new CdException(ERR_NO_ISTREAM);
+        }
+        if (stdout == null){
+            throw new CdException(ERR_NO_OSTREAM);
+        }
         changeToDirectory(args[0]);
     }
 
