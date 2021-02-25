@@ -20,6 +20,7 @@ class RegexArgumentTest {
     private final File file1 = new File(RESOURCES_DIRECTORY, "file1.txt");
     private final File file2 = new File(RESOURCES_DIRECTORY, "file2.txt");
     private final File file3 = new File(RESOURCES_DIRECTORY, "test.md");
+
     private final File folder1 = new File(RESOURCES_DIRECTORY, "folder1");
     private final File folder2 = new File(RESOURCES_DIRECTORY, "folder2");
     private final File folder3 = new File(RESOURCES_DIRECTORY, "testFolder");
