@@ -6,7 +6,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,43 +19,65 @@ import static org.junit.jupiter.api.Assertions.*;
 class RegexArgumentTest {
 
     private static final String RESOURCES_PATH = "src/test/resources/";
-    private static final File RESOURCES_DIRECTORY = new File(RESOURCES_PATH);
 
-    private final File file1 = new File(RESOURCES_DIRECTORY, "file1.txt");
-    private final File file2 = new File(RESOURCES_DIRECTORY, "file2.txt");
-    private final File file3 = new File(RESOURCES_DIRECTORY, "test.md");
+    private static final String FILE_1 = "file1.txt";
+    private static final String FILE_2 = "file2.txt";
+    private static final String FILE_3 = "test.md";
 
-    private final File folder1 = new File(RESOURCES_DIRECTORY, "folder1");
-    private final File folder2 = new File(RESOURCES_DIRECTORY, "folder2");
-    private final File folder3 = new File(RESOURCES_DIRECTORY, "testFolder");
+    private static final String FOLDER_1 = "folder1";
+    private static final String FOLDER_2 = "folder2";
+    private static final String FOLDER_3 = "testFolder";
+
+    private final Path file1 = Paths.get(RESOURCES_PATH, FILE_1);
+    private final Path file2 = Paths.get(RESOURCES_PATH, FILE_2);
+    private final Path file3 = Paths.get(RESOURCES_PATH, FILE_3);
+
+    private final Path folder1 = Paths.get(RESOURCES_PATH, FOLDER_1);
+    private final Path folder2 = Paths.get(RESOURCES_PATH, FOLDER_2);
+    private final Path folder3 = Paths.get(RESOURCES_PATH, FOLDER_3);
+
+    private final List<Path> paths = List.of(file1, file2, file3, folder1, folder2, folder3);
 
     private RegexArgument regexArgument;
 
     private String resolveArg(String arg) {
-        return new File(RESOURCES_DIRECTORY, arg).getAbsolutePath();
+        return Paths.get(RESOURCES_PATH, arg).toAbsolutePath().toString();
     }
 
     @BeforeEach
-    void setup() throws IOException {
-        file1.createNewFile();
-        file2.createNewFile();
-        file3.createNewFile();
-        folder1.mkdir();
-        folder2.mkdir();
-        folder3.mkdir();
-
+    void setup() {
         regexArgument = new RegexArgument();
         regexArgument.merge(RESOURCES_PATH);
+
+        try {
+            Files.createFile(file1);
+            Files.createFile(file2);
+            Files.createFile(file3);
+
+            Files.createDirectory(folder1);
+            Files.createDirectory(folder2);
+            Files.createDirectory(folder3);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 
     @AfterEach
     void tearDown() {
-        file1.delete();
-        file2.delete();
-        file3.delete();
-        folder1.delete();
-        folder2.delete();
-        folder3.delete();
+        try {
+            for (Path path : paths) {
+                if (Files.isDirectory(path)) {
+                    Files.walk(path)
+                            .sorted(Comparator.reverseOrder())
+                            .map(Path::toFile)
+                            .forEach(File::delete);
+                } else {
+                    Files.deleteIfExists(path);
+                }
+            }
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 
     @Test
@@ -85,7 +111,7 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(1, globbedFiles.size());
-        assertEquals(resolveArg("test.md"), globbedFiles.get(0));
+        assertEquals(resolveArg(FILE_3), globbedFiles.get(0));
     }
 
     @Test
@@ -96,8 +122,8 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(2, globbedFiles.size());
-        assertEquals(resolveArg("file1.txt"), globbedFiles.get(0));
-        assertEquals(resolveArg("file2.txt"), globbedFiles.get(1));
+        assertEquals(resolveArg(FILE_1), globbedFiles.get(0));
+        assertEquals(resolveArg(FILE_2), globbedFiles.get(1));
     }
 
     @Test
@@ -109,8 +135,8 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(2, globbedFiles.size());
-        assertEquals(resolveArg("folder1"), globbedFiles.get(0));
-        assertEquals(resolveArg("folder2"), globbedFiles.get(1));
+        assertEquals(resolveArg(FOLDER_1), globbedFiles.get(0));
+        assertEquals(resolveArg(FOLDER_2), globbedFiles.get(1));
     }
 
     @Test
@@ -121,10 +147,10 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(4, globbedFiles.size());
-        assertEquals(resolveArg("file1.txt"), globbedFiles.get(0));
-        assertEquals(resolveArg("file2.txt"), globbedFiles.get(1));
-        assertEquals(resolveArg("folder1"), globbedFiles.get(2));
-        assertEquals(resolveArg("folder2"), globbedFiles.get(3));
+        assertEquals(resolveArg(FILE_1), globbedFiles.get(0));
+        assertEquals(resolveArg(FILE_2), globbedFiles.get(1));
+        assertEquals(resolveArg(FOLDER_1), globbedFiles.get(2));
+        assertEquals(resolveArg(FOLDER_2), globbedFiles.get(3));
     }
 
     @Test
@@ -135,9 +161,9 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(3, globbedFiles.size());
-        assertEquals(resolveArg("folder1"), globbedFiles.get(0));
-        assertEquals(resolveArg("folder2"), globbedFiles.get(1));
-        assertEquals(resolveArg("testFolder"), globbedFiles.get(2));
+        assertEquals(resolveArg(FOLDER_1), globbedFiles.get(0));
+        assertEquals(resolveArg(FOLDER_2), globbedFiles.get(1));
+        assertEquals(resolveArg(FOLDER_3), globbedFiles.get(2));
     }
 
     @Test
@@ -152,8 +178,8 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(2, globbedFiles.size());
-        assertEquals(resolveArg("file1.txt"), globbedFiles.get(0));
-        assertEquals(resolveArg("file2.txt"), globbedFiles.get(1));
+        assertEquals(resolveArg(FILE_1), globbedFiles.get(0));
+        assertEquals(resolveArg(FILE_2), globbedFiles.get(1));
     }
 
     @Test

@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.app.MvInterface;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
 
@@ -58,23 +57,36 @@ public class MvApplication implements MvInterface {
 
         // srcFile must exist
         if (Files.notExists(srcPath)) {
-            throw new Exception(ERR_FILE_NOT_FOUND);
+            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND));
         }
 
         // Cannot rename a file/folder to a existing directory
-        if (destPath.toFile().isDirectory()) {
+        if (Files.isDirectory(destPath)) {
             throw new Exception(ERR_IS_DIR);
         }
 
-        // Cannot rename a folder to an existing file
-        if (srcPath.toFile().isDirectory() && destPath.toFile().isFile()) {
-            throw new Exception(String.format("rename %s to %s: %s", srcFile, destFile, ERR_IS_NOT_DIR));
+        // When renaming a file, destFile must belong to a existing directory
+        if (srcPath.toFile().isFile() && Files.notExists(destPath.toAbsolutePath().getParent())) {
+            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND));
+        }
+
+
+        if (Files.isDirectory(srcPath)) {
+            // Cannot rename a folder to an existing file
+            if (destPath.toFile().isFile()) {
+                throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_IS_NOT_DIR));
+            }
+
+            // When renaming a folder, destFolder must not contain srcFile
+            if (destPath.toAbsolutePath().startsWith(srcPath.toAbsolutePath())) {
+                throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARG));
+            }
         }
 
         try {
             Files.move(srcPath, destPath, REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new Exception(ERR_IO_EXCEPTION);
+            throw new Exception(e.getMessage());
         }
 
         return null;
@@ -90,7 +102,7 @@ public class MvApplication implements MvInterface {
         }
 
         // `destFolder` must be a directory
-        if (!destPath.toFile().isDirectory()) {
+        if (!Files.isDirectory(destPath)) {
             throw new Exception(ERR_IS_NOT_DIR);
         }
 
@@ -125,5 +137,9 @@ public class MvApplication implements MvInterface {
         }
 
         return filtered;
+    }
+
+    private String constructRenameErrorMsg(String srcFile, String destFile, String error) {
+        return String.format("rename %s to %s: %s", srcFile, destFile, error);
     }
 }

@@ -87,7 +87,7 @@ public final class RegexArgument {
 
             File currentDir = Paths.get(dir).toFile();
             if (!isAbsolute) {
-                currentDir = Paths.get(Environment.currentDirectory + File.separator + dir).toFile();
+                currentDir = Paths.get(dir).toAbsolutePath().toFile();
             }
 
             globbedFiles = traverseAndFilter(regexPattern, currentDir, isAbsolute, onlyDirectories);

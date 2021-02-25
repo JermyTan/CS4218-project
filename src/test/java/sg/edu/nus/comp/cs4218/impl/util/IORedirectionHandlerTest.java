@@ -5,8 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,26 +25,32 @@ class ArgumentResolverStub extends ArgumentResolver {
 
 class IORedirectionHandlerTest {
 
-    private static final String RESOURCES_PATH = "src/test/resources/";
-
     private final String STRING_REDIR_INPUT = String.valueOf(CHAR_REDIR_INPUT);
     private final String STRING_REDIR_OUTPUT = String.valueOf(CHAR_REDIR_OUTPUT);
 
-    private static final String FILE_1 = RESOURCES_PATH + "file1.txt";
-    private static final String FILE_2 = RESOURCES_PATH + "file2.txt";
+    private static final String FILE_1 = "file1.txt";
+    private static final String FILE_2 = "file2.txt";
 
-    private final File file1 = new File(FILE_1); // exists
-    private final File file2 = new File(FILE_2); // does not exist
+    private final Path file1 = Paths.get(FILE_1); // exists
+    private final Path file2 = Paths.get(FILE_2); // does not exist
 
     @BeforeEach
-    void setup() throws IOException {
-        file1.createNewFile();
+    void setup() {
+        try {
+            Files.createFile(file1);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 
     @AfterEach
     void tearDown() {
-        file1.delete();
-        file2.delete();
+        try {
+            Files.deleteIfExists(file1);
+            Files.deleteIfExists(file2);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 
     private IORedirectionHandler constructRedirHandler(List<String> argsList) {

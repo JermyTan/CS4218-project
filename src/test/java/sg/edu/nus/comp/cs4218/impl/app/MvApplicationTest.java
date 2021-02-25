@@ -3,7 +3,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.exception.MvException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,6 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 
 class MvApplicationTest {
 
@@ -28,190 +28,219 @@ class MvApplicationTest {
     private static final String FOLDER_2 = "folder2";
     private static final String FOLDER_3 = "folder3";
 
-    private final File file1 = new File(FILE_1); // exists
-    private final File file2 = new File(FILE_2); // does not exist
-    private final File file3 = new File(FILE_3); // exists
-    private final File folder1 = new File(FOLDER_1); // exists
-    private final File folder2 = new File(FOLDER_2); // does not exist
-    private final File folder3 = new File(FOLDER_3); // exists
+    private final Path file1 = Paths.get(FILE_1); // exists
+    private final Path file2 = Paths.get(FILE_2); // does not exist
+    private final Path file3 = Paths.get(FILE_3); // exists
+    private final Path folder1 = Paths.get(FOLDER_1); // exists
+    private final Path folder2 = Paths.get(FOLDER_2); // does not exist
+    private final Path folder3 = Paths.get(FOLDER_3); // exists
 
-    private final List<File> files = List.of(file1, file2, file3, folder1, folder2, folder3);
+    private final List<Path> paths = List.of(file1, file2, file3, folder1, folder2, folder3);
 
     private MvApplication app;
 
-    private void createFileWithContent(File file, String content) {
-        try {
-            file.createNewFile();
-            BufferedWriter outputStream = new BufferedWriter(new FileWriter(file, true));
+    private void createFileWithContent(Path path, String content) throws IOException {
+            Files.createFile(path);
+            BufferedWriter outputStream = new BufferedWriter(new FileWriter(path.toFile(), true));
             outputStream.append(content);
             outputStream.close();
-        } catch (IOException e) {
-            fail();
-        }
+    }
+
+    private String constructRenameErrorMsg(String srcFile, String destFile, String error) {
+        return String.format("rename %s to %s: %s", srcFile, destFile, error);
     }
 
     @BeforeEach
     void setup() {
         app = new MvApplication();
 
-        createFileWithContent(file1, FILE_1);
-        createFileWithContent(file3, FILE_3);
+        try {
+            createFileWithContent(file1, FILE_1);
+            createFileWithContent(file3, FILE_3);
 
-        folder1.mkdir();
-        folder3.mkdir();
+            Files.createDirectory(folder1);
+            Files.createDirectory(folder3);
+        } catch (IOException e ) {
+            fail(e.getMessage());
+        }
     }
 
     @AfterEach
     void tearDown() {
         try {
-            for (File file : files) {
-                if (!file.isDirectory()) {
-                    file.delete();
+            for (Path path : paths) {
+                if (Files.isDirectory(path)) {
+                    Files.walk(path)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
                 } else {
-                    Files.walk(Paths.get(file.getPath()))
-                            .sorted(Comparator.reverseOrder())
-                            .map(Path::toFile)
-                            .forEach(File::delete);
+                    Files.deleteIfExists(path);
                 }
             }
         } catch (IOException e) {
-            fail();
+            fail(e.getMessage());
         }
     }
 
 
     @Test
     public void mvSrcFileToDestFile_SameDirectoryRenameFile_FileRenamed() {
-        assertTrue(file1.exists());
-        assertFalse(file2.exists());
+        assertTrue(Files.exists(file1));
+        assertTrue(Files.notExists(file2));
 
         assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, FILE_2));
 
-        assertFalse(file1.exists());
-        assertTrue(file2.exists());
+        assertTrue(Files.notExists(file1));
+        assertTrue(Files.exists(file2));
     }
 
     @Test
     public void mvSrcFileToDestFile_DifferentDirectorySameFileName_FileRenamed() {
-        String destFilePath = FOLDER_1 + File.separator + FILE_1;
-        File destFileObj = new File(destFilePath);
+        Path destPath = Paths.get(FOLDER_1, FILE_1);
 
-        assertTrue(file1.exists());
-        assertFalse(destFileObj.exists());
+        assertTrue(Files.exists(file1));
+        assertTrue(Files.notExists(destPath));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, destFilePath));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, destPath.toString()));
 
-        assertFalse(file1.exists());
-        assertTrue(destFileObj.exists());
+        assertTrue(Files.notExists(file1));
+        assertTrue(Files.exists(destPath));
     }
 
     @Test
     public void mvSrcFileToDestFile_DifferentDirectoryDifferentFileName_FileRenamed() {
-        String destFilePath = FOLDER_1 + File.separator + FILE_2;
-        File destFileObj = new File(destFilePath);
+        Path destPath = Paths.get(FOLDER_1, FILE_2);
 
-        assertTrue(file1.exists());
-        assertFalse(destFileObj.exists());
+        assertTrue(Files.exists(file1));
+        assertTrue(Files.notExists(destPath));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, destFilePath));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, destPath.toString()));
 
-        assertFalse(file1.exists());
-        assertTrue(destFileObj.exists());
+        assertTrue(Files.notExists(file1));
+        assertTrue(Files.exists(destPath));
     }
 
     @Test
     public void mvSrcFileToDestFile_DestFileExists_FileOverwritten() {
-        assertTrue(file1.exists());
-        assertTrue(file3.exists());
+        assertTrue(Files.exists(file1));
+        assertTrue(Files.exists(file3));
 
         assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, FILE_3));
 
-        assertFalse(file1.exists());
-        assertTrue(file3.exists());
+        assertTrue(Files.notExists(file1));
+        assertTrue(Files.exists(file3));
 
         assertDoesNotThrow(() -> {
-            String fileContent = new String(Files.readAllBytes(Paths.get(FILE_3)));
+            String fileContent = new String(Files.readAllBytes(file3));
             assertEquals(FILE_1, fileContent);
         });
     }
 
     @Test
     public void mvSrcFileToDestFile_SameDirectoryRenameFolder_FolderRenamed() {
-        assertTrue(folder1.exists());
-        assertFalse(folder2.exists());
+        assertTrue(Files.exists(folder1));
+        assertTrue(Files.notExists(folder2));
 
         assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FOLDER_1, FOLDER_2));
 
-        assertFalse(folder1.exists());
-        assertTrue(folder2.exists());
+        assertTrue(Files.notExists(folder1));
+        assertTrue(Files.exists(folder2));
     }
 
     @Test
     public void mvSrcFileToDestFile_DifferentDirectorySameFolderName_FolderRenamed() {
-        String destFilePath = FOLDER_3 + File.separator + FOLDER_1;
-        File destFileObj = new File(destFilePath);
+        Path destPath = Paths.get(FOLDER_3, FOLDER_1);
 
-        assertTrue(folder1.exists());
-        assertFalse(destFileObj.exists());
+        assertTrue(Files.exists(folder1));
+        assertTrue(Files.notExists(destPath));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FOLDER_1, destFilePath));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FOLDER_1, destPath.toString()));
 
-        assertFalse(folder1.exists());
-        assertTrue(destFileObj.exists());
+        assertTrue(Files.notExists(folder1));
+        assertTrue(Files.exists(destPath));
     }
 
     @Test
     public void mvSrcFileToDestFile_DifferentDirectoryDifferentFolderName_FolderRenamed() {
-        String destFilePath = FOLDER_3 + File.separator + FOLDER_2;
-        File destFileObj = new File(destFilePath);
+        Path destPath = Paths.get(FOLDER_3, FOLDER_2);
 
-        assertTrue(folder1.exists());
-        assertFalse(destFileObj.exists());
+        assertTrue(Files.exists(folder1));
+        assertTrue(Files.notExists(destPath));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FOLDER_1, destFilePath));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FOLDER_1, destPath.toString()));
 
-        assertFalse(folder1.exists());
-        assertTrue(destFileObj.exists());
+        assertTrue(Files.notExists(folder1));
+        assertTrue(Files.exists(destPath));
     }
 
     @Test
     public void mvSrcFileToDestFile_SrcFileDoesNotExist_ThrowsException() {
-        assertFalse(file2.exists());
+        assertTrue(Files.notExists(file2));
+        String srcFile = FILE_2;
+        String destFile = FILE_1;
 
-        assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(FILE_2, FILE_1));
+        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), error.getMessage());
     }
 
     @Test
     public void mvSrcFileToDestFile_SrcFolderDoesNotExist_ThrowsException() {
-        assertFalse(folder2.exists());
+        assertTrue(Files.notExists(folder2));
+        String srcFile = FOLDER_2;
+        String destFile = FOLDER_1;
 
-        assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(FOLDER_2, FOLDER_2));
+        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), error.getMessage());
+    }
+
+    @Test
+    public void mvSrcFileToDestFile_DestFolderDirDoesNotExist_ThrowsException() {
+        Path destPath = Paths.get(FOLDER_2, FILE_1);
+        String srcFile = FILE_1;
+        String destFile = destPath.toString();
+
+        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), error.getMessage());
     }
 
     @Test
     public void mvSrcFileToDestFile_DestFolderExists_ThrowsException() {
-        assertTrue(folder3.exists());
+        assertTrue(Files.exists(folder3));
 
         assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(FOLDER_1, FOLDER_3));
     }
 
     @Test
-    public void mvSrcFileToDestFile_FolderToExistingFile_ThrowsException() {
-        assertTrue(file1.exists());
+    public void mvSrcFileToDestFile_FolderToFile_ThrowsException() {
+        assertTrue(Files.exists(file1));
+        String srcFile = FOLDER_1;
+        String destFile = FILE_1;
 
-        assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(FOLDER_1, FILE_1));
+        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_IS_NOT_DIR), error.getMessage());
+    }
+
+    @Test
+    public void mvSrcFileToDestFile_SrcFolderContainsDestFolder_ThrowsException() {
+        Path destPath = Paths.get(FOLDER_1, FOLDER_2);
+        String srcFile = FOLDER_1;
+        String destFile = destPath.toString();
+
+        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARG), error.getMessage());
     }
 
     @Test
     public void mvFilesToFolder_DestFolderDoesNotExist_ThrowsException() {
-        assertFalse(folder2.exists());
+        assertTrue(Files.notExists(folder2));
 
         assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_2, FILE_1));
     }
 
     @Test
     public void mvFilesToFolder_DestFolderIsNotDirectory_ThrowsException() {
-        assertFalse(file1.isDirectory());
+        assertFalse(Files.isDirectory(file1));
 
         assertThrows(Exception.class, () -> app.mvFilesToFolder(FILE_1, FILE_3));
     }
@@ -227,30 +256,45 @@ class MvApplicationTest {
     }
 
     @Test
+    public void mvFilesToFolder_SrcFolderContainsDestFolder_ThrowsException() {
+        Path destPath = Paths.get(FOLDER_1, FOLDER_2);
+        String srcFile = FOLDER_1;
+        String destFile = destPath.toString();
+
+        try {
+            Files.createDirectory(destPath);
+        } catch (IOException e ) {
+            fail(e.getMessage());
+        }
+
+        assertThrows(Exception.class, () -> app.mvFilesToFolder(destFile, srcFile));
+    }
+
+    @Test
     public void mvFilesToFolder_SingleFile_FileMoved() {
-        String destFilePath = FOLDER_1 + File.separator + FILE_1;
-        File destFile = new File(destFilePath);
-        assertFalse(destFile.exists());
+        Path destPath = Paths.get(FOLDER_1, FILE_1);
+
+        assertTrue(Files.notExists(destPath));
 
         assertDoesNotThrow(() -> app.mvFilesToFolder(FOLDER_1, FILE_1));
 
-        assertFalse(file1.exists());
-        assertTrue(destFile.exists());
+        assertTrue(Files.notExists(file1));
+        assertTrue(Files.exists(destPath));
     }
 
     @Test
     public void mvFilesToFolder_MultipleFiles_FilesMoved() {
-        File destFile1 = new File(FOLDER_1 + File.separator + FILE_1);
-        assertFalse(destFile1.exists());
+        Path destPath1 = Paths.get(FOLDER_1, FILE_1);
+        assertTrue(Files.notExists(destPath1));
 
-        File destFile2 = new File(FOLDER_1 + File.separator + FILE_3);
-        assertFalse(destFile2.exists());
+        Path destPath2 = Paths.get(FOLDER_1, FILE_3);
+        assertTrue(Files.notExists(destPath2));
 
         assertDoesNotThrow(() -> app.mvFilesToFolder(FOLDER_1, FILE_1, FILE_3));
 
-        assertFalse(file1.exists());
-        assertFalse(file3.exists());
-        assertTrue(destFile1.exists());
-        assertTrue(destFile2.exists());
+        assertTrue(Files.notExists(file1));
+        assertTrue(Files.notExists(file3));
+        assertTrue(Files.exists(destPath1));
+        assertTrue(Files.exists(destPath2));
     }
 }
