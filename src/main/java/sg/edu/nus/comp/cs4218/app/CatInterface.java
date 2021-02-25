@@ -9,7 +9,11 @@ public interface CatInterface extends Application {
      * Returns string containing the content of the specified file
      *
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
+<<<<<<< HEAD
+     * @param fileNames     Array of String of file names
+=======
      * @param fileNames    Array of String of file names
+>>>>>>> main
      * @return
      * @throws Exception
      */
@@ -32,7 +36,11 @@ public interface CatInterface extends Application {
      *
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
      * @param stdin        InputStream containing arguments from Stdin
+<<<<<<< HEAD
+     * @param fileNames     Array of String of file names
+=======
      * @param fileNames    Array of String of file names
+>>>>>>> main
      * @return
      * @throws Exception
      */

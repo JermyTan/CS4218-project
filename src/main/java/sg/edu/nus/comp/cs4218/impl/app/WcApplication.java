@@ -12,7 +12,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -52,22 +51,22 @@ public class WcApplication implements WcInterface {
 
             return String.format(
                     "%s%s%s%s",
-                    isLines ? String.format("%d%c", numLines, CHAR_TAB) : "",
-                    isWords ? String.format("%d%c", numWords, CHAR_TAB) : "",
-                    isBytes ? String.format("%d%c", numBytes, CHAR_TAB) : "",
+                    isLines ? String.format("%s%s", numLines, CHAR_TAB) : "",
+                    isWords ? String.format("%s%s", numWords, CHAR_TAB) : "",
+                    isBytes ? String.format("%s%s", numBytes, CHAR_TAB) : "",
                     label
             ).trim();
         }
     }
 
     /**
-     * Runs the wc application.
+     * Runs the wc application with the specified arguments.
      *
      * @param args   array of arguments for the application. Each array element is the path to a
      *               file. If no files are specified stdin is used.
      * @param stdin  an InputStream. Can be used to read in lines from stdin.
      * @param stdout an OutputStream. The output of the command is written to this OutputStream.
-     * @throws WcException
+     * @throws WcException if the file(s) specified do not exist or are unreadable.
      */
     @Override
     @SuppressWarnings("PMD.PreserveStackTrace")
@@ -111,9 +110,9 @@ public class WcApplication implements WcInterface {
     }
 
     private String wcContent(
-            Boolean isBytes,
-            Boolean isLines,
-            Boolean isWords,
+            boolean isBytes,
+            boolean isLines,
+            boolean isWords,
             InputStream stdin,
             String... fileNames
     ) throws WcException {
@@ -131,9 +130,11 @@ public class WcApplication implements WcInterface {
     private List<WcStatistics> computeAndAttachTotalStatistics(List<WcStatistics> statisticsList) {
         WcStatistics totalStatistics = new WcStatistics(TOTAL_LABEL);
 
-        totalStatistics.numLines = statisticsList.stream().mapToLong(statistics -> statistics.numLines).sum();
-        totalStatistics.numWords = statisticsList.stream().mapToLong(statistics -> statistics.numWords).sum();
-        totalStatistics.numBytes = statisticsList.stream().mapToLong(statistics -> statistics.numBytes).sum();
+        statisticsList.forEach(statistics -> {
+            totalStatistics.numLines += statistics.numLines;
+            totalStatistics.numWords += statistics.numWords;
+            totalStatistics.numBytes += statistics.numBytes;
+        });
 
         return Stream.concat(statisticsList.stream(), Stream.of(totalStatistics)).collect(Collectors.toList());
     }

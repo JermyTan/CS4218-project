@@ -12,7 +12,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -63,13 +62,13 @@ public class GrepApplication implements GrepInterface {
     }
 
     /**
-     * Runs the grep application.
+     * Runs the grep application with the specified arguments.
      *
      * @param args array of arguments for the application.
      * @param stdin an InputStream. Can be used to read in lines from stdin.
      * @param stdout an OutputStream. Lines which match supplied pattern will be output to stdout,
      *               separated by a newline character.
-     * @throws GrepException
+     * @throws GrepException if the file(s) specified do not exist or are unreadable.
      */
     @Override
     @SuppressWarnings("PMD.PreserveStackTrace")

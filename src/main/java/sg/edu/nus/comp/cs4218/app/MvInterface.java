@@ -16,7 +16,11 @@ public interface MvInterface extends Application {
      * move files to destination folder
      *
      * @param destFolder of path to destination folder
+<<<<<<< HEAD
+     * @param fileNames   Array of String of file names
+=======
      * @param fileNames  Array of String of file names
+>>>>>>> main
      * @throws Exception
      */
     String mvFilesToFolder(String destFolder, String... fileNames) throws Exception;

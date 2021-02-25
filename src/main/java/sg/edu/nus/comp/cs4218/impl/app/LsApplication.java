@@ -29,12 +29,12 @@ public class LsApplication implements LsInterface {
     private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
 
     /**
-     * Runs the ls application.
+     * Runs the ls application with the specified arguments.
      *
      * @param args array of arguments for the application.
      * @param stdin an InputStream, not used.
      * @param stdout an OutputStream. Contents in the given directories will be output to stdout.
-     * @throws LsException
+     * @throws LsException if the file(s) specified do not exist or are unreadable.
      */
     @Override
     @SuppressWarnings("PMD.PreserveStackTrace")
