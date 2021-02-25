@@ -73,19 +73,24 @@ public final class RegexArgument {
 
         if (isRegex) {
             Pattern regexPattern = Pattern.compile(regex.toString());
+
+            String modifiedPlaintext = plaintext.toString().replaceAll("\\\\", "/");
+            String tokens[] = modifiedPlaintext.split("/");
+
             String dir = "";
-            String tokens[] = plaintext.toString().replaceAll("\\\\", "/").split("/");
             for (int i = 0; i < tokens.length - 1; i++) {
                 dir += tokens[i] + File.separator;
             }
 
-            File currentDir = Paths.get(Environment.currentDirectory + File.separator + dir).toFile();
+            boolean isAbsolute = Paths.get(dir).isAbsolute();
+            boolean onlyDirectories = modifiedPlaintext.charAt(plaintext.length() - 1) == '/';
 
-            for (String candidate : currentDir.list()) {
-                if (regexPattern.matcher(candidate).matches()) {
-                    globbedFiles.add(dir + candidate);
-                }
+            File currentDir = Paths.get(dir).toFile();
+            if (!isAbsolute) {
+                currentDir = Paths.get(Environment.currentDirectory + File.separator + dir).toFile();
             }
+
+            globbedFiles = traverseAndFilter(regexPattern, currentDir, isAbsolute, onlyDirectories);
 
             Collections.sort(globbedFiles);
         }
@@ -118,8 +123,8 @@ public final class RegexArgument {
         for (String current : node.list()) {
             File nextNode = new File(node, current);
             String match = isAbsolute
-                    ? nextNode.getPath()
-                    : nextNode.getPath().substring(Environment.currentDirectory.length() + 1);
+                    ? nextNode.getAbsolutePath()
+                    : nextNode.getAbsolutePath().substring(Environment.currentDirectory.length() + 1);
             // TODO: Find a better way to handle this.
             if (onlyDirectories && nextNode.isDirectory()) {
                 match += File.separator;
@@ -130,10 +135,6 @@ public final class RegexArgument {
             matches.addAll(traverseAndFilter(regexPattern, nextNode, isAbsolute, onlyDirectories));
         }
         return matches;
-    }
-
-    public boolean isRegex() {
-        return isRegex;
     }
 
     public boolean isEmpty() {
