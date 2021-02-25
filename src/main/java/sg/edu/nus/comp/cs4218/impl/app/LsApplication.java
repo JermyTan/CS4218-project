@@ -37,7 +37,6 @@ public class LsApplication implements LsInterface {
      * @throws LsException if the file(s) specified do not exist or are unreadable.
      */
     @Override
-    @SuppressWarnings("PMD.PreserveStackTrace")
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws LsException {
         if (stdout == null) {
             throw new LsException(ERR_NO_OSTREAM);
@@ -51,12 +50,16 @@ public class LsApplication implements LsInterface {
             throw new LsException(e.getMessage(), e);
         }
 
-        Boolean isFoldersOnly = parser.isFoldersOnly();
-        Boolean isRecursive = parser.isRecursive();
-        Boolean isSortByExt = parser.isSortByExt();
+        boolean isFoldersOnly = parser.isFoldersOnly();
+        boolean isRecursive = parser.isRecursive();
+        boolean isSortByExt = parser.isSortByExt();
         String[] folderNames = parser.getFolderNames().toArray(String[]::new);
 
         String result = listFolderContent(isFoldersOnly, isRecursive, isSortByExt, folderNames);
+
+        if (result.isEmpty()) {
+            return;
+        }
 
         try {
             stdout.write(result.getBytes());
@@ -67,7 +70,6 @@ public class LsApplication implements LsInterface {
     }
 
     @Override
-    @SuppressWarnings("PMD.PreserveStackTrace")
     public String listFolderContent(Boolean isFoldersOnly, Boolean isRecursive, Boolean isSortByExt,
                                     String... folderNames) throws LsException {
         if (folderNames.length == 0 && !isRecursive) {
@@ -94,7 +96,6 @@ public class LsApplication implements LsInterface {
      * @param isSortByExt
      * @return current directory's content.
      */
-    @SuppressWarnings("PMD.PreserveStackTrace")
     private String listCwdContent(Boolean isFoldersOnly, Boolean isSortByExt) throws LsException {
         String cwd = Environment.currentDirectory;
         return formatContents(getContents(Paths.get(cwd), isFoldersOnly), isSortByExt);
@@ -177,7 +178,6 @@ public class LsApplication implements LsInterface {
      * @param directory
      * @return list of files + directories in the passed directory.
      */
-    @SuppressWarnings("PMD.PreserveStackTrace")
     private List<Path> getContents(Path directory, Boolean isFoldersOnly) throws LsException {
         try {
             if (!Files.exists(directory)) {

@@ -1,8 +1,11 @@
 package sg.edu.nus.comp.cs4218.exception;
 
+import java.io.Serial;
+
 public class RmException extends AbstractApplicationException {
 
-    private static final long serialVersionUID = 6616752571518808461L;
+    @Serial
+    private static final long serialVersionUID = 6146162077392622131L;
 
     public RmException(String message) {
         super("rm: " + message);

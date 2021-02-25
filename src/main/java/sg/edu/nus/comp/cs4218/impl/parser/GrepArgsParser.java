@@ -22,15 +22,15 @@ public class GrepArgsParser extends ArgsParser {
         legalFlags.add(FLAG_IS_PREFIX_FILE_NAME);
     }
 
-    public Boolean isCaseInsensitive() {
+    public boolean isCaseInsensitive() {
         return flags.contains(FLAG_IS_CASE_INSENSITIVE);
     }
 
-    public Boolean isCountLines() {
+    public boolean isCountLines() {
         return flags.contains(FLAG_IS_COUNT_LINES);
     }
 
-    public Boolean isPrefixFileName() {
+    public boolean isPrefixFileName() {
         return flags.contains(FLAG_IS_PREFIX_FILE_NAME);
     }
 

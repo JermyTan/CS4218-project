@@ -1,8 +1,11 @@
 package sg.edu.nus.comp.cs4218.exception;
 
+import java.io.Serial;
+
 public class CdException extends AbstractApplicationException {
 
-    private static final long serialVersionUID = -4730922172179294678L;
+    @Serial
+    private static final long serialVersionUID = -5127470754542073972L;
 
     public CdException(String message) {
         super("cd: " + message);

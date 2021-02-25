@@ -48,9 +48,8 @@ public class CallCommand implements Command {
         List<String> parsedArgsList = argumentResolver.parseArguments(noRedirArgsList);
         if (!parsedArgsList.isEmpty()) {
             String app = parsedArgsList.remove(0);
-            appRunner.runApp(app, parsedArgsList.toArray(new String[parsedArgsList.size()]), inputStream, outputStream);
+            appRunner.runApp(app, parsedArgsList.toArray(String[]::new), inputStream, outputStream);
         }
-
     }
 
     @Override

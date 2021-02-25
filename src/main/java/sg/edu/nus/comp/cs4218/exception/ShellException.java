@@ -1,8 +1,11 @@
 package sg.edu.nus.comp.cs4218.exception;
 
+import java.io.Serial;
+
 public class ShellException extends Exception {
 
-    private static final long serialVersionUID = -4439395674558704575L;
+    @Serial
+    private static final long serialVersionUID = -2526980738797157495L;
 
     public ShellException(String message) {
         super("shell: " + message);

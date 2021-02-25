@@ -33,6 +33,7 @@ public class IORedirectionHandler {
         this.argumentResolver = argumentResolver;
     }
 
+    @SuppressWarnings("PMD.ExcessiveMethodLength")
     public void extractRedirOptions() throws AbstractApplicationException, ShellException {
         if (argsList == null || argsList.isEmpty()) {
             throw new ShellException(ERR_SYNTAX);

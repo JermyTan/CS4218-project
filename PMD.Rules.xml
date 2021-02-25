@@ -138,11 +138,7 @@
   
   <!-- Replacement for deprecated rulesets/java/strings.xml -->
   <rule ref="category/java/performance.xml/AppendCharacterWithChar" />
-  <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals" >
-    <properties>
-      <property name="exceptionList" value="PMD.PreserveStackTrace"/>
-    </properties>
-  </rule>
+  <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals" />
   <rule ref="category/java/bestpractices.xml/AvoidStringBufferField" />
   <rule ref="category/java/performance.xml/ConsecutiveAppendsShouldReuse" />
   <rule ref="category/java/performance.xml/ConsecutiveLiteralAppends" />

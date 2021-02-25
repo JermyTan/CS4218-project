@@ -1,7 +1,10 @@
 package sg.edu.nus.comp.cs4218.exception;
 
+import java.io.Serial;
+
 public class ExitException extends AbstractApplicationException {
 
+    @Serial
     private static final long serialVersionUID = 6517503252362314995L;
 
     /**

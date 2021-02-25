@@ -28,15 +28,15 @@ public class LsArgsParser extends ArgsParser {
         }
     }
 
-    public Boolean isFoldersOnly() {
+    public boolean isFoldersOnly() {
         return flags.contains(FLAG_IS_FOLDERS);
     }
 
-    public Boolean isRecursive() {
+    public boolean isRecursive() {
         return flags.contains(FLAG_IS_RECURSIVE);
     }
 
-    public Boolean isSortByExt() {
+    public boolean isSortByExt() {
         return flags.contains(FLAG_IS_SORT_BY_EXT);
     }
 

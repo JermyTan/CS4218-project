@@ -46,7 +46,7 @@ public class MvApplication implements MvInterface {
                 mvFilesToFolder(target, srcFiles.toArray(String[]::new));
             }
         } catch (Exception e) {
-            throw new MvException(e.getMessage());
+            throw new MvException(e.getMessage(), e);
         }
     }
 
@@ -86,7 +86,7 @@ public class MvApplication implements MvInterface {
         try {
             Files.move(srcPath, destPath, REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new Exception(e.getMessage());
+            throw new Exception(e.getMessage(), e);
         }
 
         return null;

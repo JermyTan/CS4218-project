@@ -16,13 +16,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 
 public class CdApplication implements CdInterface {
 
-
-
-    @Override
-    public void changeToDirectory(String path) throws CdException {
-        Environment.currentDirectory = getNormalizedAbsolutePath(path);
-    }
-
     /**
      * Runs the cd application with the specified arguments.
      * Assumption: The application must take in one arg. (cd without args is not supported)
@@ -72,5 +65,10 @@ public class CdApplication implements CdInterface {
         }
 
         return path.normalize().toString();
+    }
+
+    @Override
+    public void changeToDirectory(String path) throws CdException {
+        Environment.currentDirectory = getNormalizedAbsolutePath(path);
     }
 }

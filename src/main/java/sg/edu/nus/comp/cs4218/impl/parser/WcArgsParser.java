@@ -28,15 +28,15 @@ public class WcArgsParser extends ArgsParser {
         }
     }
 
-    public Boolean isBytes() {
+    public boolean isBytes() {
         return flags.contains(FLAG_IS_BYTES);
     }
 
-    public Boolean isLines() {
+    public boolean isLines() {
         return flags.contains(FLAG_IS_LINES);
     }
 
-    public Boolean isWords() {
+    public boolean isWords() {
         return flags.contains(FLAG_IS_WORDS);
     }
 

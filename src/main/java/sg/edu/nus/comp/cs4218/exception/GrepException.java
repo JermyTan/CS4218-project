@@ -1,8 +1,11 @@
 package sg.edu.nus.comp.cs4218.exception;
 
+import java.io.Serial;
+
 public class GrepException extends AbstractApplicationException {
 
-    private static final long serialVersionUID = -5883292222072101576L;
+    @Serial
+    private static final long serialVersionUID = 690613118569875767L;
 
     public GrepException(String message) {
         super("grep: " + message);

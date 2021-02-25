@@ -6,6 +6,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
+import sg.edu.nus.comp.cs4218.impl.result.WcResult;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -19,46 +20,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 @SuppressWarnings("PMD.GodClass")
 public class WcApplication implements WcInterface {
+
     private static final String TOTAL_LABEL = "total";
     private static final String STDIN_LABEL = STRING_EMPTY;
-
-    private static class WcStatistics {
-        long numLines = 0;
-        long numWords = 0;
-        long numBytes = 0;
-        String label;
-        boolean isError = false;
-
-        WcStatistics(String label) {
-            this.label = label;
-        }
-
-        WcStatistics(String label, boolean isError) {
-            this.label = label;
-            this.isError = isError;
-        }
-
-        String formatToString(boolean isBytes, boolean isLines, boolean isWords) {
-            if (isError) {
-                return label;
-            }
-
-            return String.format(
-                    "%s%s%s%s",
-                    isLines ? String.format("%s%s", numLines, CHAR_TAB) : "",
-                    isWords ? String.format("%s%s", numWords, CHAR_TAB) : "",
-                    isBytes ? String.format("%s%s", numBytes, CHAR_TAB) : "",
-                    label
-            ).trim();
-        }
-    }
 
     /**
      * Runs the wc application with the specified arguments.
@@ -70,7 +40,6 @@ public class WcApplication implements WcInterface {
      * @throws WcException if the file(s) specified do not exist or are unreadable.
      */
     @Override
-    @SuppressWarnings("PMD.PreserveStackTrace")
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws WcException {
         if (stdout == null) {
             throw new WcException(ERR_NO_OSTREAM);
@@ -84,17 +53,17 @@ public class WcApplication implements WcInterface {
             throw new WcException(e.getMessage(), e);
         }
 
-        Boolean isDefault = parser.isDefault();
-        Boolean isBytes = parser.isBytes() || isDefault;
-        Boolean isLines = parser.isLines() || isDefault;
-        Boolean isWords = parser.isWords() || isDefault;
+        boolean isDefault = parser.isDefault();
+        boolean isBytes = parser.isBytes() || isDefault;
+        boolean isLines = parser.isLines() || isDefault;
+        boolean isWords = parser.isWords() || isDefault;
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
         if (stdin == null && (fileNames == null || fileNames.length == 0)) {
             throw new WcException(ERR_NO_INPUT);
         }
 
-        String result = wcContent(
+        String output = wcContent(
                 isBytes,
                 isLines,
                 isWords,
@@ -102,8 +71,12 @@ public class WcApplication implements WcInterface {
                 fileNames
         );
 
+        if (output.isEmpty()) {
+            return;
+        }
+
         try {
-            stdout.write(result.getBytes());
+            stdout.write(output.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
             throw new WcException(ERR_WRITE_STREAM, e);
@@ -128,19 +101,18 @@ public class WcApplication implements WcInterface {
         return countFromFiles(isBytes, isLines, isWords, fileNames);
     }
 
-    private List<WcStatistics> computeAndAttachTotalStatistics(List<WcStatistics> statisticsList) {
-        WcStatistics totalStatistics = new WcStatistics(TOTAL_LABEL);
-
-        statisticsList.forEach(statistics -> {
-            totalStatistics.numLines += statistics.numLines;
-            totalStatistics.numWords += statistics.numWords;
-            totalStatistics.numBytes += statistics.numBytes;
-        });
+    private List<WcResult> computeAndAttachTotalStatistics(List<WcResult> statisticsList) {
+        WcResult totalStatistics = new WcResult(
+                TOTAL_LABEL,
+                statisticsList.stream().mapToLong(WcResult::getNumLines).sum(),
+                statisticsList.stream().mapToLong(WcResult::getNumWords).sum(),
+                statisticsList.stream().mapToLong(WcResult::getNumBytes).sum()
+        );
 
         return Stream.concat(statisticsList.stream(), Stream.of(totalStatistics)).collect(Collectors.toList());
     }
 
-    private WcStatistics computeStatisticsFromInputStream(
+    private WcResult computeStatisticsFromInputStream(
             String label,
             InputStream inputStream,
             Path filePath
@@ -148,14 +120,15 @@ public class WcApplication implements WcInterface {
         try {
             List<String> lines = IOUtils.getLinesFromInputStream(inputStream);
 
-            WcStatistics statistics = new WcStatistics(label);
-            statistics.numLines = lines.size();
-            statistics.numWords = lines.stream().map(StringUtils::tokenize).flatMap(Stream::of).count();
-            statistics.numBytes = filePath == null
-                    ? lines.stream().mapToInt(line -> line.getBytes().length).sum() + statistics.numLines
+            long numLines = lines.size();
+            long numWords = lines.stream().map(StringUtils::tokenize).flatMap(Stream::of).count();
+            long numBytes = filePath == null
+                    ? lines.stream().mapToInt(line -> line.getBytes().length).sum() + numWords
                     : Files.size(filePath);
 
-            return statistics;
+
+            return new WcResult(label, numLines, numWords, numBytes);
+
         } catch (ShellException e) {
             throw new WcException(e.getMessage(), e);
         } catch (Exception e) {
@@ -163,14 +136,13 @@ public class WcApplication implements WcInterface {
         }
     }
 
-    @SuppressWarnings("PMD.PreserveStackTrace")
-    private WcStatistics computeStatisticsFromFile(String fileName) throws WcException {
+    private WcResult computeStatisticsFromFile(String fileName) throws WcException {
         if (fileName == null) {
             throw new WcException(ERR_NO_FILE_ARGS);
         }
 
-        if (StringUtils.isBlank(fileName)) {
-            throw new WcException(ERR_INVALID_FILE);
+        if (fileName.isBlank()) {
+            throw new WcException(ERR_INVALID_FILES);
         }
 
         String trimmedFileName = fileName.trim();
@@ -192,28 +164,24 @@ public class WcApplication implements WcInterface {
             }
 
         } catch (Exception e) {
-            return new WcStatistics(new WcException(e.getMessage(), e).getMessage(), true);
+            return new WcResult(new WcException(e.getMessage(), e).getMessage());
         }
     }
 
-    private WcStatistics computeStatisticsFromStdin(InputStream stdin) throws WcException{
+    private WcResult computeStatisticsFromStdin(InputStream stdin) throws WcException{
         if (stdin == null) {
             throw new WcException(ERR_NO_ISTREAM);
         }
 
-        WcStatistics statistics;
-
         try {
-            statistics = computeStatisticsFromInputStream(STDIN_LABEL, stdin, null);
+            return computeStatisticsFromInputStream(STDIN_LABEL, stdin, null);
         } catch (Exception e) {
-            statistics = new WcStatistics(new WcException(ERR_READ_STREAM, e).getMessage(), true);
+            return new WcResult(new WcException(ERR_READ_STREAM, e).getMessage());
         }
-
-        return statistics;
     }
 
     private String formatStatistics(
-            List<WcStatistics> statisticsList,
+            List<WcResult> statisticsList,
             boolean isBytes,
             boolean isLines,
             boolean isWords
@@ -223,7 +191,7 @@ public class WcApplication implements WcInterface {
         List<String> result = (numEntries > 1 ? computeAndAttachTotalStatistics(statisticsList) : statisticsList)
                 .stream()
                 .map(statistics -> statistics.formatToString(isBytes, isLines, isWords))
-                .filter(Predicate.not(StringUtils::isBlank))
+                .filter(Predicate.not(String::isBlank))
                 .collect(Collectors.toList());
 
         return String.join(STRING_NEWLINE, result).trim();
@@ -243,13 +211,17 @@ public class WcApplication implements WcInterface {
         String[] sanitizedFileNames = StringUtils.sanitizeStrings(fileNames);
 
         if (sanitizedFileNames.length == 0) {
-            throw new WcException(ERR_INVALID_FILE);
+            throw new WcException(ERR_INVALID_FILES);
         }
 
-        List<WcStatistics> result = new ArrayList<>();
+        List<WcResult> result = new ArrayList<>();
 
         for (String fileName: sanitizedFileNames) {
-            result.add(computeStatisticsFromFile(fileName));
+            WcResult statistics = computeStatisticsFromFile(fileName);
+
+            statistics.outputError();
+
+            result.add(statistics);
         }
 
         return formatStatistics(result, isBytes, isLines, isWords);
@@ -266,7 +238,11 @@ public class WcApplication implements WcInterface {
             throw new WcException(ERR_NO_ISTREAM);
         }
 
-        return computeStatisticsFromStdin(stdin).formatToString(isBytes, isLines, isWords).trim();
+        WcResult statistics = computeStatisticsFromStdin(stdin);
+
+        statistics.outputError();
+
+        return formatStatistics(List.of(statistics), isBytes, isLines, isWords);
     }
 
     @Override
@@ -288,15 +264,19 @@ public class WcApplication implements WcInterface {
         String[] sanitizedFileNames = StringUtils.sanitizeStrings(fileNames);
 
         if (sanitizedFileNames.length == 0) {
-            throw new WcException(ERR_INVALID_FILE);
+            throw new WcException(ERR_INVALID_FILES);
         }
 
-        List<WcStatistics> result = new ArrayList<>();
+        List<WcResult> result = new ArrayList<>();
 
         for (String fileName: sanitizedFileNames) {
-            result.add(fileName.equals(STRING_STDIN_FLAG)
-                            ? computeStatisticsFromStdin(stdin)
-                            : computeStatisticsFromFile(fileName));
+            WcResult statistics = fileName.equals(STRING_STDIN_FLAG)
+                    ? computeStatisticsFromStdin(stdin)
+                    : computeStatisticsFromFile(fileName);
+
+            statistics.outputError();
+
+            result.add(statistics);
         }
 
         return formatStatistics(result, isBytes, isLines, isWords);

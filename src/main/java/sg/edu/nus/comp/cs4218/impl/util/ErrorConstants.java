@@ -1,6 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions"})
 public final class ErrorConstants {
     // Streams related
     public static final String ERR_CREATE_STREAM = "Could not create stream";
@@ -11,15 +10,13 @@ public final class ErrorConstants {
     public static final String ERR_STREAM_CLOSED = "Stream is closed";
     public static final String ERR_NO_OSTREAM = "OutputStream not provided";
     public static final String ERR_NO_ISTREAM = "InputStream not provided";
-    public static final String ERR_NO_INPUT = "No inputStream and no filenames";
-    public static final String ERR_NO_FILE_ARGS = "No files provided";
+    public static final String ERR_NO_INPUT = "No inputStream and no filename(s)";
+    public static final String ERR_NO_FILE_ARGS = "No file(s) provided";
 
     // Arguments related
-    public static final String ERR_MISSING_ARG = "Missing arguments";
-    public static final String ERR_NULL_ARGS = "Null arguments";
+    public static final String ERR_MISSING_ARG = "Missing argument(s)";
+    public static final String ERR_NULL_ARGS = "Null argument(s)";
     public static final String ERR_TOO_MANY_ARGS = "Too many arguments";
-    public static final String ERR_INVALID_FLAG = "Invalid flag option supplied";
-    public static final String ERR_BAD_REGEX = "Invalid pattern";
     public static final String ERR_INVALID_ARG = "Invalid argument";
 
     // Files and folders related
@@ -35,18 +32,18 @@ public final class ErrorConstants {
     public static final String ERR_MISSING_FIELD = "Invalid format";
 
     // `find` related
-    public static final String ERR_INVALID_FILE = "Invalid file";
+    public static final String ERR_INVALID_FILES = "Invalid file(s)";
     public static final String ERR_NAME_FLAG = "Paths must precede -name";
 
     // `sed` related
     public static final String ERR_NO_REP_RULE = "No replacement rule supplied";
     public static final String ERR_INVALID_REP_RULE = "Invalid replacement rule";
     public static final String ERR_INVALID_REP_X = "X needs to be a number greater than 0";
-    public static final String ERR_INVALID_REGEX = "Invalid regular expression supplied";
+    public static final String ERR_INVALID_REGEX = "Invalid regex pattern";
     public static final String ERR_EMPTY_REGEX = "Regular expression cannot be empty";
 
     // `grep` related
-    public static final String ERR_NO_REGEX = "No regular expression supplied";
+    public static final String ERR_NO_REGEX = "No regex pattern supplied";
 
     // `mkdir` related
     public static final String ERR_NO_FOLDERS = "No folder names are supplied";

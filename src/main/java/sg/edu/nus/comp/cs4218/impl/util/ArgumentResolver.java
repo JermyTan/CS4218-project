@@ -166,7 +166,7 @@ public class ArgumentResolver {
 
     private String evaluateSubCommand(String commandString) throws AbstractApplicationException, ShellException {
         if (StringUtils.isBlank(commandString)) {
-            return "";
+            return STRING_EMPTY;
         }
 
         OutputStream outputStream = new ByteArrayOutputStream();

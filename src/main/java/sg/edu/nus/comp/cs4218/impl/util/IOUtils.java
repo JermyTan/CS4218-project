@@ -24,7 +24,6 @@ public final class IOUtils {
      * @return inputStream of file opened.
      * @throws ShellException if file destination is inaccessible.
      */
-    @SuppressWarnings("PMD.PreserveStackTrace")
     public static InputStream openInputStream(String fileName) throws ShellException {
         try {
             return Files.newInputStream(resolveFilePath(fileName));
@@ -44,7 +43,6 @@ public final class IOUtils {
      * @return outputStream of file opened.
      * @throws ShellException if file destination is inaccessible.
      */
-    @SuppressWarnings("PMD.PreserveStackTrace")
     public static OutputStream openOutputStream(String fileName) throws ShellException {
         try {
             return Files.newOutputStream(resolveFilePath(fileName));
@@ -63,7 +61,6 @@ public final class IOUtils {
      * @param inputStream inputStream to be closed.
      * @throws ShellException if inputStream cannot be closed successfully.
      */
-    @SuppressWarnings("PMD.PreserveStackTrace")
     public static void closeInputStream(InputStream inputStream) throws ShellException {
         if (inputStream == null || inputStream.equals(System.in)) {
             return;
@@ -82,7 +79,6 @@ public final class IOUtils {
      * @param outputStream outputStream to be closed.
      * @throws ShellException if outputStream cannot be closed successfully.
      */
-    @SuppressWarnings("PMD.PreserveStackTrace")
     public static void closeOutputStream(OutputStream outputStream) throws ShellException {
         if (outputStream == null || outputStream.equals(System.out)) {
             return;
@@ -95,7 +91,6 @@ public final class IOUtils {
         }
     }
 
-    @SuppressWarnings("PMD.PreserveStackTrace")
     public static Path resolveFilePath(String fileName) throws ShellException {
         if (fileName == null) {
             throw new ShellException(ERR_NO_FILE_ARGS);
@@ -104,7 +99,7 @@ public final class IOUtils {
         try {
             return Paths.get(Environment.currentDirectory).resolve(fileName);
         } catch (InvalidPathException e) {
-            throw new ShellException(ERR_INVALID_FILE, e);
+            throw new ShellException(ERR_INVALID_FILES, e);
         }
     }
 

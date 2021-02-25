@@ -50,8 +50,8 @@ public final class StringUtils {
     /**
      * Returns the file extension of file name.
      *
-     * @param fileName File name whose extension will be retrieved.
-     * @return File extension.
+     * @param fileName file name whose extension will be retrieved.
+     * @return file extension.
      */
     public static String getFileExtension(String fileName) {
         if (isBlank(fileName)) {
@@ -73,7 +73,7 @@ public final class StringUtils {
      * Returns the file separator defined for a particular system.
      * Used for RegexArgument parsing only.
      *
-     * @return String of file separator.
+     * @return string of file separator.
      */
     public static String fileSeparator() {
         // We need to escape \ in Windows...
@@ -86,7 +86,7 @@ public final class StringUtils {
     /**
      * Check if string contains only whitespace.
      *
-     * @param str String to be checked.
+     * @param str string to be checked.
      * @return true under any one of the 3 conditions:
      * 1. string is null
      * 2. string is empty
@@ -101,7 +101,7 @@ public final class StringUtils {
      *
      * @param character char to be multiplied.
      * @param num if num is < 0, num is assumed to be 0.
-     * @return String result of c * n.
+     * @return string result of c * n.
      */
     public static String multiplyChar(char character, int num) {
         return String.valueOf(character).repeat(Math.max(0, num));
@@ -110,8 +110,8 @@ public final class StringUtils {
     /**
      * Tokenize a string delimited by whitespace.
      *
-     * @param str String to be tokenized.
-     * @return String array containing the tokens.
+     * @param str string to be tokenized.
+     * @return string array containing the tokens.
      */
     public static String[] tokenize(String str) {
         if (isBlank(str)) {
@@ -123,7 +123,7 @@ public final class StringUtils {
     /**
      * Checks if a string can be represented as a number.
      *
-     * @param str String possibly representing a number.
+     * @param str string possibly representing a number.
      * @return true if str can be represented as a number.
      */
     public static boolean isNumber(String str) {

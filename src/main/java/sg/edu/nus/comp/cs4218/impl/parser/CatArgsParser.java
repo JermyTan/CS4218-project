@@ -24,7 +24,7 @@ public class CatArgsParser extends ArgsParser {
         }
     }
 
-    public Boolean isLineNumber() {
+    public boolean isLineNumber() {
         return flags.contains(FLAG_IS_LINE_NUMBER);
     }
 
