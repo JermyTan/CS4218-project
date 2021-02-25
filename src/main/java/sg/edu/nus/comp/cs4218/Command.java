@@ -11,12 +11,10 @@ public interface Command {
     /**
      * Evaluates command using data provided through stdin stream. Write result to stdout stream.
      */
-    void evaluate(InputStream stdin, OutputStream stdout)
-            throws AbstractApplicationException, ShellException;
+    void evaluate(InputStream stdin, OutputStream stdout) throws AbstractApplicationException, ShellException;
 
     /**
      * Terminates current execution of the command.
      */
     void terminate();
-
 }

@@ -54,14 +54,14 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_NO_INPUT);
         }
 
-        String result = catContent(isLineNumber, stdin, fileNames);
+        String output = catContent(isLineNumber, stdin, fileNames);
 
-        if (result.isEmpty()) {
+        if (output.isEmpty()) {
             return;
         }
 
         try {
-            stdout.write(result.getBytes());
+            stdout.write(output.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
             throw new CatException(ERR_WRITE_STREAM, e);

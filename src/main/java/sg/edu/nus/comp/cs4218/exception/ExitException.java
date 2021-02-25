@@ -1,5 +1,8 @@
 package sg.edu.nus.comp.cs4218.exception;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_EXIT;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
+
 import java.io.Serial;
 
 public class ExitException extends AbstractApplicationException {
@@ -13,7 +16,7 @@ public class ExitException extends AbstractApplicationException {
      * @param message exit code
      */
     public ExitException(String message) {
-        super("exit: " + message);
+        super(String.format(STRING_LABEL_VALUE_PAIR, APP_EXIT, message));
     }
 
     public ExitException(String message, Throwable cause) {

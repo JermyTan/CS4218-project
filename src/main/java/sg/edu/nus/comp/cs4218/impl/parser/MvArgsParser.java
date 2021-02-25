@@ -19,7 +19,7 @@ public class MvArgsParser extends ArgsParser {
         legalFlags.add(FLAG_IS_OVERWRITE);
     }
 
-    public Boolean isOverwrite() {
+    public boolean isOverwrite() {
         return !flags.contains(FLAG_IS_OVERWRITE);
     }
 
@@ -31,7 +31,7 @@ public class MvArgsParser extends ArgsParser {
         return nonFlagArgs.get(nonFlagArgs.size() - 1);
     }
 
-    public Boolean isFormatOne() {
+    public boolean isFormatOne() {
         File target = new File(getTarget());
         return !target.isDirectory();
     }

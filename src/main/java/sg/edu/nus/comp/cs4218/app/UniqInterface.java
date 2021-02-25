@@ -30,5 +30,5 @@ public interface UniqInterface extends Application {
      * @return
      * @throws Exception
      */
-    String uniqFromStdin(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, InputStream stdin) throws Exception;
+    String uniqFromStdin(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, InputStream stdin, String outputFileName) throws Exception;
 }

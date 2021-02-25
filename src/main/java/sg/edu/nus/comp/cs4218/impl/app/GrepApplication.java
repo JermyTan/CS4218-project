@@ -61,7 +61,7 @@ public class GrepApplication implements GrepInterface {
             throw new GrepException(ERR_NO_INPUT);
         }
 
-        String result = grepContent(
+        String output = grepContent(
                 pattern,
                 isCaseInsensitive,
                 isCountLines,
@@ -70,12 +70,12 @@ public class GrepApplication implements GrepInterface {
                 fileNames
         );
 
-        if (result.isEmpty()) {
+        if (output.isEmpty()) {
             return;
         }
 
         try {
-            stdout.write(result.getBytes());
+            stdout.write(output.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
             throw new GrepException(ERR_WRITE_STREAM, e);

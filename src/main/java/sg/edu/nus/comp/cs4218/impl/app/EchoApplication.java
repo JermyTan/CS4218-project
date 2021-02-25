@@ -34,10 +34,10 @@ public class EchoApplication implements EchoInterface {
             throw new EchoException(ERR_NO_OSTREAM);
         }
 
-        String result = constructResult(args);
+        String output = constructResult(args);
 
         try {
-            stdout.write(result.getBytes());
+            stdout.write(output.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
             throw new EchoException(ERR_WRITE_STREAM, e);

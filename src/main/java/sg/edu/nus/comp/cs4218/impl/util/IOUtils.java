@@ -97,7 +97,7 @@ public final class IOUtils {
         }
 
         try {
-            return Paths.get(Environment.currentDirectory).resolve(fileName);
+            return Paths.get(Environment.currentDirectory).resolve(fileName).normalize();
         } catch (InvalidPathException e) {
             throw new ShellException(ERR_INVALID_FILES, e);
         }

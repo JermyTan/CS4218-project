@@ -55,14 +55,14 @@ public class LsApplication implements LsInterface {
         boolean isSortByExt = parser.isSortByExt();
         String[] folderNames = parser.getFolderNames().toArray(String[]::new);
 
-        String result = listFolderContent(isFoldersOnly, isRecursive, isSortByExt, folderNames);
+        String output = listFolderContent(isFoldersOnly, isRecursive, isSortByExt, folderNames);
 
-        if (result.isEmpty()) {
+        if (output.isEmpty()) {
             return;
         }
 
         try {
-            stdout.write(result.getBytes());
+            stdout.write(output.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (Exception e) {
             throw new LsException(ERR_WRITE_STREAM, e);
