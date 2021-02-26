@@ -19,7 +19,7 @@ public class CatResult extends Result{
             throw new IllegalArgumentException(ERR_NULL_ARGS);
         }
 
-        this.lines = lines;
+        this.lines = List.copyOf(lines);
     }
 
     public CatResult(String errorMessage) {

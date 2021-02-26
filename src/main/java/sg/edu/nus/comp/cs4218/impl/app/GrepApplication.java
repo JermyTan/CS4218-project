@@ -7,8 +7,8 @@ import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.GrepArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.GrepResult;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -134,30 +134,25 @@ public class GrepApplication implements GrepInterface {
         }
 
         if (fileName == null) {
-            throw new GrepException(ERR_NO_FILE_ARGS);
-        }
-
-        if (fileName.isBlank()) {
             throw new GrepException(ERR_INVALID_FILES);
         }
 
-        String trimmedFileName = fileName.trim();
-
         try {
-            Path filePath = IOUtils.resolveFilePath(trimmedFileName);
-            if (!Files.exists(filePath)) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_FILE_NOT_FOUND);
+            Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
+
+            if (Files.notExists(filePath)) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
             }
 
             if (Files.isDirectory(filePath)) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_IS_DIR);
+                throw new InvalidDirectoryException(fileName, ERR_IS_DIR);
             }
 
             try {
-                return new GrepResult(trimmedFileName, grepFromInputStream(grepPattern, Files.newInputStream(filePath)));
+                return new GrepResult(fileName, grepFromInputStream(grepPattern, Files.newInputStream(filePath)));
 
             } catch (Exception e) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_READING_FILE, e);
+                throw new InvalidDirectoryException(fileName, ERR_READING_FILE, e);
             }
 
         } catch (Exception e) {
@@ -196,24 +191,22 @@ public class GrepApplication implements GrepInterface {
             throw new GrepException(ERR_NO_FILE_ARGS);
         }
 
-        String[] sanitizedFileNames = StringUtils.sanitizeStrings(fileNames);
-
-        if (sanitizedFileNames.length == 0) {
+        if (CollectionUtils.isAnyNull(fileNames)) {
             throw new GrepException(ERR_INVALID_FILES);
         }
 
         Pattern grepPattern = processRegexPattern(pattern, isCaseInsensitive);
         List<String> result = new ArrayList<>();
 
-        for (String fileName: sanitizedFileNames) {
+        for (String fileName: fileNames) {
             GrepResult content = computeGrepFromFile(grepPattern, fileName);
 
             content.outputError();
 
-            String stringContent = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
+            String contentString = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
 
-            if (!stringContent.isEmpty()) {
-                result.add(stringContent);
+            if (!contentString.isEmpty()) {
+                result.add(contentString);
             }
         }
 
@@ -266,26 +259,24 @@ public class GrepApplication implements GrepInterface {
             throw new GrepException(ERR_NO_FILE_ARGS);
         }
 
-        String[] sanitizedFileNames = StringUtils.sanitizeStrings(fileNames);
-
-        if (sanitizedFileNames.length == 0) {
+        if (CollectionUtils.isAnyNull(fileNames)) {
             throw new GrepException(ERR_INVALID_FILES);
         }
 
         Pattern grepPattern = processRegexPattern(pattern, isCaseInsensitive);
         List<String> result = new ArrayList<>();
 
-        for (String fileName: sanitizedFileNames) {
+        for (String fileName: fileNames) {
             GrepResult content = fileName.equals(STRING_STDIN_FLAG)
                     ? computeGrepFromStdin(grepPattern, stdin)
                     : computeGrepFromFile(grepPattern, fileName);
 
             content.outputError();
 
-            String stringContent = content.formatToString(isCountLines, true);
+            String contentString = content.formatToString(isCountLines, true);
 
-            if (!stringContent.isEmpty()) {
-                result.add(stringContent);
+            if (!contentString.isEmpty()) {
+                result.add(contentString);
             }
         }
 

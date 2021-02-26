@@ -26,7 +26,7 @@ public final class IOUtils {
      */
     public static InputStream openInputStream(String fileName) throws ShellException {
         try {
-            return Files.newInputStream(resolveFilePath(fileName));
+            return Files.newInputStream(resolveAbsoluteFilePath(fileName));
         } catch (SecurityException e) {
             throw new ShellException(ERR_NO_PERM, e);
         } catch (IOException e) {
@@ -45,7 +45,7 @@ public final class IOUtils {
      */
     public static OutputStream openOutputStream(String fileName) throws ShellException {
         try {
-            return Files.newOutputStream(resolveFilePath(fileName));
+            return Files.newOutputStream(resolveAbsoluteFilePath(fileName));
         } catch (SecurityException e) {
             throw new ShellException(ERR_NO_PERM, e);
         } catch (IOException e) {
@@ -91,13 +91,14 @@ public final class IOUtils {
         }
     }
 
-    public static Path resolveFilePath(String fileName) throws ShellException {
+    public static Path resolveAbsoluteFilePath(String fileName) throws ShellException {
         if (fileName == null) {
             throw new ShellException(ERR_NO_FILE_ARGS);
         }
 
         try {
             return Paths.get(Environment.currentDirectory).resolve(fileName).normalize();
+
         } catch (InvalidPathException e) {
             throw new ShellException(ERR_INVALID_FILES, e);
         }

@@ -41,6 +41,6 @@ public class LsArgsParser extends ArgsParser {
     }
 
     public List<String> getFolderNames() {
-        return nonFlagArgs.stream().collect(Collectors.toList());
+        return List.copyOf(nonFlagArgs);
     }
 }

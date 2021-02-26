@@ -10,8 +10,8 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.parser.CatArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.CatResult;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -82,30 +82,25 @@ public class CatApplication implements CatInterface {
 
     private CatResult computeCatFile(String fileName) throws CatException {
         if (fileName == null) {
-            throw new CatException(ERR_NO_FILE_ARGS);
-        }
-
-        if (fileName.isBlank()) {
             throw new CatException(ERR_INVALID_FILES);
         }
 
-        String trimmedFileName = fileName.trim();
-
         try {
-            Path filePath = IOUtils.resolveFilePath(trimmedFileName);
-            if (!Files.exists(filePath)) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_FILE_NOT_FOUND);
+            Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
+
+            if (Files.notExists(filePath)) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
             }
 
             if (Files.isDirectory(filePath)) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_IS_DIR);
+                throw new InvalidDirectoryException(fileName, ERR_IS_DIR);
             }
 
             try {
                 return new CatResult(IOUtils.getLinesFromInputStream(Files.newInputStream(filePath)));
 
             } catch (Exception e) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_READING_FILE, e);
+                throw new InvalidDirectoryException(fileName, ERR_READING_FILE, e);
             }
 
         } catch (Exception e) {
@@ -131,23 +126,21 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_NO_FILE_ARGS);
         }
 
-        String[] sanitizedFileNames = StringUtils.sanitizeStrings(fileNames);
-
-        if (sanitizedFileNames.length == 0) {
+        if (CollectionUtils.isAnyNull(fileNames)) {
             throw new CatException(ERR_INVALID_FILES);
         }
 
         List<String> result = new ArrayList<>();
 
-        for (String fileName: sanitizedFileNames) {
+        for (String fileName: fileNames) {
             CatResult content = computeCatFile(fileName);
 
             content.outputError();
 
-            String stringContent = content.formatToString(isLineNumber);
+            String contentString = content.formatToString(isLineNumber);
 
-            if (!stringContent.isEmpty()) {
-                result.add(stringContent);
+            if (!contentString.isEmpty()) {
+                result.add(contentString);
             }
         }
 
@@ -177,25 +170,23 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_NO_FILE_ARGS);
         }
 
-        String[] sanitizedFileNames = StringUtils.sanitizeStrings(fileNames);
-
-        if (sanitizedFileNames.length == 0) {
+        if (CollectionUtils.isAnyNull(fileNames)) {
             throw new CatException(ERR_INVALID_FILES);
         }
 
         List<String> result = new ArrayList<>();
 
-        for (String fileName: sanitizedFileNames) {
+        for (String fileName: fileNames) {
             CatResult content = fileName.equals(STRING_STDIN_FLAG)
                     ? computeCatStdin(stdin)
                     : computeCatFile(fileName);
 
             content.outputError();
 
-            String stringContent = content.formatToString(isLineNumber);
+            String contentString = content.formatToString(isLineNumber);
 
-            if (!stringContent.isEmpty()) {
-                result.add(stringContent);
+            if (!contentString.isEmpty()) {
+                result.add(contentString);
             }
         }
 

@@ -4,7 +4,6 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 public final class StringUtils {
     public static final String STRING_LABEL_VALUE_PAIR = "%s: %s";
@@ -42,7 +41,7 @@ public final class StringUtils {
         }
 
         return Arrays.stream(strings)
-                .filter(Predicate.not(Objects::isNull))
+                .filter(Objects::nonNull)
                 .map(String::trim)
                 .toArray(String[]::new);
     }

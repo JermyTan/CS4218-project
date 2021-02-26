@@ -47,9 +47,9 @@ public class CdApplication implements CdInterface {
         }
 
         try {
-            Path path = IOUtils.resolveFilePath(pathStr);
+            Path path = IOUtils.resolveAbsoluteFilePath(pathStr);
 
-            if (!Files.exists(path)) {
+            if (Files.notExists(path)) {
                 throw new InvalidDirectoryException(pathStr, ERR_FILE_NOT_FOUND);
             }
 

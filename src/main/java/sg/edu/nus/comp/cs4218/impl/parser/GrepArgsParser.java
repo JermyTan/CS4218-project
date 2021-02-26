@@ -39,7 +39,7 @@ public class GrepArgsParser extends ArgsParser {
     }
 
     public List<String> getFileNames() {
-        return nonFlagArgs.subList(INDEX_FILES, nonFlagArgs.size()).stream().collect(Collectors.toList());
+        return List.copyOf(nonFlagArgs.subList(INDEX_FILES, nonFlagArgs.size()));
     }
 
     @Override

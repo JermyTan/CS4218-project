@@ -14,7 +14,7 @@ public class TeeArgsParser extends ArgsParser{
         legalFlags.add(FLAG_IS_APPEND);
     }
 
-    // allows null ars
+    // allows null args
     @Override
     public void parse(String... args) throws InvalidArgsException {
         if (args == null) {
@@ -29,6 +29,6 @@ public class TeeArgsParser extends ArgsParser{
     }
 
     public List<String> getFileNames() {
-        return nonFlagArgs.stream().collect(Collectors.toList());
+        return List.copyOf(nonFlagArgs);
     }
 }

@@ -17,8 +17,8 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.TeeException;
 import sg.edu.nus.comp.cs4218.impl.parser.TeeArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.TeeResult;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class TeeApplication implements TeeInterface {
 
@@ -80,32 +80,23 @@ public class TeeApplication implements TeeInterface {
         }
 
         if (fileName == null) {
-            throw new TeeException(ERR_NO_FILE_ARGS);
-        }
-
-        if (fileName.isBlank()) {
             throw new TeeException(ERR_INVALID_FILES);
         }
 
-        String trimmedFileName = fileName.trim();
-
         try {
-            Path filePath = IOUtils.resolveFilePath(trimmedFileName);
+            Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
 
             if (Files.isDirectory(filePath)) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_IS_DIR);
+                throw new InvalidDirectoryException(fileName, ERR_IS_DIR);
             }
 
             try {
-                if (isAppend) {
-                    Files.write(filePath, content, CREATE, WRITE, APPEND);
-                } else {
-                    Files.write(filePath, content, CREATE, WRITE, TRUNCATE_EXISTING);
-                }
+                Files.write(filePath, content, CREATE, WRITE, isAppend ? APPEND : TRUNCATE_EXISTING);
 
                 return new TeeResult();
+                
             } catch (Exception e) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_FILE_NOT_FOUND, e);
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND, e);
             }
 
         } catch (Exception e) {
@@ -119,12 +110,17 @@ public class TeeApplication implements TeeInterface {
             throw new TeeException(ERR_NO_ISTREAM);
         }
 
+        // okay for fileNames itself to be null but not okay if it contains any null values
+        if (fileNames != null && CollectionUtils.isAnyNull(fileNames)) {
+            throw new TeeException(ERR_INVALID_FILES);
+        }
+
         List<String> result = teeFromInputStream(stdin);
 
-        String[] sanitizedFileNames = StringUtils.sanitizeStrings(fileNames);
-
-        for (String fileName: sanitizedFileNames) {
-            teeToFile(isAppend, result, fileName).outputError();
+        if (fileNames != null) {
+            for (String fileName: fileNames) {
+                teeToFile(isAppend, result, fileName).outputError();
+            }
         }
 
         return String.join(STRING_NEWLINE, result);

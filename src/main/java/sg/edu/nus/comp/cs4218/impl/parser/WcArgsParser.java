@@ -45,6 +45,6 @@ public class WcArgsParser extends ArgsParser {
     }
 
     public List<String> getFileNames() {
-        return nonFlagArgs.stream().collect(Collectors.toList());
+        return List.copyOf(nonFlagArgs);
     }
 }

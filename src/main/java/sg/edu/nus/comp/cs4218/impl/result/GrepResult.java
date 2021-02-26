@@ -20,7 +20,7 @@ public class GrepResult extends Result {
         }
 
         this.label = label;
-        this.lines = lines;
+        this.lines = List.copyOf(lines);
     }
 
     public GrepResult(String errorMessage) {
@@ -32,18 +32,15 @@ public class GrepResult extends Result {
             return STRING_EMPTY;
         }
 
-        String result;
-
         if (isCountLines) {
             String stringCount = String.valueOf(lines.size());
-            result = isPrefixFileName ? String.format(STRING_LABEL_VALUE_PAIR, label, stringCount) : stringCount;
-        } else {
-            List<String> formattedLines = lines.stream()
-                    .map(line -> isPrefixFileName ? String.format(STRING_LABEL_VALUE_PAIR, label, line) : line)
-                    .collect(Collectors.toList());
-            result = String.join(STRING_NEWLINE, formattedLines);
+            return isPrefixFileName ? String.format(STRING_LABEL_VALUE_PAIR, label, stringCount) : stringCount;
         }
 
-        return result;
+        List<String> formattedLines = lines.stream()
+                .map(line -> isPrefixFileName ? String.format(STRING_LABEL_VALUE_PAIR, label, line) : line)
+                .collect(Collectors.toList());
+
+        return String.join(STRING_NEWLINE, formattedLines);
     }
 }

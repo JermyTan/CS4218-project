@@ -50,6 +50,6 @@ public class EchoApplication implements EchoInterface {
             throw new EchoException(ERR_NULL_ARGS);
         }
 
-        return String.join(STRING_WHITESPACE, args).trim();
+        return String.join(STRING_WHITESPACE, args);
     }
 }

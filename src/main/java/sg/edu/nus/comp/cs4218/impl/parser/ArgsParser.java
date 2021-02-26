@@ -24,6 +24,9 @@ public class ArgsParser {
     protected Set<Character> legalFlags = new HashSet<>();
     protected List<String> nonFlagArgs = new ArrayList<>();
 
+    protected ArgsParser() { // does not allow any direct initialisation
+    }
+
     /**
      * Separates command flags from non-flag arguments given a tokenized command.
      *

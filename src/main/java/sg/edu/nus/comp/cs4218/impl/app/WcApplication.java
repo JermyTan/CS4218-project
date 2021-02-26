@@ -7,6 +7,7 @@ import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.WcResult;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -138,29 +139,24 @@ public class WcApplication implements WcInterface {
 
     private WcResult computeStatisticsFromFile(String fileName) throws WcException {
         if (fileName == null) {
-            throw new WcException(ERR_NO_FILE_ARGS);
-        }
-
-        if (fileName.isBlank()) {
             throw new WcException(ERR_INVALID_FILES);
         }
 
-        String trimmedFileName = fileName.trim();
-
         try {
-            Path filePath = IOUtils.resolveFilePath(trimmedFileName);
-            if (!Files.exists(filePath)) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_FILE_NOT_FOUND);
+            Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
+
+            if (Files.notExists(filePath)) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
             }
 
             if (Files.isDirectory(filePath)) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_IS_DIR);
+                throw new InvalidDirectoryException(fileName, ERR_IS_DIR);
             }
 
             try {
-                return computeStatisticsFromInputStream(trimmedFileName, Files.newInputStream(filePath), filePath);
+                return computeStatisticsFromInputStream(fileName, Files.newInputStream(filePath), filePath);
             } catch (Exception e) {
-                throw new InvalidDirectoryException(trimmedFileName, ERR_READING_FILE, e);
+                throw new InvalidDirectoryException(fileName, ERR_READING_FILE, e);
             }
 
         } catch (Exception e) {
@@ -208,15 +204,13 @@ public class WcApplication implements WcInterface {
             throw new WcException(ERR_NO_FILE_ARGS);
         }
 
-        String[] sanitizedFileNames = StringUtils.sanitizeStrings(fileNames);
-
-        if (sanitizedFileNames.length == 0) {
+        if (CollectionUtils.isAnyNull(fileNames)) {
             throw new WcException(ERR_INVALID_FILES);
         }
 
         List<WcResult> result = new ArrayList<>();
 
-        for (String fileName: sanitizedFileNames) {
+        for (String fileName: fileNames) {
             WcResult statistics = computeStatisticsFromFile(fileName);
 
             statistics.outputError();
@@ -261,15 +255,13 @@ public class WcApplication implements WcInterface {
             throw new WcException(ERR_NO_FILE_ARGS);
         }
 
-        String[] sanitizedFileNames = StringUtils.sanitizeStrings(fileNames);
-
-        if (sanitizedFileNames.length == 0) {
+        if (CollectionUtils.isAnyNull(fileNames)) {
             throw new WcException(ERR_INVALID_FILES);
         }
 
         List<WcResult> result = new ArrayList<>();
 
-        for (String fileName: sanitizedFileNames) {
+        for (String fileName: fileNames) {
             WcResult statistics = fileName.equals(STRING_STDIN_FLAG)
                     ? computeStatisticsFromStdin(stdin)
                     : computeStatisticsFromFile(fileName);
