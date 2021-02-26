@@ -43,7 +43,7 @@ class RegexArgumentTest {
     private String resolveArg(String arg) {
         return Paths.get(RESOURCES_PATH, arg).toAbsolutePath().toString();
     }
-
+    /*
     @BeforeEach
     void setup() {
         regexArgument = new RegexArgument();
@@ -205,4 +205,5 @@ class RegexArgumentTest {
             assertEquals(directories.get(i), globbedFiles.get(i));
         }
     }
+     */
 }

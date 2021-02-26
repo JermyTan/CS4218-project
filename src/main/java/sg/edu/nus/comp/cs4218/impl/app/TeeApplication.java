@@ -111,7 +111,7 @@ public class TeeApplication implements TeeInterface {
         }
 
         // okay for fileNames itself to be null but not okay if it contains any null values
-        if (fileNames != null && CollectionUtils.isAnyNull(fileNames)) {
+        if (fileNames != null && CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new TeeException(ERR_INVALID_FILES);
         }
 

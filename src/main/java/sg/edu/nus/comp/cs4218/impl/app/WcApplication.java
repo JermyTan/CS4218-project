@@ -204,7 +204,7 @@ public class WcApplication implements WcInterface {
             throw new WcException(ERR_NO_FILE_ARGS);
         }
 
-        if (CollectionUtils.isAnyNull(fileNames)) {
+        if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new WcException(ERR_INVALID_FILES);
         }
 
@@ -255,7 +255,7 @@ public class WcApplication implements WcInterface {
             throw new WcException(ERR_NO_FILE_ARGS);
         }
 
-        if (CollectionUtils.isAnyNull(fileNames)) {
+        if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new WcException(ERR_INVALID_FILES);
         }
 

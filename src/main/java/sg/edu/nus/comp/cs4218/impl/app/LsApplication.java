@@ -112,7 +112,7 @@ public class LsApplication implements LsInterface {
             boolean isRecursive,
             String... folderNames
     ) throws LsException {
-        if (folderNames == null || CollectionUtils.isAnyNull(folderNames)) {
+        if (folderNames == null || CollectionUtils.isAnyNull((Object[]) folderNames)) {
             throw new LsException(ERR_INVALID_FILES);
         }
 
@@ -149,7 +149,7 @@ public class LsApplication implements LsInterface {
             String... folderNames
     ) throws LsException {
         // okay for folderNames itself to be null but not okay if it contains any null values
-        if (folderNames != null && CollectionUtils.isAnyNull(folderNames)) {
+        if (folderNames != null && CollectionUtils.isAnyNull((Object[]) folderNames)) {
             throw new LsException(ERR_INVALID_FILES);
         }
 

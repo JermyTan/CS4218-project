@@ -191,7 +191,7 @@ public class GrepApplication implements GrepInterface {
             throw new GrepException(ERR_NO_FILE_ARGS);
         }
 
-        if (CollectionUtils.isAnyNull(fileNames)) {
+        if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new GrepException(ERR_INVALID_FILES);
         }
 
@@ -259,7 +259,7 @@ public class GrepApplication implements GrepInterface {
             throw new GrepException(ERR_NO_FILE_ARGS);
         }
 
-        if (CollectionUtils.isAnyNull(fileNames)) {
+        if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new GrepException(ERR_INVALID_FILES);
         }
 

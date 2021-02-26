@@ -126,7 +126,7 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_NO_FILE_ARGS);
         }
 
-        if (CollectionUtils.isAnyNull(fileNames)) {
+        if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new CatException(ERR_INVALID_FILES);
         }
 
@@ -170,7 +170,7 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_NO_FILE_ARGS);
         }
 
-        if (CollectionUtils.isAnyNull(fileNames)) {
+        if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new CatException(ERR_INVALID_FILES);
         }
 
