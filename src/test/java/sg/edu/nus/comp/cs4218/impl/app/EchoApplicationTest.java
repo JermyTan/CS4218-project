@@ -9,7 +9,6 @@ import sg.edu.nus.comp.cs4218.exception.EchoException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PipedOutputStream;
-import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
