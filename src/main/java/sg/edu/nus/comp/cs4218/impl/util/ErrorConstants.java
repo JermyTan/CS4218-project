@@ -50,6 +50,11 @@ public final class ErrorConstants {
     public static final String ERR_FILE_EXISTS = "File or directory already exists";
     public static final String ERR_TOP_LEVEL_MISSING = "Top level folders do not exist";
 
+    // `split` related
+    public static final String ERR_OPTION_REQUIRES_ARGUMENT = "Option requires an argument";
+    public static final String ERR_ILLEGAL_LINE_COUNT = "Illegal line count";
+    public static final String ERR_ILLEGAL_BYTE_COUNT = "Illegal byte count";
+
     // General constants
     public static final String ERR_INVALID_APP = "Invalid app";
     public static final String ERR_NOT_SUPPORTED = "Not supported yet";

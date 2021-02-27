@@ -21,6 +21,7 @@ public class ApplicationRunner {
     public final static String APP_PASTE = "paste";
     public final static String APP_CD = "cd";
     public final static String APP_CAT = "cat";
+    public final static String APP_SPLIT = "split";
     public final static String APP_MV = "mv";
     public final static String APP_TEE = "tee";
     public final static String APP_RM = "rm";
@@ -62,6 +63,9 @@ public class ApplicationRunner {
                 break;
             case APP_CAT:
                 application = new CatApplication();
+                break;
+            case APP_SPLIT:
+                application = new SplitApplication();
                 break;
             case APP_MV:
                 application = new MvApplication();
