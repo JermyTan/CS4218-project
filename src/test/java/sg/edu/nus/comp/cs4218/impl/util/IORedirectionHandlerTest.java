@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,15 +15,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
-
-class ArgumentResolverStub extends ArgumentResolver {
-    @Override
-    public List<String> resolveOneArgument(String arg) {
-        return List.of(arg);
-    }
-}
 
 class IORedirectionHandlerTest {
 
@@ -34,11 +30,23 @@ class IORedirectionHandlerTest {
     private final Path file1 = Paths.get(FILE_1); // exists
     private final Path file2 = Paths.get(FILE_2); // does not exist
 
+    private IORedirectionHandler redirHandler;
+    private ArgumentResolver mockedArgumentResolver;
+    private InputStream mockedStdin;
+    private OutputStream mockedStdout;
+
     @BeforeEach
     void setup() {
         try {
             Files.createFile(file1);
-        } catch (IOException e) {
+
+            mockedArgumentResolver = mock(ArgumentResolver.class);
+            when(mockedArgumentResolver.resolveOneArgument(FILE_1)).thenReturn(List.of(FILE_1));
+            when(mockedArgumentResolver.resolveOneArgument(FILE_2)).thenReturn(List.of(FILE_2));
+
+            mockedStdin = mock(InputStream.class);
+            mockedStdout = mock(OutputStream.class);
+        } catch (Exception e) {
             fail(e.getMessage());
         }
     }
@@ -53,61 +61,61 @@ class IORedirectionHandlerTest {
         }
     }
 
-    private IORedirectionHandler constructRedirHandler(List<String> argsList) {
-        return new IORedirectionHandler(argsList, System.in, System.out, new ArgumentResolverStub());
+    private void buildRedirHandler(List<String> argsList) {
+        redirHandler = new IORedirectionHandler(argsList, mockedStdin, mockedStdout, mockedArgumentResolver);
     }
 
     @Test
     public void extractRedirOptions_NullArgList_ThrowsException() {
-        IORedirectionHandler redirHandler = constructRedirHandler(null);
+        buildRedirHandler(null);
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
     public void extractRedirOptions_EmptyArgList_ThrowsException() {
-        IORedirectionHandler redirHandler = constructRedirHandler(new LinkedList<>());
+        buildRedirHandler(new LinkedList<>());
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
     public void extractRedirOptions_NoFileSpecified_ThrowsException() {
-        IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_INPUT));
+        buildRedirHandler(List.of(STRING_REDIR_INPUT));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
     public void extractRedirOptions_ConsecutiveRedirOptions_ThrowsException() {
-        IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_INPUT, STRING_REDIR_INPUT));
+        buildRedirHandler(List.of(STRING_REDIR_INPUT, STRING_REDIR_INPUT));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
     public void extractRedirOptions_TwoInputRedir_ThrowsException() {
-        IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_INPUT, FILE_1, STRING_REDIR_INPUT, FILE_2));
+        buildRedirHandler(List.of(STRING_REDIR_INPUT, FILE_1, STRING_REDIR_INPUT, FILE_2));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
     public void extractRedirOptions_TwoOutputRedir_ThrowsException() {
-        IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_OUTPUT, FILE_1, STRING_REDIR_OUTPUT, FILE_2));
+        buildRedirHandler(List.of(STRING_REDIR_OUTPUT, FILE_1, STRING_REDIR_OUTPUT, FILE_2));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
     public void extractRedirOptions_InputRedirFileDoesNotExist_ThrowsException() {
-        IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_INPUT, FILE_2));
+        buildRedirHandler(List.of(STRING_REDIR_INPUT, FILE_2));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
     public void extractRedirOptions_OutputRedirMultipleFiles_ThrowsException() {
-        IORedirectionHandler redirHandler = constructRedirHandler(List.of(STRING_REDIR_OUTPUT, FILE_1, FILE_2));
+        buildRedirHandler(List.of(STRING_REDIR_OUTPUT, FILE_1, FILE_2));
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 
     @Test
     public void extractRedirOptions_ValidArgList_RemovesRedirOptions() {
-        IORedirectionHandler redirHandler = constructRedirHandler(List.of("paste", STRING_REDIR_INPUT, FILE_1, STRING_REDIR_OUTPUT, FILE_2));
+        buildRedirHandler(List.of("paste", STRING_REDIR_INPUT, FILE_1, STRING_REDIR_OUTPUT, FILE_2));
 
         assertDoesNotThrow(() -> redirHandler.extractRedirOptions());
 
