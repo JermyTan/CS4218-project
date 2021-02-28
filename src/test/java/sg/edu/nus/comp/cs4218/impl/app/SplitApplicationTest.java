@@ -170,10 +170,9 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenLinesOptionInvalidNumber_ShouldThrowException() {
-        String[] args = { LINES_OPTION, "0" };
+    void testSplitStdinByLines_WhenInvalidNumber_ShouldThrowException() {
         Throwable thrown = assertThrows(SplitException.class,
-                () -> splitApp.run(args, testStream, null));
+                () -> splitApp.splitStdinByLines(testStream, null, -100));
         Exception expected = new SplitException(ERR_ILLEGAL_LINE_COUNT);
         assertEquals(expected.getMessage(), thrown.getMessage());
     }
@@ -188,19 +187,25 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenBytesOptionInvalidNumber_ShouldThrowException() {
-        String[] args = { BYTES_OPTION, "0" };
+    void testSplitStdinByBytes_WhenNotANumber_ShouldThrowException() {
         Throwable thrown = assertThrows(SplitException.class,
-                () -> splitApp.run(args, testStream, null));
+                () -> splitApp.splitStdinByBytes(testStream, null, "def"));
         Exception expected = new SplitException(ERR_ILLEGAL_BYTE_COUNT);
         assertEquals(expected.getMessage(), thrown.getMessage());
     }
 
     @Test
-    void testRun_WhenBytesOptionInvalidAppendage_ShouldThrowException() {
-        String[] args = { BYTES_OPTION, "1024a" };
+    void testSplitStdinByBytes_WhenInvalidNumber_ShouldThrowException() {
         Throwable thrown = assertThrows(SplitException.class,
-                () -> splitApp.run(args, testStream, null));
+                () -> splitApp.splitStdinByBytes(testStream, null, "0"));
+        Exception expected = new SplitException(ERR_ILLEGAL_BYTE_COUNT);
+        assertEquals(expected.getMessage(), thrown.getMessage());
+    }
+
+    @Test
+    void testSplitStdinByBytes_WhenInvalidAppendage_ShouldThrowException() {
+        Throwable thrown = assertThrows(SplitException.class,
+                () -> splitApp.splitStdinByBytes(testStream, null, "1024a"));
         Exception expected = new SplitException(ERR_ILLEGAL_BYTE_COUNT);
         assertEquals(expected.getMessage(), thrown.getMessage());
     }
@@ -320,10 +325,9 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When3LinesOption8LinesStdin_ShouldGet3Splits() throws Exception {
+    void testSplitStdinByLines_When3LinesOption8LinesStdin_ShouldGet3Splits() throws Exception {
         testStream = generateStream(generateString(8));
-        String[] args = { LINES_OPTION, "3" };
-        assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
+        assertDoesNotThrow(() -> splitApp.splitStdinByLines(testStream, null, 3));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAC);
         File overflowFile = new File(TEST_DIRNAME + File.separator + XAD);
@@ -334,6 +338,24 @@ class SplitApplicationTest {
         String actualFirstContent = new String(Files.readAllBytes(firstFile.toPath()));
         assertEquals(expectedFirstContent, actualFirstContent);
         String expectedLastContent = generateString(2);
+        String actualLastContent = new String(Files.readAllBytes(lastFile.toPath()));
+        assertEquals(expectedLastContent, actualLastContent);
+    }
+
+    @Test
+    void testSplitFileByLines_When20LinesOption100LinesFile_ShouldGet5Splits() throws Exception {
+        Files.writeString(testFile.toPath(), generateString(100));
+        assertDoesNotThrow(() -> splitApp.splitFileByLines(TEST_FILENAME, null, 20));
+        File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
+        File lastFile = new File(TEST_DIRNAME + File.separator + XAE);
+        File overflowFile = new File(TEST_DIRNAME + File.separator + XAF);
+        assertTrue(firstFile.exists());
+        assertTrue(lastFile.exists());
+        assertFalse(overflowFile.exists());
+        String expectedFirstContent = generateString(20);
+        String actualFirstContent = new String(Files.readAllBytes(firstFile.toPath()));
+        assertEquals(expectedFirstContent, actualFirstContent);
+        String expectedLastContent = generateString(20);
         String actualLastContent = new String(Files.readAllBytes(lastFile.toPath()));
         assertEquals(expectedLastContent, actualLastContent);
     }
@@ -358,11 +380,10 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When16BytesOption46BytesStdin_ShouldGet3Splits() throws Exception {
+    void testSplitStdinByBytes_When16BytesOption46BytesStdin_ShouldGet3Splits() throws Exception {
         byte[] testContent = generateBytes(46);
         testStream = generateStream(testContent);
-        String[] args = { BYTES_OPTION, "16" };
-        assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
+        assertDoesNotThrow(() -> splitApp.splitStdinByBytes(testStream, null, "16"));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAC);
         File overflowFile = new File(TEST_DIRNAME + File.separator + XAD);
@@ -378,11 +399,10 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When8BytesOption16BytesFile_ShouldGet2Splits() throws Exception {
+    void testSplitFileByBytes_When8BytesOption16BytesFile_ShouldGet2Splits() throws Exception {
         byte[] testContent = generateBytes(16);
         Files.write(testFile.toPath(), testContent);
-        String[] args = { BYTES_OPTION, "8", TEST_FILENAME };
-        assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
+        assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME,null, "8"));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAB);
         File overflowFile = new File(TEST_DIRNAME + File.separator + XAC);
@@ -398,11 +418,10 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When16bBytesOption2048BytesStdin_ShouldGet2Splits() throws Exception {
+    void testSplitStdinByBytes_When16bBytesOption2048BytesStdin_ShouldGet2Splits() throws Exception {
         byte[] testContent = generateBytes(16384);
         testStream = generateStream(testContent);
-        String[] args = { BYTES_OPTION, "16b" };
-        assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
+        assertDoesNotThrow(() -> splitApp.splitStdinByBytes(testStream, null, "16b"));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAB);
         File overflowFile = new File(TEST_DIRNAME + File.separator + XAC);
@@ -418,11 +437,10 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When2kBytesOption8000BytesFile_ShouldGet4Splits() throws Exception {
+    void testSplitFileByBytes_When2kBytesOption8000BytesFile_ShouldGet4Splits() throws Exception {
         byte[] testContent = generateBytes(8000);
         Files.write(testFile.toPath(), testContent);
-        String[] args = { BYTES_OPTION, "2k", TEST_FILENAME };
-        assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
+        assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME,null, "2k"));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAD);
         File overflowFile = new File(TEST_DIRNAME + File.separator + XAE);
@@ -433,6 +451,25 @@ class SplitApplicationTest {
         byte[] actualFirstContent = Files.readAllBytes(firstFile.toPath());
         assertArrayEquals(expectedFirstContent, actualFirstContent);
         byte[] expectedLastContent = Arrays.copyOfRange(testContent, 6144, 8000);
+        byte[] actualLastContent = Files.readAllBytes(lastFile.toPath());
+        assertArrayEquals(expectedLastContent, actualLastContent);
+    }
+
+    @Test
+    void testSplitStdinByBytes_When1mBytesOption2000000BytesStdin_ShouldGet2Splits() throws Exception {
+        byte[] testContent = generateBytes(2000000);
+        testStream = generateStream(testContent);
+        assertDoesNotThrow(() -> splitApp.splitStdinByBytes(testStream, null, "1m"));
+        File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
+        File lastFile = new File(TEST_DIRNAME + File.separator + XAB);
+        File overflowFile = new File(TEST_DIRNAME + File.separator + XAC);
+        assertTrue(firstFile.exists());
+        assertTrue(lastFile.exists());
+        assertFalse(overflowFile.exists());
+        byte[] expectedFirstContent = Arrays.copyOfRange(testContent, 0, 1048576);
+        byte[] actualFirstContent = Files.readAllBytes(firstFile.toPath());
+        assertArrayEquals(expectedFirstContent, actualFirstContent);
+        byte[] expectedLastContent = Arrays.copyOfRange(testContent, 1048576, 2000000);
         byte[] actualLastContent = Files.readAllBytes(lastFile.toPath());
         assertArrayEquals(expectedLastContent, actualLastContent);
     }
@@ -456,6 +493,4 @@ class SplitApplicationTest {
         byte[] actualLastContent = Files.readAllBytes(lastFile.toPath());
         assertArrayEquals(expectedLastContent, actualLastContent);
     }
-
-
 }

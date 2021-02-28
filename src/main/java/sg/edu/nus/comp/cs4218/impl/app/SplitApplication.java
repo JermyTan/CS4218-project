@@ -6,8 +6,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +13,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,8 +22,10 @@ import java.util.regex.Pattern;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.app.SplitInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.SplitException;
 import sg.edu.nus.comp.cs4218.impl.parser.SplitArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 @SuppressWarnings("PMD.GodClass")
 public class SplitApplication implements SplitInterface {
@@ -50,7 +52,7 @@ public class SplitApplication implements SplitInterface {
             if (fileName == null || fileName.equals(STRING_STDIN_FLAG)) {
                 splitStdinByBytes(stdin, prefix, numOfLinesOrBytes);
             } else {
-                splitFileByBytes(Environment.currentDirectory + File.separator + fileName, prefix, numOfLinesOrBytes);
+                splitFileByBytes(fileName, prefix, numOfLinesOrBytes);
             }
         } else {
             int linesPerFile;
@@ -59,14 +61,10 @@ public class SplitApplication implements SplitInterface {
             } catch (NumberFormatException e) {
                 throw new SplitException(ERR_ILLEGAL_LINE_COUNT, e);
             }
-            if (linesPerFile < 1) {
-                throw new SplitException(ERR_ILLEGAL_LINE_COUNT);
-            }
-
             if (fileName == null || fileName.equals(STRING_STDIN_FLAG)) {
                 splitStdinByLines(stdin, prefix, linesPerFile);
             } else {
-                splitFileByLines(Environment.currentDirectory + File.separator + fileName, prefix, linesPerFile);
+                splitFileByLines(fileName, prefix, linesPerFile);
             }
         }
     }
@@ -118,18 +116,32 @@ public class SplitApplication implements SplitInterface {
     @Override
     public void splitFileByLines(String fileName, String prefix, int linesPerFile) throws SplitException {
         try {
-            splitStdinByLines(new FileInputStream(fileName), prefix, linesPerFile);
-        } catch (FileNotFoundException e) {
-            throw new SplitException(ERR_FILE_NOT_FOUND, e);
+            Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
+            if (Files.notExists(filePath)) {
+                throw new SplitException(ERR_FILE_NOT_FOUND);
+            }
+            if (Files.isDirectory(filePath)) {
+                throw new SplitException(ERR_IS_DIR);
+            }
+            splitStdinByLines(Files.newInputStream(filePath), prefix, linesPerFile);
+        } catch (IOException | ShellException e) {
+            throw new SplitException(ERR_IO_EXCEPTION, e);
         }
     }
 
     @Override
     public void splitFileByBytes(String fileName, String prefix, String bytesPerFile) throws SplitException {
         try {
-            splitStdinByBytes(new FileInputStream(fileName), prefix, bytesPerFile);
-        } catch (FileNotFoundException e) {
-            throw new SplitException(ERR_FILE_NOT_FOUND, e);
+            Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
+            if (Files.notExists(filePath)) {
+                throw new SplitException(ERR_FILE_NOT_FOUND);
+            }
+            if (Files.isDirectory(filePath)) {
+                throw new SplitException(ERR_IS_DIR);
+            }
+            splitStdinByBytes(Files.newInputStream(filePath), prefix, bytesPerFile);
+        } catch (IOException | ShellException e) {
+            throw new SplitException(ERR_IO_EXCEPTION, e);
         }
     }
 
@@ -137,6 +149,14 @@ public class SplitApplication implements SplitInterface {
     public void splitStdinByLines(InputStream stdin, String prefix, int linesPerFile) throws SplitException {
         if (stdin == null) {
             throw new SplitException(ERR_NO_ISTREAM);
+        }
+
+        if (prefix == null || prefix.trim().isEmpty()) {
+            prefix = DEFAULT_PREFIX;
+        }
+
+        if (linesPerFile < 1) {
+            throw new SplitException(ERR_ILLEGAL_LINE_COUNT);
         }
 
         try {
@@ -168,6 +188,10 @@ public class SplitApplication implements SplitInterface {
     public void splitStdinByBytes(InputStream stdin, String prefix, String bytesPerFile) throws SplitException {
         if (stdin == null) {
             throw new SplitException(ERR_NO_ISTREAM);
+        }
+
+        if (prefix == null || prefix.trim().isEmpty()) {
+            prefix = DEFAULT_PREFIX;
         }
 
         try {
