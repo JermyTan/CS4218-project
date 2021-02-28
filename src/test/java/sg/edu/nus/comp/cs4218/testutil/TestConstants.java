@@ -47,4 +47,6 @@ public final class TestConstants {
     );
 
     public static final Exception EXCEPTION = new Exception(STRING_SINGLE_WORD);
+
+    public static final String RESOURCES_PATH = "src/test/resources";
 }

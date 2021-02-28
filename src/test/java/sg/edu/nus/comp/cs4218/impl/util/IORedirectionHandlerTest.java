@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +32,6 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class IORedirectionHandlerTest {
 
-    private static final String RESOURCES_PATH = "src/test/resources";
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
     private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "IORedirectionHandlerTest";
     private static final String FILE_1 = "file1.txt"; // exists

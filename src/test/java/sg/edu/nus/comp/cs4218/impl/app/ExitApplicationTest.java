@@ -1,22 +1,16 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import org.junit.jupiter.api.Test;
+import sg.edu.nus.comp.cs4218.impl.util.SystemExit;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-
-import sg.edu.nus.comp.cs4218.impl.util.SystemExit;
+import static org.mockito.Mockito.*;
 
 
 class ExitApplicationTest {
 
-    @Mock
     private final SystemExit systemExit = mock(SystemExit.class);
 
     @Test

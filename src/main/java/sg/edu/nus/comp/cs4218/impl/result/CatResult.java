@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.result;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.util.List;
@@ -35,7 +34,7 @@ public class CatResult extends Result {
 
         if (isLineNumber) {
             result = IntStream.rangeClosed(1, lines.size())
-                    .mapToObj(index -> String.format(STRING_LABEL_VALUE_PAIR, index, lines.get(index - 1)))
+                    .mapToObj(index -> String.format("%s %s", index, lines.get(index - 1)))
                     .collect(Collectors.toList());
         }
 

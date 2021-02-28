@@ -14,6 +14,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,7 +39,6 @@ import sg.edu.nus.comp.cs4218.exception.MvException;
 
 class MvApplicationTest {
 
-    private static final String RESOURCES_PATH = "src/test/resources";
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
     private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "MvApplicationTest";
 

@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -15,7 +16,6 @@ import sg.edu.nus.comp.cs4218.Environment;
 
 class RegexArgumentTest {
 
-    private static final String RESOURCES_PATH = "src/test/resources";
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
     private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "RegexArgumentTest";
 
