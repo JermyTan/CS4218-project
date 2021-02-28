@@ -22,6 +22,7 @@ import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 import static sg.edu.nus.comp.cs4218.impl.app.SplitApplication.DEFAULT_LINES;
 import static sg.edu.nus.comp.cs4218.impl.app.SplitApplication.DEFAULT_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SplitApplicationTest {
@@ -31,7 +32,7 @@ class SplitApplicationTest {
     private static final String DEFAULT_OPTION_ARG = String.valueOf(DEFAULT_LINES);
 
     private static final String DEFAULT_DIRNAME = Environment.currentDirectory;
-    private static final String TEST_DIRNAME = Environment.currentDirectory + File.separator + "SplitApplicationTest";
+    private static final String TEST_DIRNAME = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "SplitApplicationTest";
     private static final String TEST_FILENAME = "test.txt";
     private static final String TEST_STRING = "The quick brown fox jumped over the lazy dog.\n"; // 46 bytes
     private static final String XAA = "xaa";
@@ -214,7 +215,6 @@ class SplitApplicationTest {
         assertTrue(file.exists());
         String actualContent = new String(Files.readAllBytes(file.toPath()));
         assertEquals(expectedContent, actualContent);
-
     }
 
     @Test

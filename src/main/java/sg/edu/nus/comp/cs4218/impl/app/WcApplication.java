@@ -134,9 +134,8 @@ public class WcApplication implements WcInterface {
             long numLines = lines.size();
             long numWords = lines.stream().map(StringUtils::tokenize).flatMap(Stream::of).count();
             long numBytes = filePath == null
-                    ? lines.stream().mapToInt(line -> line.getBytes().length).sum() + numWords
+                    ? lines.stream().mapToInt(line -> line.getBytes().length).sum() + numLines
                     : Files.size(filePath);
-
 
             return new WcResult(label, numLines, numWords, numBytes);
 
