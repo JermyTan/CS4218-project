@@ -1,10 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_OPTION_REQUIRES_ARGUMENT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_OPTIONS;
+
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class SplitArgsParser extends ArgsParser {
     private final static char FLAG_IS_SPLIT_BY_LINES = 'l';

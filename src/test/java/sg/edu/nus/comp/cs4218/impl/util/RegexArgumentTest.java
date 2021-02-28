@@ -1,13 +1,20 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +53,11 @@ class RegexArgumentTest {
     @BeforeEach
     void setup() {
         regexArgument = new RegexArgument();
+    }
+
+    @AfterEach
+    void tearDown() {
+        regexArgument = null;
     }
 
     @Test
@@ -156,7 +168,7 @@ class RegexArgumentTest {
     }
 
     @Test
-    public void globFiles_ConsecutiveAsterisks_SameAsSingleAsterisk() {
+    void globFiles_ConsecutiveAsterisks_SameAsSingleAsterisk() {
         regexArgument.merge("f");
         regexArgument.appendAsterisk();
         regexArgument.appendAsterisk();
@@ -171,7 +183,7 @@ class RegexArgumentTest {
     }
 
     @Test
-    public void globFiles_MultipleAsterisks_ReturnsGlobbedFilesSorted() {
+    void globFiles_MultipleAsterisks_ReturnsGlobbedFilesSorted() {
         regexArgument.appendAsterisk();
         regexArgument.merge("test");
         regexArgument.appendAsterisk();
@@ -181,5 +193,93 @@ class RegexArgumentTest {
         assertEquals(2, globbedFiles.size());
         assertEquals(resolveArg(FILE_3), globbedFiles.get(0));
         assertEquals(resolveArg(FOLDER_3), globbedFiles.get(1));
+    }
+
+    @Test
+    void append_EmptyRegexArg_CharAppendedRegexArg() {
+        regexArgument.append('a');
+        assertEquals("a", regexArgument.toString());
+    }
+
+    @Test
+    void append_NonEmptyRegexArg_CharAppendedRegexArg() {
+        regexArgument = new RegexArgument(STRING_SINGLE_WORD);
+        regexArgument.append('a');
+        assertEquals(STRING_SINGLE_WORD + "a", regexArgument.toString());
+    }
+
+    @Test
+    void appendAsterisk_EmptyRegexArg_AsteriskAppendedRegexArg() {
+        regexArgument.appendAsterisk();
+        assertEquals("*", regexArgument.toString());
+    }
+
+    @Test
+    void appendAsterisk_NonEmptyRegexArg_AsteriskAppendedRegexArg() {
+        regexArgument = new RegexArgument(STRING_SINGLE_WORD);
+        regexArgument.appendAsterisk();
+        assertEquals(STRING_SINGLE_WORD + "*", regexArgument.toString());
+    }
+
+    @Test
+    void merge_WithOtherNonEmptyRegexArg_MergedRegexArg() {
+        RegexArgument otherRegexArg = new RegexArgument(STRING_SINGLE_WORD);
+        regexArgument.merge(otherRegexArg);
+        assertEquals(STRING_SINGLE_WORD, regexArgument.toString());
+    }
+
+    @Test
+    void merge_WithOtherEmptyRegexArg_OriginalRegexArg() {
+        RegexArgument otherRegexArg = new RegexArgument();
+        regexArgument.merge(otherRegexArg);
+        assertEquals(STRING_EMPTY, regexArgument.toString());
+    }
+
+    @Test
+    void merge_WithNonEmptyString_MergedRegexArg() {
+        regexArgument = new RegexArgument(STRING_SINGLE_WORD);
+        regexArgument.merge(STRING_MULTI_WORDS);
+        assertEquals(STRING_SINGLE_WORD + STRING_MULTI_WORDS, regexArgument.toString());
+    }
+
+    @Test
+    void merge_WithEmptyString_OriginalRegexArg() {
+        regexArgument = new RegexArgument(STRING_SINGLE_WORD);
+        regexArgument.merge(STRING_EMPTY);
+        assertEquals(STRING_SINGLE_WORD, regexArgument.toString());
+    }
+
+    @Test
+    void isEmpty_EmptyRegexArg_ReturnsTrue() {
+        assertTrue(regexArgument.isEmpty());
+    }
+
+    @Test
+    void isEmpty_WhitespacesOnlyRegexArg_ReturnsFalse() {
+        regexArgument = new RegexArgument(STRING_BLANK);
+        assertFalse(regexArgument.isEmpty());
+    }
+
+    @Test
+    void isEmpty_NonEmptyRegexArg_ReturnsFalse() {
+        regexArgument = new RegexArgument(STRING_SINGLE_WORD);
+        assertFalse(regexArgument.isEmpty());
+    }
+
+    @Test
+    void toString_EmptyRegexArg_ReturnsEmptyString() {
+        assertEquals(STRING_EMPTY, regexArgument.toString());
+    }
+
+    @Test
+    void toString_WhitespacesOnlyRegexArg_ReturnsWhitespacesOnlyString() {
+        regexArgument = new RegexArgument(STRING_BLANK);
+        assertEquals(STRING_BLANK, regexArgument.toString());
+    }
+
+    @Test
+    void toString_NonEmptyRegexArg_ReturnsNonEmptyString() {
+        regexArgument = new RegexArgument(STRING_MULTI_WORDS);
+        assertEquals(STRING_MULTI_WORDS, regexArgument.toString());
     }
 }

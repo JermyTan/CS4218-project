@@ -24,7 +24,7 @@ public class MvArgsParser extends ArgsParser {
     }
 
     public List<String> getSrcFiles() {
-        return List.copyOf(nonFlagArgs.subList(0, nonFlagArgs.size()-1));
+        return List.copyOf(nonFlagArgs.subList(0, nonFlagArgs.size() - 1));
     }
 
     @Override

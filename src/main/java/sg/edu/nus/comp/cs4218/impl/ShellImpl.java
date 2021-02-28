@@ -22,7 +22,7 @@ public class ShellImpl implements Shell {
      * @param args List of strings arguments, unused.
      */
     public static void main(String... args) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));//NOPMD
         Shell shell = new ShellImpl();
 
         while (true) {

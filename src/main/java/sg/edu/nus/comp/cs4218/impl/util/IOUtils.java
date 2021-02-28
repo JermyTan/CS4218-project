@@ -4,6 +4,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CLOSING_STREAM
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CREATE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READ_STREAM;
 
@@ -120,6 +121,10 @@ public final class IOUtils {
      * @throws ShellException if there is error reading from input stream.
      */
     public static List<String> getLinesFromInputStream(InputStream input) throws ShellException {
+        if (input == null) {
+            throw new ShellException(ERR_NO_ISTREAM);
+        }
+
         List<String> output = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         String line;

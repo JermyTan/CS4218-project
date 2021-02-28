@@ -1,23 +1,29 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.GrepException;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.GrepException;
 
 class GrepApplicationTest {
 
@@ -96,7 +102,7 @@ class GrepApplicationTest {
 
     @BeforeEach
     void setUp() {
-        testInputStream =  new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8));
+        testInputStream = new ByteArrayInputStream(TEST_STRING.getBytes(StandardCharsets.UTF_8));
         testOutputStream = new ByteArrayOutputStream();
     }
 
@@ -108,27 +114,27 @@ class GrepApplicationTest {
 
     @Test
     void testRun_WhenNullArgs_ShouldThrowException() {
-        String[] args = { null };
+        String[] args = {null};
         assertThrows(GrepException.class, () -> grepApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
     void testRun_WhenIllegalFlagWrongLetter_ShouldThrowException() {
-        String[] args = { "-a" };
+        String[] args = {"-a"};
         assertThrows(GrepException.class,
                 () -> grepApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
     void testRun_WhenIllegalFlagLegalLetterWrongCase_ShouldThrowException() {
-        String[] args = { "-C" };
+        String[] args = {"-C"};
         assertThrows(GrepException.class,
                 () -> grepApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
     void testRun_WhenFilenameDash_ShouldUseStdin() {
-        String[] args = { "Copyright", "-" };
+        String[] args = {"Copyright", "-"};
         assertDoesNotThrow(() -> grepApp.run(args, testInputStream, testOutputStream));
         List<String> result = testOutputStream.toString().lines().collect(Collectors.toList());
         assertEquals(1, result.size());
@@ -171,7 +177,13 @@ class GrepApplicationTest {
 
     @Test
     void testGrepFromFiles_WhenOneFileFindPhrase_ShouldPrintLines() {
-        String output = assertDoesNotThrow(() -> grepApp.grepFromFiles("the above copyright notice, this list of conditions and the following disclaimer", false, false, false, TEST_FILENAME));
+        String output = assertDoesNotThrow(
+                () -> grepApp.grepFromFiles(
+                        "the above copyright notice, this list of conditions and the following disclaimer",//NOPMD
+                        false,
+                        false,
+                        false, TEST_FILENAME)
+        );
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(2, result.size());
         assertEquals(TEST_LINE_4, result.get(0));

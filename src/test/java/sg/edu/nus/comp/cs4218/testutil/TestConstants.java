@@ -28,7 +28,7 @@ public final class TestConstants {
     public static final String STRING_NO_EXT_FILE = " build  ";
     public static final String STRING_FILE_JPG = "image.jpg";
     public static final String STRING_FILE_MD = "markdown.md";
-    public static final String STRING_CUSTOM_EXT_FILE = "custom.custom";
+    public static final String STRING_CUSTOM_EXT_FILE = "custom.CusTom";
     public static final String STRING_LEADING_PERIOD_FILE_TXT = ".test.txt";
     public static final String STRING_LEADING_PERIOD_NO_EXT_FILE = ".file";
     public static final String STRING_TRAILING_PERIOD_FILE = "test.";

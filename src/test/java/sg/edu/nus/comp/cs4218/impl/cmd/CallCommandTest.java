@@ -1,14 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
-import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.SHELL;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.File;
 import java.io.InputStream;
@@ -16,12 +19,15 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.SHELL;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
+import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 class CallCommandTest {
 
@@ -30,13 +36,10 @@ class CallCommandTest {
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
-
-    private CallCommand command;
-    private ApplicationRunner appRunner;
-    private ArgumentResolver argumentResolver;
-
     private final InputStream stdin = mock(InputStream.class);
     private final OutputStream stdout = mock(OutputStream.class);
+    private CallCommand command;
+    private ApplicationRunner appRunner;
 
     @BeforeAll
     static void setupBeforeAll() {
@@ -50,7 +53,7 @@ class CallCommandTest {
 
     private void buildCommand(List<String> argList) {
         appRunner = mock(ApplicationRunner.class);
-        argumentResolver = spy(ArgumentResolver.class);
+        ArgumentResolver argumentResolver = spy(ArgumentResolver.class);
         command = new CallCommand(argList, appRunner, argumentResolver);
     }
 
@@ -72,7 +75,7 @@ class CallCommandTest {
 
     @Test
     public void evaluate_NoIORedirectionNoQuotingNoGlobingNoCommandSub_AppRunWithCorrectArgs() {
-        buildCommand(List.of("echo", "abc"));
+        buildCommand(List.of("echo", "abc"));//NOPMD
 
         assertDoesNotThrow(() -> {
             command.evaluate(stdin, stdout);

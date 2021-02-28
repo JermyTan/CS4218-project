@@ -1,13 +1,22 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.SplitException;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.app.SplitApplication.DEFAULT_LINES;
+import static sg.edu.nus.comp.cs4218.impl.app.SplitApplication.DEFAULT_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_BYTE_COUNT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_LINE_COUNT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_OPTION_REQUIRES_ARGUMENT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_OPTIONS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -17,13 +26,14 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Random;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
-import static sg.edu.nus.comp.cs4218.impl.app.SplitApplication.DEFAULT_LINES;
-import static sg.edu.nus.comp.cs4218.impl.app.SplitApplication.DEFAULT_PREFIX;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.SplitException;
 
 class SplitApplicationTest {
 
@@ -49,6 +59,19 @@ class SplitApplicationTest {
 
     private final SplitApplication splitApp = new SplitApplication();
 
+    @BeforeAll
+    static void setUpBeforeAll() {
+        testDir = new File(TEST_DIRNAME);
+        testDir.mkdir();
+        Environment.currentDirectory = TEST_DIRNAME;
+    }
+
+    @AfterAll
+    static void tearDownAfterAll() {
+        testDir.delete();
+        Environment.currentDirectory = DEFAULT_DIRNAME;
+    }
+
     private String generateString(int lines) {
         return TEST_STRING.repeat(Math.max(0, lines));
     }
@@ -65,19 +88,6 @@ class SplitApplicationTest {
 
     private InputStream generateStream(byte[] arr) {
         return new ByteArrayInputStream(arr);
-    }
-
-    @BeforeAll
-    static void setUpBeforeAll() {
-        testDir = new File(TEST_DIRNAME);
-        testDir.mkdir();
-        Environment.currentDirectory = TEST_DIRNAME;
-    }
-
-    @AfterAll
-    static void tearDownAfterAll() {
-        testDir.delete();
-        Environment.currentDirectory = DEFAULT_DIRNAME;
     }
 
     @BeforeEach
@@ -97,7 +107,7 @@ class SplitApplicationTest {
 
     @Test
     void testRun_WhenNullArgs_ShouldThrowException() {
-        String[] args = { null };
+        String[] args = {null};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
         Exception expected = new SplitException(ERR_NULL_ARGS);
@@ -107,7 +117,7 @@ class SplitApplicationTest {
     @Test
     void testRun_WhenIllegalOptionWrongLetter_ShouldThrowException() {
         String illegalFlag = "r";
-        String[] args = { CHAR_FLAG_PREFIX + illegalFlag, DEFAULT_OPTION_ARG };
+        String[] args = {CHAR_FLAG_PREFIX + illegalFlag, DEFAULT_OPTION_ARG};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
         Exception expected = new SplitException(ILLEGAL_FLAG_MSG + illegalFlag);
@@ -117,7 +127,7 @@ class SplitApplicationTest {
     @Test
     void testRun_WhenIllegalOptionUppercaseOfLegalLetter_ShouldThrowException() {
         String illegalFlag = "B";
-        String[] args = { CHAR_FLAG_PREFIX + illegalFlag, LINES_OPTION };
+        String[] args = {CHAR_FLAG_PREFIX + illegalFlag, LINES_OPTION};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
         Exception expected = new SplitException(ILLEGAL_FLAG_MSG + illegalFlag);
@@ -126,7 +136,7 @@ class SplitApplicationTest {
 
     @Test
     void testRun_WhenTooManyLegalOptions_ShouldThrowException() {
-        String[] args = { BYTES_OPTION, DEFAULT_OPTION_ARG, LINES_OPTION, DEFAULT_OPTION_ARG };
+        String[] args = {BYTES_OPTION, DEFAULT_OPTION_ARG, LINES_OPTION, DEFAULT_OPTION_ARG};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
         Exception expected = new SplitException(ERR_TOO_MANY_OPTIONS);
@@ -135,7 +145,7 @@ class SplitApplicationTest {
 
     @Test
     void testRun_WhenLegalOptionNoArg_ShouldThrowException() {
-        String[] args = { LINES_OPTION };
+        String[] args = {LINES_OPTION};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
         Exception expected = new SplitException(ERR_OPTION_REQUIRES_ARGUMENT);
@@ -144,7 +154,7 @@ class SplitApplicationTest {
 
     @Test
     void testRun_WhenLegalOptionTooManyArgs_ShouldThrowException() {
-        String[] args = { LINES_OPTION, DEFAULT_OPTION_ARG, TEST_FILENAME, DEFAULT_PREFIX, "extra" };
+        String[] args = {LINES_OPTION, DEFAULT_OPTION_ARG, TEST_FILENAME, DEFAULT_PREFIX, "extra"};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
         Exception expected = new SplitException(ERR_TOO_MANY_ARGS);
@@ -153,7 +163,7 @@ class SplitApplicationTest {
 
     @Test
     void testRun_WhenNoOptionTooManyArgs_ShouldThrowException() {
-        String[] args = { TEST_FILENAME, DEFAULT_PREFIX, "extra" };
+        String[] args = {TEST_FILENAME, DEFAULT_PREFIX, "extra"};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
         Exception expected = new SplitException(ERR_TOO_MANY_ARGS);
@@ -162,7 +172,7 @@ class SplitApplicationTest {
 
     @Test
     void testRun_WhenLinesOptionNotANumber_ShouldThrowException() {
-        String[] args = { LINES_OPTION, "abc" };
+        String[] args = {LINES_OPTION, "abc"};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
         Exception expected = new SplitException(ERR_ILLEGAL_LINE_COUNT);
@@ -179,7 +189,7 @@ class SplitApplicationTest {
 
     @Test
     void testRun_WhenBytesOptionNotANumber_ShouldThrowException() {
-        String[] args = { BYTES_OPTION, "abc" };
+        String[] args = {BYTES_OPTION, "abc"};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
         Exception expected = new SplitException(ERR_ILLEGAL_BYTE_COUNT);
@@ -226,7 +236,7 @@ class SplitApplicationTest {
     void testRun_When676LinesStdin_ShouldGenerateCorrectFilenames() {
         String testContent = generateString(676);
         testStream = generateStream(testContent);
-        String[] args = { LINES_OPTION, "1" };
+        String[] args = {LINES_OPTION, "1"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XZZ);
@@ -237,7 +247,7 @@ class SplitApplicationTest {
     @Test
     void testRun_When676LinesFilePrefix_ShouldGenerateCorrectFilenames() throws Exception {
         Files.writeString(testFile.toPath(), generateString(676));
-        String[] args = { LINES_OPTION, "1", TEST_FILENAME, "prefix_" };
+        String[] args = {LINES_OPTION, "1", TEST_FILENAME, "prefix_"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
         File firstFile = new File(TEST_DIRNAME + File.separator + "prefix_aa");
         File lastFile = new File(TEST_DIRNAME + File.separator + "prefix_zz");
@@ -249,7 +259,7 @@ class SplitApplicationTest {
     void testRun_When1353BytesStdinPrefix_ShouldGenerateCorrectFilenames() {
         byte[] testContent = generateBytes(1353);
         testStream = generateStream(testContent);
-        String[] args = { BYTES_OPTION, "1" };
+        String[] args = {BYTES_OPTION, "1"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
         File firstFile = new File(TEST_DIRNAME + File.separator + "xzaa");
         File lastFile = new File(TEST_DIRNAME + File.separator + "xzzaa");
@@ -275,7 +285,7 @@ class SplitApplicationTest {
     void testRun_When1000LinesFile_ShouldNotSplit() throws Exception {
         String expectedContent = generateString(1000);
         Files.writeString(testFile.toPath(), expectedContent);
-        String[] args = { TEST_FILENAME };
+        String[] args = {TEST_FILENAME};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
         File file = new File(TEST_DIRNAME + File.separator + XAA);
         File overflowFile = new File(TEST_DIRNAME + File.separator + XAB);
@@ -308,7 +318,7 @@ class SplitApplicationTest {
     @Test
     void testRun_When4000LinesFile_ShouldGet4Splits() throws Exception {
         Files.writeString(testFile.toPath(), generateString(4000));
-        String[] args = { TEST_FILENAME };
+        String[] args = {TEST_FILENAME};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAD);
@@ -363,7 +373,7 @@ class SplitApplicationTest {
     @Test
     void testRun_When20LinesOption100LinesFile_ShouldGet5Splits() throws Exception {
         Files.writeString(testFile.toPath(), generateString(100));
-        String[] args = { LINES_OPTION, "20", TEST_FILENAME };
+        String[] args = {LINES_OPTION, "20", TEST_FILENAME};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAE);
@@ -402,7 +412,7 @@ class SplitApplicationTest {
     void testSplitFileByBytes_When8BytesOption16BytesFile_ShouldGet2Splits() throws Exception {
         byte[] testContent = generateBytes(16);
         Files.write(testFile.toPath(), testContent);
-        assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME,null, "8"));
+        assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME, null, "8"));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAB);
         File overflowFile = new File(TEST_DIRNAME + File.separator + XAC);
@@ -440,7 +450,7 @@ class SplitApplicationTest {
     void testSplitFileByBytes_When2kBytesOption8000BytesFile_ShouldGet4Splits() throws Exception {
         byte[] testContent = generateBytes(8000);
         Files.write(testFile.toPath(), testContent);
-        assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME,null, "2k"));
+        assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME, null, "2k"));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAD);
         File overflowFile = new File(TEST_DIRNAME + File.separator + XAE);
@@ -478,7 +488,7 @@ class SplitApplicationTest {
     void testRun_When1mBytesOption2000000BytesStdin_ShouldGet2Splits() throws Exception {
         byte[] testContent = generateBytes(2000000);
         testStream = generateStream(testContent);
-        String[] args = { BYTES_OPTION, "1m" };
+        String[] args = {BYTES_OPTION, "1m"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
         File firstFile = new File(TEST_DIRNAME + File.separator + XAA);
         File lastFile = new File(TEST_DIRNAME + File.separator + XAB);

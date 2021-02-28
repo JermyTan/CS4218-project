@@ -1,12 +1,16 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.impl.util.SystemExit;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.impl.util.SystemExit;
 
 
 class ExitApplicationTest {
@@ -16,8 +20,8 @@ class ExitApplicationTest {
     @Test
     public void run_MockClass_TerminateExecutionCalled() {
         ExitApplication app = spy(new ExitApplication(systemExit));
-        InputStream inputStream = mock(InputStream.class);
-        OutputStream outputStream = mock(OutputStream.class);
+        InputStream inputStream = mock(InputStream.class);//NOPMD
+        OutputStream outputStream = mock(OutputStream.class);//NOPMD
 
         app.run(new String[0], inputStream, outputStream);
 
