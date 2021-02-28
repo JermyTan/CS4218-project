@@ -7,6 +7,7 @@ import sg.edu.nus.comp.cs4218.exception.EchoException;
 import sg.edu.nus.comp.cs4218.exception.TeeException;
 import sg.edu.nus.comp.cs4218.impl.result.TeeResult;
 
+import javax.print.DocFlavor;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,6 +28,10 @@ class TeeApplicationTest {
     private static final String OUTPUT_FILE_1 = "output1.txt";
     private static final String OUTPUT_FILE_2 = "output2.txt";
     private static final String OUTPUT_FILE_3 = "output3.txt";
+    private static final String INPUT_FILE_1 = "input1.txt";
+
+    private static final String[] ARGS_1 = {"tee", OUTPUT_FILE_1 , OUTPUT_FILE_2};
+    private static final String[] ARGS_2 = {"tee", "-a", OUTPUT_FILE_1};
 
     private static final String FOLDER = "folder";
 
@@ -34,6 +39,8 @@ class TeeApplicationTest {
     private static final String FILE_CONTENT_2 = "";
 
     private InputStream inputStream;
+    private final ByteArrayOutputStream ERR_OUTPUT = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream STD_OUTPUT = new ByteArrayOutputStream();
 
     private final Path file1 = Paths.get(OUTPUT_FILE_1); // exists
     private final Path file2 = Paths.get(OUTPUT_FILE_2); // exists
@@ -80,6 +87,9 @@ class TeeApplicationTest {
         } catch (IOException e ) {
             fail(e.getMessage());
         }
+
+        System.setOut(new PrintStream(STD_OUTPUT));
+        System.setErr(new PrintStream(ERR_OUTPUT));
     }
 
     @AfterEach
@@ -91,10 +101,13 @@ class TeeApplicationTest {
         } catch (IOException e) {
             fail(e.getMessage());
         }
+
+        System.setErr(System.err);
+        System.setErr(System.out);
     }
 
     @Test
-    public void tee_WriteSingleLineToBothStdoutAndFileAppend_Success() throws TeeException {
+    public void teeFromStdin_WriteSingleLineToBothStdoutAndFileAppend_ShouldReturn() throws TeeException {
         inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
         String[] filenames = {OUTPUT_FILE_1, OUTPUT_FILE_2};
         String output = app.teeFromStdin(true, inputStream, filenames);
@@ -107,7 +120,7 @@ class TeeApplicationTest {
     }
 
     @Test
-    public void tee_WriteMultiLinesToBothStdoutAndFileAppend_Success() throws TeeException {
+    public void teeFromStdin_WriteMultiLinesToBothStdoutAndFileAppend_ShouldReturn() throws TeeException {
         inputStream = new ByteArrayInputStream(INPUT_2.getBytes());
         String[] filenames = {OUTPUT_FILE_1, OUTPUT_FILE_2};
         String output = app.teeFromStdin(true, inputStream, filenames);
@@ -120,7 +133,7 @@ class TeeApplicationTest {
     }
 
     @Test
-    public void tee_WriteToBothStdoutAndFileNoAppend_ShouldTruncateFile() throws TeeException {
+    public void teeFromStdin_WriteToBothStdoutAndFileNoAppend_ShouldTruncateFile() throws TeeException {
         inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
         String[] filenames = {OUTPUT_FILE_1, OUTPUT_FILE_2};
         String output = app.teeFromStdin(false, inputStream, filenames);
@@ -133,7 +146,7 @@ class TeeApplicationTest {
     }
 
     @Test
-    public void tee_WriteToStdoutOnlyNoAppend_Success() throws TeeException {
+    public void teeFromStdin_WriteToStdoutOnlyNoAppend_ShouldReturn() throws TeeException {
         inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
         String output = app.teeFromStdin(false, inputStream);
 
@@ -141,30 +154,34 @@ class TeeApplicationTest {
     }
 
     @Test
-    public void tee_WriteToStdoutOnlyAppend_Success() throws TeeException {
+    public void teeFromStdin_WriteToStdoutOnlyAppend_ShouldReturn() throws TeeException {
         inputStream = new ByteArrayInputStream(INPUT_2.getBytes());
         String output = app.teeFromStdin(true, inputStream);
 
         assertEquals(INPUT_2, output);
     }
 
-//    @Test
-//    public void tee_FileIsDirectory_ShouldThrow() {
-//
-//    }
-//
-//    @Test
-//    public void tee_FileNotFound_ShouldThrow() {
-//
-//    }
-//
-//    @Test
-//    public void tee_ContentNull_ShouldThrow() {
-//
-//    }
+    @Test
+    public void teeFromStdin_FileIsDirectory_ShouldWriteToStderr() throws TeeException {
+        inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
+        String[] filenames = {FOLDER};
+        app.teeFromStdin(false, inputStream, filenames);
+        assertEquals("tee: " + FOLDER + ": " + ERR_IS_DIR + STRING_NEWLINE, ERR_OUTPUT.toString());
+    }
 
     @Test
-    public void tee_FilenameContainsNullValues_ShouldThrow() {
+    public void teeFromStdin_FileNotFound_ShouldCreateFile() throws TeeException {
+        inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
+        String[] filenames = {OUTPUT_FILE_3};
+        String output = app.teeFromStdin(false, inputStream, filenames);
+        String fromFile3 = readFromFile(OUTPUT_FILE_3);
+
+        assertEquals(INPUT_1, fromFile3);
+        assertEquals(INPUT_1, output);
+    }
+
+    @Test
+    public void teeFromStdin_FilenameContainsNullValues_ShouldWriteToStderr() {
         String[] filenames = {OUTPUT_FILE_1, null};
         inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
         Throwable error = assertThrows(TeeException.class, () -> app.teeFromStdin(false, inputStream , filenames));
@@ -172,9 +189,44 @@ class TeeApplicationTest {
     }
 
     @Test
-    public void tee_NoInputStream_ShouldThrow() {
+    public void teeFromStdin_NoInputStream_ShouldWriteToStderr() {
         String[] filenames = {OUTPUT_FILE_1};
         Throwable error = assertThrows(TeeException.class, () -> app.teeFromStdin(false, null, filenames));
         assertEquals("tee: " + ERR_NO_ISTREAM, error.getMessage());
+    }
+
+    @Test
+    public void run_NoInputStream_ShouldThrowException() {
+        Throwable error = assertThrows(TeeException.class, () -> app.run(ARGS_1, null, STD_OUTPUT));
+        assertEquals("tee: " + ERR_NO_ISTREAM, error.getMessage());
+    }
+
+    @Test
+    public void run_NoOutputStream_ShouldThrowException() {
+        inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
+        Throwable error = assertThrows(TeeException.class, () -> app.run(ARGS_1, inputStream, null));
+        assertEquals("tee: " + ERR_NO_OSTREAM, error.getMessage());
+    }
+
+    @Test
+    public void run_ReadFromStdinNoAppend_ShouldReturn() throws TeeException {
+        inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
+        app.run(ARGS_1, inputStream, STD_OUTPUT);
+        String fromFile1 = readFromFile(OUTPUT_FILE_1);
+        String fromFile2 = readFromFile(OUTPUT_FILE_2);
+
+        assertEquals(INPUT_1 + STRING_NEWLINE, STD_OUTPUT.toString());
+        assertEquals(INPUT_1, fromFile1);
+        assertEquals(INPUT_1, fromFile2);
+    }
+
+    @Test
+    public void run_ReadFromStdinAppend_ShouldReturn() throws TeeException {
+        inputStream = new ByteArrayInputStream(INPUT_2.getBytes());
+        app.run(ARGS_2, inputStream, STD_OUTPUT);
+        String fromFile1 = readFromFile(OUTPUT_FILE_1);
+
+        assertEquals(INPUT_2 + STRING_NEWLINE, STD_OUTPUT.toString());
+        assertEquals(FILE_CONTENT_1 + INPUT_2, fromFile1);
     }
 }
