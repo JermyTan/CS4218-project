@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class ExitExceptionTest {
     @Test
-    void abstractSuperClass_Initialization_ReturnsTrue() {
+    void abstractSuperClass_Initialization_AbstractApplicationException() {
         assertTrue(new ExitException(STRING_SINGLE_WORD) instanceof AbstractApplicationException);
     }
 
@@ -21,22 +21,22 @@ class ExitExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new ExitException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, APP_EXIT, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, APP_EXIT, string),
+                    new ExitException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new ExitException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, APP_EXIT, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_EXIT, null), new ExitException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new ExitException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new ExitException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

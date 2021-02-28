@@ -7,40 +7,46 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_OPTION_REQUIRE
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 
 public class SplitArgsParser extends ArgsParser {
-    private final static char FLAG_SHOULD_SPLIT_BY_LINES = 'l';
-    private final static char FLAG_SHOULD_SPLIT_BY_BYTES = 'b';
-    private final static int INDEX_NO_OF_LINES_OR_BYTES = 0;
+    private final static char FLAG_IS_SPLIT_BY_LINES = 'l';
+    private final static char FLAG_IS_SPLIT_BY_BYTES = 'b';
+    private final static int INDEX_OF_LINES_OR_BYTES = 0;
     private final static int INDEX_FILE = 0;
     private final static int INDEX_PREFIX = 1;
 
     public SplitArgsParser() {
         super();
 
-        legalFlags.add(FLAG_SHOULD_SPLIT_BY_LINES);
-        legalFlags.add(FLAG_SHOULD_SPLIT_BY_BYTES);
+        legalFlags.add(FLAG_IS_SPLIT_BY_LINES);
+        legalFlags.add(FLAG_IS_SPLIT_BY_BYTES);
     }
 
-    public Boolean shouldSplitByLines() {
-        return flags.contains(FLAG_SHOULD_SPLIT_BY_LINES);
+    // allows null args
+    @Override
+    public void parse(String... args) throws InvalidArgsException {
+        if (args == null) {
+            super.parse();
+        } else {
+            super.parse(args);
+        }
     }
 
-    public Boolean shouldSplitByBytes() {
-        return flags.contains(FLAG_SHOULD_SPLIT_BY_BYTES);
+    public boolean isSplitByLines() {
+        return flags.contains(FLAG_IS_SPLIT_BY_LINES);
     }
 
-    public Boolean hasOption() {
-        return shouldSplitByBytes() || shouldSplitByLines();
+    public boolean isSplitByBytes() {
+        return flags.contains(FLAG_IS_SPLIT_BY_BYTES);
     }
 
-    public String getNoOfLinesOrBytes() {
+    private boolean hasOption() {
+        return isSplitByBytes() || isSplitByLines();
+    }
+
+    public String getNumOfLinesOrBytes() {
         if (nonFlagArgs.isEmpty() || !hasOption()) {
             return null;
         }
-        return nonFlagArgs.get(INDEX_NO_OF_LINES_OR_BYTES);
-    }
-
-    public Boolean hasNoOfLinesOrBytes() {
-        return getNoOfLinesOrBytes() != null;
+        return nonFlagArgs.get(INDEX_OF_LINES_OR_BYTES);
     }
 
     public String getFileName() {
@@ -59,10 +65,6 @@ public class SplitArgsParser extends ArgsParser {
         }
     }
 
-    public Boolean hasFileName() {
-        return getFileName() != null;
-    }
-
     public String getPrefix() {
         if (hasOption()) {
             if (nonFlagArgs.size() >= 3) {
@@ -79,10 +81,6 @@ public class SplitArgsParser extends ArgsParser {
         }
     }
 
-    public Boolean hasPrefix() {
-        return getPrefix() != null;
-    }
-
     @Override
     protected void validateArgs() throws InvalidArgsException {
         super.validateArgs();
@@ -91,7 +89,7 @@ public class SplitArgsParser extends ArgsParser {
             throw new InvalidArgsException(ERR_TOO_MANY_OPTIONS);
         }
 
-        if (hasOption() && !hasNoOfLinesOrBytes()) {
+        if (hasOption() && getNumOfLinesOrBytes() == null) {
             throw new InvalidArgsException(ERR_OPTION_REQUIRES_ARGUMENT);
         }
 

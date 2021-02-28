@@ -32,6 +32,8 @@ public final class TestConstants {
     public static final String STRING_LEADING_PERIOD_FILE_TXT = ".test.txt";
     public static final String STRING_LEADING_PERIOD_NO_EXT_FILE = ".file";
     public static final String STRING_TRAILING_PERIOD_FILE = "test.";
+    public static final String STRING_UNICODE_NAME_FILE = "Test 💩😅.txt";
+    public static final String STRING_UNICODE_EXT_FILE = "Test.😈🌚";
 
     public static final List<String> FILE_LIST = List.of(
             STRING_FILE_TXT,
@@ -43,7 +45,9 @@ public final class TestConstants {
             STRING_CUSTOM_EXT_FILE,
             STRING_LEADING_PERIOD_FILE_TXT,
             STRING_LEADING_PERIOD_NO_EXT_FILE,
-            STRING_TRAILING_PERIOD_FILE
+            STRING_TRAILING_PERIOD_FILE,
+            STRING_UNICODE_NAME_FILE,
+            STRING_UNICODE_EXT_FILE
     );
 
     public static final Exception EXCEPTION = new Exception(STRING_SINGLE_WORD);

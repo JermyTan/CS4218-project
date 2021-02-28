@@ -13,9 +13,9 @@ class AbstractApplicationExceptionTest {
     void getMessage_AnyValidMessage_SuppliedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
+                    string,
                     new AbstractApplicationException(string) {
-                    }.getMessage(),
-                    string
+                    }.getMessage()
             );
         });
     }

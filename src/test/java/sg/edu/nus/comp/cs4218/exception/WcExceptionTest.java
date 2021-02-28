@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class WcExceptionTest {
     @Test
-    void abstractSuperClass_Initialization_ReturnsTrue() {
+    void abstractSuperClass_Initialization_AbstractApplicationException() {
         assertTrue(new WcException(STRING_SINGLE_WORD) instanceof AbstractApplicationException);
     }
 
@@ -21,22 +21,22 @@ class WcExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new WcException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, APP_WC, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, APP_WC, string),
+                    new WcException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new WcException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, APP_WC, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_WC, null), new WcException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new WcException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new WcException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

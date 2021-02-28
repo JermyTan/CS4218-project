@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -76,7 +77,7 @@ public final class RegexArgument {
             String modifiedPlaintext = plaintext.toString().replaceAll("\\\\", "/");
             String[] tokens = modifiedPlaintext.split("/");
 
-            String dir = "";
+            String dir = STRING_EMPTY;
             for (int i = 0; i < tokens.length - 1; i++) {
                 dir += tokens[i] + File.separator;
             }
@@ -111,8 +112,8 @@ public final class RegexArgument {
      *
      * @param regexPattern    Pattern object
      * @param node            File object
-     * @param isAbsolute      Boolean option to indicate that the regexPattern refers to an absolute path
-     * @param onlyDirectories Boolean option to list only the directories
+     * @param isAbsolute      boolean option to indicate that the regexPattern refers to an absolute path
+     * @param onlyDirectories boolean option to list only the directories
      */
     private List<String> traverseAndFilter(Pattern regexPattern, File node, boolean isAbsolute, boolean onlyDirectories) {
         List<String> matches = new ArrayList<>();

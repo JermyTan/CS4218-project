@@ -1,6 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,39 +25,37 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.SplitException;
 import sg.edu.nus.comp.cs4218.impl.parser.SplitArgsParser;
 
+@SuppressWarnings("PMD.GodClass")
 public class SplitApplication implements SplitInterface {
 
     public static final int DEFAULT_LINES = 1000;
     public static final String DEFAULT_PREFIX = "x";
-    private static final String DASH = "-";
 
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws SplitException {
         SplitArgsParser parser = new SplitArgsParser();
+
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
             throw new SplitException(e.getMessage(), e);
         }
-        Boolean shouldSplitByBytes = parser.shouldSplitByBytes();
-        Boolean hasNoOfLinesOrBytes = parser.hasNoOfLinesOrBytes();
-        String noOfLinesOrBytes = parser.getNoOfLinesOrBytes();
-        Boolean hasFileName = parser.hasFileName();
-        String fileName = parser.getFileName();
-        Boolean hasPrefix = parser.hasPrefix();
-        String prefix = hasPrefix ? parser.getPrefix() : DEFAULT_PREFIX;
 
-        if (shouldSplitByBytes) {
-            String bytesPerFile = noOfLinesOrBytes;
-            if (!hasFileName || fileName.equals(DASH)) {
-                splitStdinByBytes(stdin, prefix, bytesPerFile);
+        boolean isSplitByBytes = parser.isSplitByBytes();
+        String numOfLinesOrBytes = parser.getNumOfLinesOrBytes();
+        String fileName = parser.getFileName();
+        String prefix = Objects.requireNonNullElse(parser.getPrefix(), DEFAULT_PREFIX);
+
+        if (isSplitByBytes) {
+            if (fileName == null || fileName.equals(STRING_STDIN_FLAG)) {
+                splitStdinByBytes(stdin, prefix, numOfLinesOrBytes);
             } else {
-                splitFileByBytes(Environment.currentDirectory + File.separator + fileName, prefix, bytesPerFile);
+                splitFileByBytes(Environment.currentDirectory + File.separator + fileName, prefix, numOfLinesOrBytes);
             }
         } else {
             int linesPerFile;
             try {
-                linesPerFile = hasNoOfLinesOrBytes ? Integer.parseInt(noOfLinesOrBytes) : DEFAULT_LINES;
+                linesPerFile = Integer.parseInt(Objects.requireNonNullElse(numOfLinesOrBytes, String.valueOf(DEFAULT_LINES)));
             } catch (NumberFormatException e) {
                 throw new SplitException(ERR_ILLEGAL_LINE_COUNT, e);
             }
@@ -62,7 +63,7 @@ public class SplitApplication implements SplitInterface {
                 throw new SplitException(ERR_ILLEGAL_LINE_COUNT);
             }
 
-            if (!hasFileName || fileName.equals(DASH)) {
+            if (fileName == null || fileName.equals(STRING_STDIN_FLAG)) {
                 splitStdinByLines(stdin, prefix, linesPerFile);
             } else {
                 splitFileByLines(Environment.currentDirectory + File.separator + fileName, prefix, linesPerFile);
@@ -83,48 +84,38 @@ public class SplitApplication implements SplitInterface {
     }
 
     private int parseBytes(String string) throws SplitException {
-        Pattern pattern = Pattern.compile("^(\\d+)([b,k,m]?)$");
+        Pattern pattern = Pattern.compile("^(\\d+)([bkm]?)$");
         Matcher matcher = pattern.matcher(string);
         if (!matcher.matches()) {
             throw new SplitException(ERR_ILLEGAL_BYTE_COUNT);
         }
-        int noOfBytes;
+        int numOfBytes;
         try {
-            noOfBytes = Integer.parseInt(matcher.group(1));
+            numOfBytes = Integer.parseInt(matcher.group(1));
         } catch (NumberFormatException e) {
             throw new SplitException(ERR_ILLEGAL_BYTE_COUNT, e);
         }
-        if (noOfBytes < 1) {
+        if (numOfBytes < 1) {
             throw new SplitException(ERR_ILLEGAL_BYTE_COUNT);
         }
-        String appendage = matcher.group(2);
+
+        final String appendage = matcher.group(2);
+
         switch (appendage) {
-        case "":
-            return noOfBytes;
+        case STRING_EMPTY:
+            return numOfBytes;
         case "b":
-            return noOfBytes * 512;
+            return numOfBytes * 512;
         case "k":
-            return noOfBytes * 1024;
+            return numOfBytes * 1024;
         case "m":
-            return noOfBytes * 1048576;
+            return numOfBytes * 1048576;
         default:
             throw new SplitException(ERR_ILLEGAL_BYTE_COUNT);
         }
     }
 
-    /**
-     * Split a file into fixed size pieces with specified number of
-     * lines. Output splits naming convention: prefix + counter.
-     * Default prefix is "x". Default counter is aa, ab, ..., zz,
-     * zaa, zab, ..., zzz, zzaa, etc. For example: xaa, xab, etc.
-     * This is the default option for 'split'.
-     *
-     * @param fileName     String of source file name
-     * @param prefix       String of output file prefix (default is 'x')
-     * @param linesPerFile Int of lines to have in the output file
-     *                     (default is 1,000 lines)
-     * @throws Exception
-     */
+    @Override
     public void splitFileByLines(String fileName, String prefix, int linesPerFile) throws SplitException {
         try {
             splitStdinByLines(new FileInputStream(fileName), prefix, linesPerFile);
@@ -133,22 +124,7 @@ public class SplitApplication implements SplitInterface {
         }
     }
 
-    /**
-     * Split a file into fixed size pieces with specified number of
-     * lines. Output splits naming convention: prefix + counter.
-     * Default prefix is "x". Default counter is aa, ab, ..., zz,
-     * zaa, zab, ..., zzz, zzaa, etc. For example: xaa, xab, etc.
-     *
-     * @param fileName     String of source file name
-     * @param prefix       String of output file prefix (default is 'x')
-     * @param bytesPerFile String of number of bytes of content to
-     *                     fit into a file. Can have a suffix of either 'b', 'k', or 'm'.
-     *                     Impact of suffix:
-     *                     'b' - multiply the bytes by 512
-     *                     'k' - multiply the bytes by 1024
-     *                     'm' - multiply the bytes by 1048576
-     * @throws Exception
-     */
+    @Override
     public void splitFileByBytes(String fileName, String prefix, String bytesPerFile) throws SplitException {
         try {
             splitStdinByBytes(new FileInputStream(fileName), prefix, bytesPerFile);
@@ -157,19 +133,7 @@ public class SplitApplication implements SplitInterface {
         }
     }
 
-    /**
-     * Split input from stdin into fixed size pieces with specified number of
-     * lines. Output splits naming convention: prefix + counter.
-     * Default prefix is "x". Default counter is aa, ab, ..., zz,
-     * zaa, zab, ..., zzz, zzaa, etc. For example: xaa, xab, etc.
-     * This is the default option for 'split'.
-     *
-     * @param stdin        InputStream containing arguments from Stdin
-     * @param prefix       String of output file prefix (default is 'x')
-     * @param linesPerFile Int of lines to have in the output file
-     *                     (default is 1,000 lines)
-     * @throws Exception
-     */
+    @Override
     public void splitStdinByLines(InputStream stdin, String prefix, int linesPerFile) throws SplitException {
         if (stdin == null) {
             throw new SplitException(ERR_NO_ISTREAM);
@@ -200,34 +164,19 @@ public class SplitApplication implements SplitInterface {
         }
     }
 
-    /**
-     * Split input from stdin into fixed size pieces with specified number of
-     * lines. Output splits naming convention: prefix + counter.
-     * Default prefix is "x". Default counter is aa, ab, ..., zz,
-     * zaa, zab, ..., zzz, zzaa, etc. For example: xaa, xab, etc.
-     *
-     * @param stdin        InputStream containing arguments from Stdin
-     * @param prefix       String of output file prefix (default is 'x')
-     * @param bytesPerFile String of number of bytes of content to
-     *                     fit into a file. Can have a suffix of either 'b', 'k', or 'm'.
-     *                     Impact of suffix:
-     *                     'b' - multiply the bytes by 512
-     *                     'k' - multiply the bytes by 1024
-     *                     'm' - multiply the bytes by 1048576
-     * @throws Exception
-     */
+    @Override
     public void splitStdinByBytes(InputStream stdin, String prefix, String bytesPerFile) throws SplitException {
         if (stdin == null) {
             throw new SplitException(ERR_NO_ISTREAM);
         }
 
         try {
-            int noOfBytesPerFile = parseBytes(bytesPerFile);
-            byte[] buffer = new byte[noOfBytesPerFile];
+            int numOfBytesPerFile = parseBytes(bytesPerFile);
+            byte[] buffer = new byte[numOfBytesPerFile];
 
             int pieceNo = 1;
             int bytesRead;
-            while ((bytesRead = stdin.read(buffer, 0, noOfBytesPerFile)) != -1) {
+            while ((bytesRead = stdin.read(buffer, 0, numOfBytesPerFile)) != -1) {
                 String fileName = Environment.currentDirectory + File.separator + prefix + generateSuffix(pieceNo);
                 FileOutputStream outputStream = new FileOutputStream(fileName);
                 outputStream.write(buffer, 0, bytesRead);
@@ -238,5 +187,4 @@ public class SplitApplication implements SplitInterface {
             throw new SplitException(ERR_IO_EXCEPTION, e);
         }
     }
-
 }

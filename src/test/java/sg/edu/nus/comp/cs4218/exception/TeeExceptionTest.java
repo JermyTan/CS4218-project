@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class TeeExceptionTest {
     @Test
-    void abstractSuperClass_Initialization_ReturnsTrue() {
+    void abstractSuperClass_Initialization_AbstractApplicationException() {
         assertTrue(new TeeException(STRING_SINGLE_WORD) instanceof AbstractApplicationException);
     }
 
@@ -21,22 +21,22 @@ class TeeExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new TeeException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, APP_TEE, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, APP_TEE, string),
+                    new TeeException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new TeeException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, APP_TEE, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_TEE, null), new TeeException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new TeeException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new TeeException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

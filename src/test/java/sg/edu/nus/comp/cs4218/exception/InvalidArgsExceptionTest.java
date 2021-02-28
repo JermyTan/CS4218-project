@@ -14,8 +14,8 @@ class InvalidArgsExceptionTest {
     void getMessage_AnyValidMessage_SuppliedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new InvalidArgsException(string).getMessage(),
-                    string
+                    string,
+                    new InvalidArgsException(string).getMessage()
             );
         });
     }
@@ -28,8 +28,8 @@ class InvalidArgsExceptionTest {
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new InvalidArgsException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new InvalidArgsException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

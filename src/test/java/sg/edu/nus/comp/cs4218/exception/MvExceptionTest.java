@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class MvExceptionTest {
     @Test
-    void abstractSuperClass_Initialization_ReturnsTrue() {
+    void abstractSuperClass_Initialization_AbstractApplicationException() {
         assertTrue(new MvException(STRING_SINGLE_WORD) instanceof AbstractApplicationException);
     }
 
@@ -21,22 +21,22 @@ class MvExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new MvException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, APP_MV, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, APP_MV, string),
+                    new MvException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new MvException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, APP_MV, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_MV, null), new MvException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new MvException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new MvException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

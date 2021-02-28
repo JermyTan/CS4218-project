@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class SplitExceptionTest {
     @Test
-    void abstractSuperClass_Initialization_ReturnsTrue() {
+    void abstractSuperClass_Initialization_AbstractApplicationException() {
         assertTrue(new SplitException(STRING_SINGLE_WORD) instanceof AbstractApplicationException);
     }
 
@@ -21,22 +21,22 @@ class SplitExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new SplitException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, APP_SPLIT, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, APP_SPLIT, string),
+                    new SplitException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new SplitException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, APP_SPLIT, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_SPLIT, null), new SplitException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new SplitException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new SplitException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

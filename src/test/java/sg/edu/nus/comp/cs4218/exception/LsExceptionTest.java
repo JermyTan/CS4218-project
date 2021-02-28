@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class LsExceptionTest {
     @Test
-    void abstractSuperClass_Initialization_ReturnsTrue() {
+    void abstractSuperClass_Initialization_AbstractApplicationException() {
         assertTrue(new LsException(STRING_SINGLE_WORD) instanceof AbstractApplicationException);
     }
 
@@ -21,22 +21,22 @@ class LsExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new LsException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, APP_LS, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, APP_LS, string),
+                    new LsException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new LsException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, APP_LS, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_LS, null), new LsException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new LsException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new LsException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

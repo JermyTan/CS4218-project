@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -9,7 +10,7 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
  */
 public class Result {
     protected boolean isError = false;
-    protected String errorMessage = "";
+    protected String errorMessage = STRING_EMPTY;
 
     protected Result(boolean isError) {
         this.isError = isError;

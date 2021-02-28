@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class CdExceptionTest {
     @Test
-    void abstractSuperClass_Initialization_ReturnsTrue() {
+    void abstractSuperClass_Initialization_AbstractApplicationException() {
         assertTrue(new CdException(STRING_SINGLE_WORD) instanceof AbstractApplicationException);
     }
 
@@ -21,22 +21,22 @@ class CdExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new CdException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, APP_CD, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, APP_CD, string),
+                    new CdException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new CdException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, APP_CD, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CD, null), new CdException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new CdException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new CdException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

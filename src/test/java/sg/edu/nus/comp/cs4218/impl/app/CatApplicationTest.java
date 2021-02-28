@@ -12,6 +12,7 @@ import java.io.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
@@ -121,7 +122,7 @@ class CatApplicationTest {
     @Test
     public void run_EmptyFile_NoOutputWritten() {
         assertDoesNotThrow(() -> app.run(new String[]{EMPTY_FILE}, stdin, stdout));
-        assertEquals("", stdout.toString());
+        assertEquals(STRING_EMPTY, stdout.toString());
     }
 
     @Test

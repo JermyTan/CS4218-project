@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_LS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
@@ -95,7 +96,7 @@ class LsApplicationTest {
     @Test
     public void run_EmptyFolder_EmptyOutput() {
         assertDoesNotThrow(() -> app.run(new String[]{EMPTY_FOLDER}, stdin, stdout));
-        assertEquals("", stdout.toString());
+        assertEquals(STRING_EMPTY, stdout.toString());
     }
 
     @Test

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class CatExceptionTest {
     @Test
-    void abstractSuperClass_Initialization_ReturnsTrue() {
+    void abstractSuperClass_Initialization_AbstractApplicationException() {
         assertTrue(new CatException(STRING_SINGLE_WORD) instanceof AbstractApplicationException);
     }
 
@@ -21,22 +21,22 @@ class CatExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new CatException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, string),
+                    new CatException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new CatException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, null), new CatException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new CatException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new CatException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

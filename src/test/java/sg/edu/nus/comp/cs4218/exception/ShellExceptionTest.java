@@ -16,22 +16,22 @@ class ShellExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new ShellException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, SHELL, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, SHELL, string),
+                    new ShellException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new ShellException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, SHELL, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, SHELL, null), new ShellException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new ShellException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new ShellException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 

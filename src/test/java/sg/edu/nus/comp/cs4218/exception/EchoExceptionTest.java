@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class EchoExceptionTest {
     @Test
-    void abstractSuperClass_Initialization_ReturnsTrue() {
+    void abstractSuperClass_Initialization_AbstractApplicationException() {
         assertTrue(new EchoException(STRING_SINGLE_WORD) instanceof AbstractApplicationException);
     }
 
@@ -21,22 +21,22 @@ class EchoExceptionTest {
     void getMessage_AnyValidMessage_AppNamePrependedMessage() {
         STRING_LIST.forEach(string -> {
             assertEquals(
-                    new EchoException(string).getMessage(),
-                    String.format(STRING_LABEL_VALUE_PAIR, APP_ECHO, string)
+                    String.format(STRING_LABEL_VALUE_PAIR, APP_ECHO, string),
+                    new EchoException(string).getMessage()
             );
         });
     }
 
     @Test
     void getMessage_NullMessage_AppNamePrependedMessage() {
-        assertEquals(new EchoException(null).getMessage(), String.format(STRING_LABEL_VALUE_PAIR, APP_ECHO, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_ECHO, null), new EchoException(null).getMessage());
     }
 
     @Test
     void getCause_ValidCause_SuppliedCause() {
         assertEquals(
-                new EchoException(STRING_SINGLE_WORD, EXCEPTION).getCause(),
-                EXCEPTION
+                EXCEPTION,
+                new EchoException(STRING_SINGLE_WORD, EXCEPTION).getCause()
         );
     }
 
