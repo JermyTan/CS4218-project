@@ -154,4 +154,32 @@ class RegexArgumentTest {
         assertEquals(resolveArg(FILE_1), globbedFiles.get(0));
         assertEquals(resolveArg(FILE_2), globbedFiles.get(1));
     }
+
+    @Test
+    public void globFiles_ConsecutiveAsterisks_SameAsSingleAsterisk() {
+        regexArgument.merge("f");
+        regexArgument.appendAsterisk();
+        regexArgument.appendAsterisk();
+
+        List<String> globbedFiles = regexArgument.globFiles();
+
+        assertEquals(4, globbedFiles.size());
+        assertEquals(resolveArg(FILE_1), globbedFiles.get(0));
+        assertEquals(resolveArg(FILE_2), globbedFiles.get(1));
+        assertEquals(resolveArg(FOLDER_1), globbedFiles.get(2));
+        assertEquals(resolveArg(FOLDER_2), globbedFiles.get(3));
+    }
+
+    @Test
+    public void globFiles_MultipleAsterisks_ReturnsGlobbedFilesSorted() {
+        regexArgument.appendAsterisk();
+        regexArgument.merge("test");
+        regexArgument.appendAsterisk();
+
+        List<String> globbedFiles = regexArgument.globFiles();
+
+        assertEquals(2, globbedFiles.size());
+        assertEquals(resolveArg(FILE_3), globbedFiles.get(0));
+        assertEquals(resolveArg(FOLDER_3), globbedFiles.get(1));
+    }
 }

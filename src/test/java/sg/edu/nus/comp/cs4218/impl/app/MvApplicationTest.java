@@ -13,7 +13,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_MV;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 class MvApplicationTest {
@@ -40,8 +42,8 @@ class MvApplicationTest {
     private final List<Path> paths = List.of(file1, file2, file3, folder1, folder2, folder3);
 
     private MvApplication app;
-    private InputStream stdin;
-    private OutputStream stdout;
+    private final InputStream stdin = mock(InputStream.class);
+    private final OutputStream stdout = mock(OutputStream.class);
 
     @BeforeAll
     static void setupBeforeAll() {
@@ -67,8 +69,6 @@ class MvApplicationTest {
     @BeforeEach
     void setup() throws IOException {
         app = spy(new MvApplication());
-        stdin = mock(InputStream.class);
-        stdout = mock(OutputStream.class);
 
         createFileWithContent(file1, FILE_1);
         createFileWithContent(file3, FILE_3);
@@ -89,6 +89,18 @@ class MvApplicationTest {
                 Files.deleteIfExists(path);
             }
         }
+    }
+
+    @Test
+    public void run_NullArgList_ThrowsException() {
+        Throwable exception = assertThrows(MvException.class, () -> app.run(null, stdin, stdout));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_MV, ERR_NULL_ARGS), exception.getMessage());
+    }
+
+    @Test
+    public void run_ArgListContainsNull_ThrowsException() {
+        Throwable exception = assertThrows(MvException.class, () -> app.run(new String[]{null}, stdin, stdout));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_MV, ERR_NULL_ARGS), exception.getMessage());
     }
 
     @Test
@@ -173,11 +185,10 @@ class MvApplicationTest {
     }
 
     @Test
-    public void run_FailedToMv_MvExceptionThrown() {
-        // file2.txt does not exist, hence cannot rename
-        assertThrows(MvException.class, () -> app.run(new String[]{FILE_2, FILE_1}, stdin, stdout));
+    public void run_MoreThanTwoFilesForFormatOne_ThrowsException() {
+        Throwable exception = assertThrows(MvException.class, () -> app.run(new String[]{FILE_1, FILE_2, FILE_3}, stdin, stdout));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_MV, ERR_TOO_MANY_ARGS), exception.getMessage());
     }
-
 
     @Test
     public void mvSrcFileToDestFile_SameDirectoryRenameFile_FileRenamed() {
@@ -275,8 +286,8 @@ class MvApplicationTest {
         String srcFile = FILE_2;
         String destFile = FILE_1;
 
-        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
-        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), error.getMessage());
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), exception.getMessage());
     }
 
     @Test
@@ -285,8 +296,8 @@ class MvApplicationTest {
         String srcFile = FOLDER_2;
         String destFile = FOLDER_1;
 
-        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
-        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), error.getMessage());
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), exception.getMessage());
     }
 
     @Test
@@ -294,15 +305,18 @@ class MvApplicationTest {
         String srcFile = FILE_1;
         String destFile = Paths.get(FOLDER_2, FILE_1).toString();
 
-        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
-        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), error.getMessage());
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), exception.getMessage());
     }
 
     @Test
     public void mvSrcFileToDestFile_DestFolderExists_ThrowsException() {
         assertTrue(Files.exists(folder3));
+        String srcFile = FOLDER_1;
+        String destFile = FOLDER_3;
 
-        assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(FOLDER_1, FOLDER_3));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_IS_DIR), exception.getMessage());
     }
 
     @Test
@@ -311,8 +325,8 @@ class MvApplicationTest {
         String srcFile = FOLDER_1;
         String destFile = FILE_1;
 
-        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
-        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_IS_NOT_DIR), error.getMessage());
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_IS_NOT_DIR), exception.getMessage());
     }
 
     @Test
@@ -320,8 +334,8 @@ class MvApplicationTest {
         String srcFile = FOLDER_1;
         String destFile = Paths.get(FOLDER_1, FOLDER_2).toString();
 
-        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
-        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARG), error.getMessage());
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARG), exception.getMessage());
     }
 
     @Test
@@ -330,32 +344,37 @@ class MvApplicationTest {
         String destFile = Paths.get(FOLDER_1, FILE_1).toString();
         folder1.toFile().setWritable(false);
 
-        Throwable error = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
-        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_CANNOT_RENAME), error.getMessage());
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_CANNOT_RENAME), exception.getMessage());
     }
 
     @Test
     public void mvFilesToFolder_DestFolderDoesNotExist_ThrowsException() {
         assertTrue(Files.notExists(folder2));
 
-        assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_2, FILE_1));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_2, FILE_1));
+        assertEquals(ERR_FILE_NOT_FOUND, exception.getMessage());
     }
 
     @Test
     public void mvFilesToFolder_DestFolderIsNotDirectory_ThrowsException() {
         assertFalse(Files.isDirectory(file1));
 
-        assertThrows(Exception.class, () -> app.mvFilesToFolder(FILE_1, FILE_3));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(FILE_1, FILE_3));
+        assertEquals(ERR_IS_NOT_DIR, exception.getMessage());
     }
 
     @Test
     public void mvFilesToFolder_NoFileName_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_1));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_1));
+        assertEquals(ERR_MISSING_ARG, exception.getMessage());
     }
 
     @Test
     public void mvFilesToFolder_FileDoesNotExist_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_1, FILE_2));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_1, FILE_2));
+        assertEquals(constructRenameErrorMsg(FILE_2, Paths.get(FOLDER_1, FILE_2).toString(), ERR_FILE_NOT_FOUND),
+                exception.getMessage());
     }
 
     @Test

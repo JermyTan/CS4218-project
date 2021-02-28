@@ -14,9 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_LS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 class LsApplicationTest {
@@ -69,13 +67,20 @@ class LsApplicationTest {
     }
 
     @Test
-    public void run_ArgsContainNull_ThrowsException() {
-        assertThrows(LsException.class, () -> app.run(new String[]{null}, stdin, stdout));
+    public void run_NullOutputStream_ThrowsException() {
+        Throwable exception = assertThrows(LsException.class, () -> app.run(new String[]{}, stdin, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_LS, ERR_NO_OSTREAM), exception.getMessage());
     }
 
     @Test
-    public void run_NullOutputStream_ThrowsException() {
-        assertThrows(LsException.class, () -> app.run(new String[]{}, stdin, null));
+    public void run_NullArgs_Allowed() {
+        assertDoesNotThrow(() -> app.run(null, stdin, stdout));
+    }
+
+    @Test
+    public void run_ArgsContainNull_ThrowsException() {
+        Throwable exception = assertThrows(LsException.class, () -> app.run(new String[]{null}, stdin, stdout));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_LS, ERR_NULL_ARGS), exception.getMessage());
     }
 
     @Test

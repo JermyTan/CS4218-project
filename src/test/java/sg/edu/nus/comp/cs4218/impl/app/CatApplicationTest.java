@@ -10,11 +10,9 @@ import sg.edu.nus.comp.cs4218.exception.CatException;
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_CAT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 class CatApplicationTest {
@@ -64,6 +62,29 @@ class CatApplicationTest {
     @BeforeEach
     void setup() {
         app = new CatApplication();
+    }
+
+    @Test
+    public void run_NullOutputStream_ThrowsException() {
+        Throwable exception = assertThrows(CatException.class, () -> app.run(new String[]{FILE_1}, stdin, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NO_OSTREAM), exception.getMessage());
+    }
+
+    @Test
+    public void run_NullArgs_Allowed() {
+        assertDoesNotThrow(() -> app.run(null, stdin, stdout));
+    }
+
+    @Test
+    public void run_ArgsContainNull_ThrowsException() {
+        Throwable exception = assertThrows(CatException.class, () -> app.run(new String[]{null}, stdin, stdout));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NULL_ARGS), exception.getMessage());
+    }
+
+    @Test
+    public void run_NoStdinNoFiles_ThrowsException() {
+        Throwable exception = assertThrows(CatException.class, () -> app.run(new String[]{}, null, stdout));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NO_INPUT), exception.getMessage());
     }
 
     @Test
@@ -128,33 +149,21 @@ class CatApplicationTest {
     }
 
     @Test
-    public void run_NullOutputStream_ThrowsException() {
-        assertThrows(CatException.class, () -> app.run(new String[]{FILE_1}, stdin, null));
-    }
-
-    @Test
-    public void run_NullArgs_ThrowsException() {
-        assertThrows(CatException.class, () -> app.run(new String[]{null}, stdin, stdout));
-    }
-
-    @Test
-    public void run_NoInput_ThrowsException() {
-        assertThrows(CatException.class, () -> app.run(new String[]{}, null, stdout));
-    }
-
-    @Test
     public void catFiles_NullFilenames_ThrowsException() {
-        assertThrows(CatException.class, () -> app.catFiles(false, (String[]) null));
+        Throwable exception = assertThrows(CatException.class, () -> app.catFiles(false, (String[]) null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NO_FILE_ARGS), exception.getMessage());
     }
 
     @Test
     public void catFiles_EmptyFilenames_ThrowsException() {
-        assertThrows(CatException.class, () -> app.catFiles(false));
+        Throwable exception = assertThrows(CatException.class, () -> app.catFiles(false));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NO_FILE_ARGS), exception.getMessage());
     }
 
     @Test
     public void catFiles_FilenamesContainNull_ThrowsException() {
-        assertThrows(CatException.class, () -> app.catFiles(false, FILE_1, null));
+        Throwable exception = assertThrows(CatException.class, () -> app.catFiles(false, FILE_1, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_INVALID_FILES), exception.getMessage());
     }
 
     @Test
@@ -199,7 +208,8 @@ class CatApplicationTest {
 
     @Test
     public void catStdin_NullStdin_ThrowsException() {
-        assertThrows(CatException.class, () -> app.catStdin(false, null));
+        Throwable exception = assertThrows(CatException.class, () -> app.catStdin(false, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NO_ISTREAM), exception.getMessage());
     }
 
     @Test
@@ -215,22 +225,26 @@ class CatApplicationTest {
 
     @Test
     public void catFileAndStdin_NullStdin_ThrowsException() {
-        assertThrows(CatException.class, () -> app.catFileAndStdin(false, null, FILE_1));
+        Throwable exception = assertThrows(CatException.class, () -> app.catFileAndStdin(false, null, FILE_1));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NO_ISTREAM), exception.getMessage());
     }
 
     @Test
     public void catFileAndStdin_NullFilenames_ThrowsException() {
-        assertThrows(CatException.class, () -> app.catFileAndStdin(false, stdin, (String[]) null));
+        Throwable exception = assertThrows(CatException.class, () -> app.catFileAndStdin(false, stdin, (String[]) null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NO_FILE_ARGS), exception.getMessage());
     }
 
     @Test
     public void catFileAndStdin_EmptyFilenames_ThrowsException() {
-        assertThrows(CatException.class, () -> app.catFileAndStdin(false, stdin));
+        Throwable exception = assertThrows(CatException.class, () -> app.catFileAndStdin(false, stdin));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NO_FILE_ARGS), exception.getMessage());
     }
 
     @Test
     public void catFileAndStdin_FilenamesContainNull_ThrowsException() {
-        assertThrows(CatException.class, () -> app.catFileAndStdin(false, stdin, FILE_1, null));
+        Throwable exception = assertThrows(CatException.class, () -> app.catFileAndStdin(false, stdin, FILE_1, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_INVALID_FILES), exception.getMessage());
     }
 
     @Test
