@@ -84,4 +84,14 @@ class ArgumentResolverTest {
             assertEquals("hello 'world'", args.get(0));
         });
     }
+
+    @Test
+    public void resolveOneArgument_QuotedAsterisk_AsteriskRemains() {
+        String arg = "\"hello *\"";
+        assertDoesNotThrow(() -> {
+            List<String> args = argumentResolver.resolveOneArgument(arg);
+            assertEquals(1, args.size());
+            assertEquals("hello *", args.get(0));
+        });
+    }
 }

@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import sg.edu.nus.comp.cs4218.app.MvInterface;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.MvException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
@@ -33,7 +34,8 @@ public class MvApplication implements MvInterface {
             if (parser.isFormatOne()) {
                 String srcFile = srcFiles.get(0);
 
-                if (!isOverwrite && new File(target).exists()) {
+                Path targetPath = IOUtils.resolveAbsoluteFilePath(target);
+                if (!isOverwrite && Files.exists(targetPath)) {
                     return;
                 }
 
@@ -41,6 +43,11 @@ public class MvApplication implements MvInterface {
             } else {
                 if (!isOverwrite) {
                     srcFiles = filterSrcFiles(srcFiles, target);
+
+                    // Return if srcFiles becomes empty after filtering
+                    if (srcFiles.isEmpty()) {
+                        return;
+                    }
                 }
 
                 mvFilesToFolder(target, srcFiles.toArray(String[]::new));
@@ -86,7 +93,7 @@ public class MvApplication implements MvInterface {
         try {
             Files.move(srcPath, destPath, REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new Exception(e.getMessage(), e);
+            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_CANNOT_RENAME), e);
         }
 
         return null;
@@ -125,12 +132,14 @@ public class MvApplication implements MvInterface {
      * @param target target directory
      * @return srcFiles that do not overwrite existing file in the target directory after mv
      */
-    private List<String> filterSrcFiles(List<String> srcFiles, String target) {
+    private List<String> filterSrcFiles(List<String> srcFiles, String target) throws ShellException {
         List<String> filtered = new ArrayList<>();
+        Path targetPath = IOUtils.resolveAbsoluteFilePath(target);
+
         for (String srcFile : srcFiles) {
             String fileName = new File(srcFile).getName();
-            String destFile = target + File.separator + fileName;
-            if (new File(destFile).exists()) {
+            Path destPath = targetPath.resolve(fileName);
+            if (Files.exists(destPath)) {
                 continue;
             }
             filtered.add(srcFile);

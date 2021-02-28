@@ -156,11 +156,11 @@ public class ArgumentResolver {
                 .collect(Collectors.toList());
     }
 
-    public RegexArgument makeRegexArgument() {
+    private RegexArgument makeRegexArgument() {
         return new RegexArgument();
     }
 
-    public RegexArgument makeRegexArgument(String str) {
+    private RegexArgument makeRegexArgument(String str) {
         return new RegexArgument(str);
     }
 

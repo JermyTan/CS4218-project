@@ -55,6 +55,9 @@ public final class ErrorConstants {
     public static final String ERR_ILLEGAL_LINE_COUNT = "Illegal line count";
     public static final String ERR_ILLEGAL_BYTE_COUNT = "Illegal byte count";
 
+    // `mv` related
+    public static final String ERR_CANNOT_RENAME = "Failed to rename";
+
     // General constants
     public static final String ERR_INVALID_APP = "Invalid app";
     public static final String ERR_NOT_SUPPORTED = "Not supported yet";
