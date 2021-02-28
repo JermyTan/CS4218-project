@@ -9,7 +9,6 @@ import sg.edu.nus.comp.cs4218.exception.EchoException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PipedOutputStream;
-import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
@@ -37,38 +36,38 @@ class EchoApplicationTest {
     }
 
     @Test
-    public void echo_Blank_ShouldWriteBlank() throws EchoException {
+    public void constructResult_Blank_ShouldWriteBlank() throws EchoException {
         assertEquals("", app.constructResult(EMPTY));
         assertEquals("  ", app.constructResult(SPACE));
     }
 
     @Test
-    public void echo_AlphanumericWithoutDoubleQuotes_ShouldWrite() throws EchoException {
+    public void constructResult_AlphanumericWithoutDoubleQuotes_ShouldWrite() throws EchoException {
         assertEquals("ABC 123", app.constructResult(STRING_1));
         assertEquals("0 5 abc", app.constructResult(STRING_2));
         assertEquals("'\"A*B*C\"'", app.constructResult(STRING_5));
     }
 
     @Test
-    public void echo_SpecialCharacters_ShouldWriteAsIs() throws EchoException {
+    public void constructResult_SpecialCharacters_ShouldWriteAsIs() throws EchoException {
         assertEquals("!@#$%^&*()_+{}|:<>?.,/~", app.constructResult(STRING_3));
     }
 
 
     @Test
-    public void echo_Null_ShouldThrow() throws EchoException {
+    public void constructResult_Null_ShouldThrow() throws EchoException {
         Throwable error = assertThrows(EchoException.class, () -> app.constructResult(STRING_4));
         assertEquals("echo: " + ERR_NULL_ARGS, error.getMessage());
     }
 
     @Test
-    public void echo_NoOutStream_ShouldThrow() {
+    public void run_NoOutStream_ShouldThrow() {
         Throwable error = assertThrows(EchoException.class, () -> app.run(STRING_1, System.in, null));
         assertEquals("echo: " + ERR_NO_OSTREAM, error.getMessage());
     }
 
     @Test
-    public void echo_RuntimeIOException_ShouldThrow() throws IOException {
+    public void run_RuntimeIOException_ShouldThrow() throws IOException {
         try (OutputStream out = new PipedOutputStream()) {
             out.close();
             Throwable error = assertThrows(EchoException.class, () -> app.run(STRING_1, System.in, out));
