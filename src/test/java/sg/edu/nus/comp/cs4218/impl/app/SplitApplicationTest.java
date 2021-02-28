@@ -71,7 +71,6 @@ class SplitApplicationTest {
         testDir = new File(TEST_DIRNAME);
         testDir.mkdir();
         Environment.currentDirectory = TEST_DIRNAME;
-        System.out.println(Environment.currentDirectory);
     }
 
     @AfterAll
