@@ -1,9 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_OPTION_REQUIRES_ARGUMENT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
-
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class SplitArgsParser extends ArgsParser {
     private final static char FLAG_SHOULD_SPLIT_BY_LINES = 'l';
@@ -85,6 +86,10 @@ public class SplitArgsParser extends ArgsParser {
     @Override
     protected void validateArgs() throws InvalidArgsException {
         super.validateArgs();
+
+        if (flags.size() > 1) {
+            throw new InvalidArgsException(ERR_TOO_MANY_OPTIONS);
+        }
 
         if (hasOption() && !hasNoOfLinesOrBytes()) {
             throw new InvalidArgsException(ERR_OPTION_REQUIRES_ARGUMENT);

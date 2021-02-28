@@ -1,9 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_BYTE_COUNT;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_LINE_COUNT;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,9 +24,8 @@ import sg.edu.nus.comp.cs4218.impl.parser.SplitArgsParser;
 
 public class SplitApplication implements SplitInterface {
 
-    private static final String DEFAULT_PREFIX = "x";
-    private static final int DEFAULT_LINES = 1000;
-
+    public static final int DEFAULT_LINES = 1000;
+    public static final String DEFAULT_PREFIX = "x";
     private static final String DASH = "-";
 
     @Override
@@ -53,7 +49,7 @@ public class SplitApplication implements SplitInterface {
             if (!hasFileName || fileName.equals(DASH)) {
                 splitStdinByBytes(stdin, prefix, bytesPerFile);
             } else {
-                splitFileByBytes(fileName, prefix, bytesPerFile);
+                splitFileByBytes(Environment.currentDirectory + File.separator + fileName, prefix, bytesPerFile);
             }
         } else {
             int linesPerFile;
@@ -69,14 +65,14 @@ public class SplitApplication implements SplitInterface {
             if (!hasFileName || fileName.equals(DASH)) {
                 splitStdinByLines(stdin, prefix, linesPerFile);
             } else {
-                splitFileByLines(fileName, prefix, linesPerFile);
+                splitFileByLines(Environment.currentDirectory + File.separator + fileName, prefix, linesPerFile);
             }
         }
     }
 
     private String generateSuffix(int num) {
         StringBuilder suffix = new StringBuilder();
-        int times = num / 676;
+        int times = (num - 1) / 676;
         suffix.append("z".repeat(times));
         int remainingNum = num - 676 * times;
         remainingNum -= 1;
@@ -175,6 +171,10 @@ public class SplitApplication implements SplitInterface {
      * @throws Exception
      */
     public void splitStdinByLines(InputStream stdin, String prefix, int linesPerFile) throws SplitException {
+        if (stdin == null) {
+            throw new SplitException(ERR_NO_ISTREAM);
+        }
+
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
             PrintWriter writer = null;
@@ -217,6 +217,10 @@ public class SplitApplication implements SplitInterface {
      * @throws Exception
      */
     public void splitStdinByBytes(InputStream stdin, String prefix, String bytesPerFile) throws SplitException {
+        if (stdin == null) {
+            throw new SplitException(ERR_NO_ISTREAM);
+        }
+
         try {
             int noOfBytesPerFile = parseBytes(bytesPerFile);
             byte[] buffer = new byte[noOfBytesPerFile];
