@@ -147,13 +147,12 @@ class WcApplicationTest {
     }
 
     @Test
-    void testRun_WhenStdinWordsLinesFlags_ShouldCountLinesWords() {
+    void testCountFromStdin_WhenLinesWords_ShouldCountLinesWords() {
         int testLines = 10;
         testInputStream = createInputStream(generateString(testLines));
 
-        String[] args = {WORDS_FLAG, LINES_FLAG};
-        assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);
+        String output = assertDoesNotThrow(() -> wcApp.countFromStdin(false, true, true, testInputStream));
+        String[] result = output.split(REGEX);
 
         int lines = Integer.parseInt(result[0]);
         int words = Integer.parseInt(result[1]);
@@ -177,15 +176,14 @@ class WcApplicationTest {
     }
 
     @Test
-    void testRun_WhenOneFile_ShouldCountLinesWordsBytes() throws Exception {
+    void testCountFromFiles_WhenOneFileLinesWords_ShouldCountLinesWords() throws Exception {
         int testLines = 10;
         File testFile = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_1);
         testFile.createNewFile();
         Files.writeString(testFile.toPath(), generateString(testLines));
 
-        String[] args = {WORDS_FLAG, LINES_FLAG, TEST_FILENAME_1};
-        assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);
+        String output = assertDoesNotThrow(() -> wcApp.countFromFiles(false, true, true, TEST_FILENAME_1));
+        String[] result = output.split(REGEX);
 
         int lines = Integer.parseInt(result[0]);
         int words = Integer.parseInt(result[1]);
@@ -194,7 +192,7 @@ class WcApplicationTest {
     }
 
     @Test
-    void testRun_WhenMultipleFiles_ShouldCountLinesWordsBytes() throws Exception {
+    void testCountFromFiles_WhenMultipleFiles_ShouldCountLinesWordsBytes() throws Exception {
         int testLines1 = 2;
         File testFile1 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_1);
         testFile1.createNewFile();
@@ -210,9 +208,8 @@ class WcApplicationTest {
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
-        String[] args = {TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3};
-        assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);
+        String output = assertDoesNotThrow(() -> wcApp.countFromFiles(true, true, true, TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3));
+        String[] result = output.split(REGEX);
 
         int lines1 = Integer.parseInt(result[0]);
         int words1 = Integer.parseInt(result[1]);
@@ -263,6 +260,39 @@ class WcApplicationTest {
         String[] args = {WORDS_FLAG, TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
         String[] result = testOutputStream.toString().split(REGEX);
+
+        int words1 = Integer.parseInt(result[0]);
+        assertEquals(getWordCount(testLines1), words1);
+
+        int words2 = Integer.parseInt(result[2]);
+        assertEquals(getWordCount(testLines2), words2);
+
+        int words3 = Integer.parseInt(result[4]);
+        assertEquals(getWordCount(testLines3), words3);
+
+        int wordsTotal = Integer.parseInt(result[6]);
+        assertEquals(getWordCount(testLines1) + getWordCount(testLines2) + getWordCount(testLines3), wordsTotal);
+    }
+
+    @Test
+    void testCountFromFiles_WhenMultipleFilesWordsFlag_ShouldCountWords() throws Exception {
+        int testLines1 = 2;
+        File testFile1 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_1);
+        testFile1.createNewFile();
+        Files.writeString(testFile1.toPath(), generateString(testLines1));
+
+        int testLines2 = 4;
+        File testFile2 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_2);
+        testFile2.createNewFile();
+        Files.writeString(testFile2.toPath(), generateString(testLines2));
+
+        int testLines3 = 6;
+        File testFile3 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_3);
+        testFile3.createNewFile();
+        Files.writeString(testFile3.toPath(), generateString(testLines3));
+
+        String output = assertDoesNotThrow(() -> wcApp.countFromFiles(false, false, true, TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3));
+        String[] result = output.split(REGEX);
 
         int words1 = Integer.parseInt(result[0]);
         assertEquals(getWordCount(testLines1), words1);
