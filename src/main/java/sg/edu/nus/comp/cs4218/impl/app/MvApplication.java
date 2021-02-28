@@ -4,6 +4,7 @@ import sg.edu.nus.comp.cs4218.app.MvInterface;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +52,8 @@ public class MvApplication implements MvInterface {
 
     @Override
     public String mvSrcFileToDestFile(String srcFile, String destFile) throws Exception {
-        Path srcPath = Paths.get(srcFile);
-        Path destPath = Paths.get(destFile);
+        Path srcPath = IOUtils.resolveAbsoluteFilePath(srcFile);
+        Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
 
         // srcFile must exist
         if (Files.notExists(srcPath)) {
@@ -94,7 +94,7 @@ public class MvApplication implements MvInterface {
 
     @Override
     public String mvFilesToFolder(String destFolder, String... fileNames) throws Exception {
-        Path destPath = Paths.get(destFolder);
+        Path destPath = IOUtils.resolveAbsoluteFilePath(destFolder);
 
         // `destFolder` must exist
         if (Files.notExists(destPath)) {
