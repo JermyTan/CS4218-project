@@ -2,11 +2,18 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.app.ExitInterface;
 import sg.edu.nus.comp.cs4218.exception.ExitException;
+import sg.edu.nus.comp.cs4218.impl.util.SystemExit;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
 public class ExitApplication implements ExitInterface {
+
+    private final SystemExit systemExit;
+
+    public ExitApplication(SystemExit systemExit) {
+        this.systemExit = systemExit;
+    }
 
     /**
      * Runs the exit application.
@@ -28,6 +35,6 @@ public class ExitApplication implements ExitInterface {
      */
     @Override
     public void terminateExecution() {
-        System.exit(0);
+        systemExit.exit(0);
     }
 }

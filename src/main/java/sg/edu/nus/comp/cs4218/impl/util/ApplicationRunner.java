@@ -53,7 +53,7 @@ public class ApplicationRunner {
                 application = new EchoApplication();
                 break;
             case APP_EXIT:
-                application = new ExitApplication();
+                application = new ExitApplication(new SystemExit());
                 break;
             case APP_GREP:
                 application = new GrepApplication();
