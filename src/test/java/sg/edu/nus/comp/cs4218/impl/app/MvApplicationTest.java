@@ -86,37 +86,29 @@ class MvApplicationTest {
     }
 
     @BeforeEach
-    void setup() {
+    void setup() throws IOException {
         app = spy(new MvApplication());
         stdin = mock(InputStream.class);
         stdout = mock(OutputStream.class);
 
-        try {
-            createFileWithContent(file1, FILE_1);
-            createFileWithContent(file3, FILE_3);
+        createFileWithContent(file1, FILE_1);
+        createFileWithContent(file3, FILE_3);
 
-            Files.createDirectory(folder1);
-            Files.createDirectory(folder3);
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
+        Files.createDirectory(folder1);
+        Files.createDirectory(folder3);
     }
 
     @AfterEach
-    void tearDown() {
-        try {
-            for (Path path : paths) {
-                if (Files.isDirectory(path)) {
-                    Files.walk(path)
-                            .sorted(Comparator.reverseOrder())
-                            .map(Path::toFile)
-                            .forEach(File::delete);
-                } else {
-                    Files.deleteIfExists(path);
-                }
+    void tearDown() throws IOException {
+        for (Path path : paths) {
+            if (Files.isDirectory(path)) {
+                Files.walk(path)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            } else {
+                Files.deleteIfExists(path);
             }
-        } catch (IOException e) {
-            fail(e.getMessage());
         }
     }
 
@@ -182,7 +174,7 @@ class MvApplicationTest {
     }
 
     @Test
-    public void run_DoesNotOverwrite_NonExistingFileMoved() {
+    public void run_DoesNotOverwrite_ConflictingFilesUnmoved() {
         // folder1 contains file1.txt only
         Path destPath = Paths.get(TESTDIR, FOLDER_1, FILE_1);
         String originalFileContent = destPath.toString();
