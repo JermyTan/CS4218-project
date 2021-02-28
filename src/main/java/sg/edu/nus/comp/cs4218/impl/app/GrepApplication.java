@@ -285,7 +285,7 @@ public class GrepApplication implements GrepInterface {
 
             content.outputError();
 
-            String contentString = content.formatToString(isCountLines, true);
+            String contentString = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
 
             if (!contentString.isEmpty()) {
                 result.add(contentString);
