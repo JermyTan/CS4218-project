@@ -11,11 +11,8 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 @Disabled
@@ -41,10 +38,9 @@ public class CpApplicationTest {
     private final Path folder3 = Paths.get(TESTDIR, FOLDER_3); // exists
 
     private final List<Path> paths = List.of(file1, file2, file3, folder1, folder2, folder3);
-
-    private CpApplication app;
     private final InputStream stdin = mock(InputStream.class);
     private final OutputStream stdout = mock(OutputStream.class);
+    private CpApplication app;
 
     @BeforeAll
     static void setupBeforeAll() {
@@ -169,13 +165,13 @@ public class CpApplicationTest {
     // Assume we do not allow this
     @Test
     public void run_IdenticalFile_ThrowsException() {
-        assertThrows(Exception.class,() -> app.run(new String[]{FILE_1, FILE_2}, stdin, stdout));
+        assertThrows(Exception.class, () -> app.run(new String[]{FILE_1, FILE_2}, stdin, stdout));
     }
 
     // Assume we do not allow this
     @Test
     public void run_IdenticalFolder_ThrowsException() {
-        assertThrows(Exception.class,() -> app.run(new String[]{"-r", FOLDER_1, FOLDER_1}, stdin, stdout));
+        assertThrows(Exception.class, () -> app.run(new String[]{"-r", FOLDER_1, FOLDER_1}, stdin, stdout));
     }
 
     @Test

@@ -39,8 +39,8 @@ class LsApplicationTest {
             FILE_1, FOLDER_1, FOLDER_2, EMPTY_FOLDER, FOLDER_WITH_HIDDEN_FILE, NESTED_FOLDER
     };
     private final OutputStream stdout = new ByteArrayOutputStream();
-    private LsApplication app;
     private final InputStream stdin = mock(InputStream.class);
+    private LsApplication app;
     private OutputStream stderr;
 
     @BeforeAll

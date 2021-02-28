@@ -40,10 +40,9 @@ class RmApplicationTest {
     private final Path emptyFolder = Paths.get(TESTDIR, EMPTY_FOLDER);
 
     private final List<Path> paths = List.of(file1, file2, folder1, folder2, emptyFolder);
-
-    private RmApplication app;
     private final InputStream stdin = mock(InputStream.class);
     private final OutputStream stdout = mock(OutputStream.class);
+    private RmApplication app;
 
     @BeforeAll
     static void setupBeforeAll() {
@@ -253,7 +252,7 @@ class RmApplicationTest {
 
     @Test
     public void remove_NullArgs_ThrowsException() {
-        assertThrows(Exception.class, () -> app.remove(false, false, null));
+        assertThrows(Exception.class, () -> app.remove(false, false, (String[]) null));
         assertThrows(Exception.class, () -> app.remove(null, false, FILE_1));
         assertThrows(Exception.class, () -> app.remove(false, null, FILE_1));
     }

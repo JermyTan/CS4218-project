@@ -1,11 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.*;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 
@@ -40,6 +35,19 @@ class WcApplicationTest {
 
     private final WcApplication wcApp = new WcApplication();
 
+    @BeforeAll
+    static void setUpBeforeAll() {
+        testDir = new File(TEST_DIRNAME);
+        testDir.mkdir();
+        Environment.currentDirectory = TEST_DIRNAME;
+    }
+
+    @AfterAll
+    static void tearDownAfterAll() {
+        testDir.delete();
+        Environment.currentDirectory = DEFAULT_DIRNAME;
+    }
+
     private String generateString(int lines) {
         return TEST_STRING.repeat(Math.max(0, lines));
     }
@@ -54,19 +62,6 @@ class WcApplicationTest {
 
     private int getByteCount(int lines) {
         return lines * 46;
-    }
-
-    @BeforeAll
-    static void setUpBeforeAll() {
-        testDir = new File(TEST_DIRNAME);
-        testDir.mkdir();
-        Environment.currentDirectory = TEST_DIRNAME;
-    }
-
-    @AfterAll
-    static void tearDownAfterAll() {
-        testDir.delete();
-        Environment.currentDirectory = DEFAULT_DIRNAME;
     }
 
     @BeforeEach
@@ -86,20 +81,20 @@ class WcApplicationTest {
 
     @Test
     void testRun_WhenNullArgs_ShouldThrowException() {
-        String[] args = { null };
+        String[] args = {null};
         assertThrows(WcException.class, () -> wcApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
     void testRun_WhenIllegalFlagWrongLetter_ShouldThrowException() {
-        String[] args = { "-a" };
+        String[] args = {"-a"};
         assertThrows(WcException.class,
                 () -> wcApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
     void testRun_WhenIllegalFlagUppercaseOfLegalLetter_ShouldThrowException() {
-        String[] args = { "-C" };
+        String[] args = {"-C"};
         assertThrows(WcException.class,
                 () -> wcApp.run(args, testInputStream, testOutputStream));
     }
@@ -111,7 +106,7 @@ class WcApplicationTest {
 
         String[] args = {"-"};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);;
+        String[] result = testOutputStream.toString().split(REGEX);
 
         int lines = Integer.parseInt(result[0]);
         int words = Integer.parseInt(result[1]);
@@ -128,7 +123,7 @@ class WcApplicationTest {
 
         String[] args = {};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);;
+        String[] result = testOutputStream.toString().split(REGEX);
 
         int lines = Integer.parseInt(result[0]);
         int words = Integer.parseInt(result[1]);
@@ -143,9 +138,9 @@ class WcApplicationTest {
         int testLines = 10;
         testInputStream = createInputStream(generateString(testLines));
 
-        String[] args = { LINES_FLAG };
+        String[] args = {LINES_FLAG};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);;
+        String[] result = testOutputStream.toString().split(REGEX);
 
         int lines = Integer.parseInt(result[0]);
         assertEquals(testLines, lines);
@@ -156,9 +151,9 @@ class WcApplicationTest {
         int testLines = 10;
         testInputStream = createInputStream(generateString(testLines));
 
-        String[] args = { WORDS_FLAG, LINES_FLAG };
+        String[] args = {WORDS_FLAG, LINES_FLAG};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);;
+        String[] result = testOutputStream.toString().split(REGEX);
 
         int lines = Integer.parseInt(result[0]);
         int words = Integer.parseInt(result[1]);
@@ -171,9 +166,9 @@ class WcApplicationTest {
         int testLines = 10;
         testInputStream = createInputStream(generateString(testLines));
 
-        String[] args = { CHAR_FLAG_PREFIX + BYTES_LETTER + WORDS_LETTER };
+        String[] args = {CHAR_FLAG_PREFIX + BYTES_LETTER + WORDS_LETTER};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);;
+        String[] result = testOutputStream.toString().split(REGEX);
 
         int words = Integer.parseInt(result[0]);
         int bytes = Integer.parseInt(result[1]);
@@ -188,9 +183,9 @@ class WcApplicationTest {
         testFile.createNewFile();
         Files.writeString(testFile.toPath(), generateString(testLines));
 
-        String[] args = { WORDS_FLAG, LINES_FLAG, TEST_FILENAME_1 };
+        String[] args = {WORDS_FLAG, LINES_FLAG, TEST_FILENAME_1};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);;
+        String[] result = testOutputStream.toString().split(REGEX);
 
         int lines = Integer.parseInt(result[0]);
         int words = Integer.parseInt(result[1]);
@@ -215,9 +210,9 @@ class WcApplicationTest {
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
-        String[] args = { TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3 };
+        String[] args = {TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);;
+        String[] result = testOutputStream.toString().split(REGEX);
 
         int lines1 = Integer.parseInt(result[0]);
         int words1 = Integer.parseInt(result[1]);
@@ -265,9 +260,9 @@ class WcApplicationTest {
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
-        String[] args = { WORDS_FLAG, TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3 };
+        String[] args = {WORDS_FLAG, TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);;
+        String[] result = testOutputStream.toString().split(REGEX);
 
         int words1 = Integer.parseInt(result[0]);
         assertEquals(getWordCount(testLines1), words1);
@@ -299,8 +294,8 @@ class WcApplicationTest {
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
-        String output = assertDoesNotThrow(() -> wcApp.countFromFileAndStdin(true, true, true, testInputStream,TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3));
-        String[] result = output.split(REGEX);;
+        String output = assertDoesNotThrow(() -> wcApp.countFromFileAndStdin(true, true, true, testInputStream, TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3));
+        String[] result = output.split(REGEX);
 
         int lines1 = Integer.parseInt(result[0]);
         int words1 = Integer.parseInt(result[1]);

@@ -29,6 +29,9 @@ class CatApplicationTest {
 
     private static final String FOLDER_1 = "folder1"; // exists
 
+    private static final String FILE_1_CONTENT = "line1" + STRING_NEWLINE + "line2" + STRING_NEWLINE + "line3" + STRING_NEWLINE;
+    private static final String STD_INPUT = "Hello World" + STRING_NEWLINE + "CS4218" + STRING_NEWLINE;
+
     private final OutputStream stdout = new ByteArrayOutputStream();
     private CatApplication app;
     private InputStream stdin = System.in;
@@ -65,7 +68,7 @@ class CatApplicationTest {
 
     @Test
     public void run_OneFile_FileDisplayed() {
-        String expected = "line1" + STRING_NEWLINE + "line2" + STRING_NEWLINE + "line3" + STRING_NEWLINE;
+        String expected = FILE_1_CONTENT;
 
         assertDoesNotThrow(() -> app.run(new String[]{FILE_1}, stdin, stdout));
         assertEquals(expected, stdout.toString());
@@ -73,8 +76,7 @@ class CatApplicationTest {
 
     @Test
     public void run_MultipleFiles_FilesDisplayed() {
-        String expected = "line1" + STRING_NEWLINE + "line2" + STRING_NEWLINE + "line3" + STRING_NEWLINE
-                + "Hello World" + STRING_NEWLINE + "CS4218" + STRING_NEWLINE;
+        String expected = FILE_1_CONTENT + STD_INPUT;
 
         assertDoesNotThrow(() -> app.run(new String[]{FILE_1, FILE_2}, stdin, stdout));
         assertEquals(expected, stdout.toString());
@@ -82,7 +84,7 @@ class CatApplicationTest {
 
     @Test
     public void run_ReadFromStdin_ReturnStdinContent() {
-        String expected = "Hello world" + STRING_NEWLINE + "CS4218" + STRING_NEWLINE;
+        String expected = STD_INPUT;
         provideInput(expected);
 
         assertDoesNotThrow(() -> app.run(new String[]{}, stdin, stdout));
@@ -100,7 +102,7 @@ class CatApplicationTest {
 
     @Test
     public void run_StdinFlag_ReadFromStdin() {
-        String expected = "Hello world" + STRING_NEWLINE + "CS4218" + STRING_NEWLINE;
+        String expected = STD_INPUT;
         provideInput(expected);
 
         assertDoesNotThrow(() -> app.run(new String[]{"-"}, stdin, stdout));
@@ -110,8 +112,8 @@ class CatApplicationTest {
 
     @Test
     public void run_ReadFromBothFileAndStdin_ReturnsConcatenatedContent() {
-        String fileContent = "line1" + STRING_NEWLINE + "line2" + STRING_NEWLINE + "line3" + STRING_NEWLINE;
-        String stdinInput = "Hello world" + STRING_NEWLINE + "CS4218" + STRING_NEWLINE;
+        String fileContent = FILE_1_CONTENT;
+        String stdinInput = STD_INPUT;
         provideInput(stdinInput);
 
         assertDoesNotThrow(() -> app.run(new String[]{FILE_1, "-"}, stdin, stdout));
@@ -234,7 +236,7 @@ class CatApplicationTest {
     @Test
     public void catFileAndStdin_ReadFromBothFileAndStdin_ReturnsConcatenatedContent() {
         String fileContent = "line1" + STRING_NEWLINE + "line2" + STRING_NEWLINE + "line3";
-        String stdinInput = "Hello world" + STRING_NEWLINE + "CS4218" + STRING_NEWLINE;
+        String stdinInput = STD_INPUT;
         provideInput(stdinInput);
 
         assertDoesNotThrow(() -> {
