@@ -121,7 +121,7 @@ class LsApplicationTest {
     }
 
     @Test
-    public void run_MultipleFolders() {
+    public void run_MultipleFolders_FilesListed() {
         Map<String, Set<String>> folders = new HashMap<>();
         folders.put(FOLDER_1 + ":", new HashSet<>(List.of(FILE_1, FILE_2)));
         folders.put(FOLDER_2 + ":", new HashSet<>(List.of(FILE_1, FILE_2)));

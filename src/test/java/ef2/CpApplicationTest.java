@@ -1,4 +1,4 @@
-package EF2;
+package ef2;
 
 import org.junit.jupiter.api.*;
 import sg.edu.nus.comp.cs4218.Environment;
@@ -43,8 +43,8 @@ public class CpApplicationTest {
     private final List<Path> paths = List.of(file1, file2, file3, folder1, folder2, folder3);
 
     private CpApplication app;
-    private InputStream stdin = mock(InputStream.class);
-    private OutputStream stdout = mock(OutputStream.class);
+    private final InputStream stdin = mock(InputStream.class);
+    private final OutputStream stdout = mock(OutputStream.class);
 
     @BeforeAll
     static void setupBeforeAll() {
