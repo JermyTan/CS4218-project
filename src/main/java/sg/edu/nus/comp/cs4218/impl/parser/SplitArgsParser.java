@@ -1,11 +1,9 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_OPTION_REQUIRES_ARGUMENT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
+
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 
 public class SplitArgsParser extends ArgsParser {
     private final static char FLAG_SHOULD_SPLIT_BY_LINES = 'l';

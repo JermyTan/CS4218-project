@@ -1,20 +1,40 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.MvException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.*;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.MvException;
 
 class MvApplicationTest {
 
@@ -44,6 +64,16 @@ class MvApplicationTest {
     private InputStream stdin;
     private OutputStream stdout;
 
+    @BeforeAll
+    static void setupBeforeAll() {
+        Environment.currentDirectory = TESTDIR;
+    }
+
+    @AfterAll
+    static void tearDownAfterAll() {
+        Environment.currentDirectory = ORIGINAL_DIR;
+    }
+
     private void createFileWithContent(Path path, String content) throws IOException {
         Files.createFile(path);
         BufferedWriter outputStream = new BufferedWriter(new FileWriter(path.toFile(), true));
@@ -53,16 +83,6 @@ class MvApplicationTest {
 
     private String constructRenameErrorMsg(String srcFile, String destFile, String error) {
         return String.format("rename %s to %s: %s", srcFile, destFile, error);
-    }
-
-    @BeforeAll
-    static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
-    }
-
-    @AfterAll
-    static void tearDownAfterAll() {
-        Environment.currentDirectory = ORIGINAL_DIR;
     }
 
     @BeforeEach
@@ -77,7 +97,7 @@ class MvApplicationTest {
 
             Files.createDirectory(folder1);
             Files.createDirectory(folder3);
-        } catch (IOException e ) {
+        } catch (IOException e) {
             fail(e.getMessage());
         }
     }
@@ -88,9 +108,9 @@ class MvApplicationTest {
             for (Path path : paths) {
                 if (Files.isDirectory(path)) {
                     Files.walk(path)
-                        .sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
+                            .sorted(Comparator.reverseOrder())
+                            .map(Path::toFile)
+                            .forEach(File::delete);
                 } else {
                     Files.deleteIfExists(path);
                 }
@@ -373,7 +393,7 @@ class MvApplicationTest {
         try {
             Path destPath = Paths.get(TESTDIR, FOLDER_1, FOLDER_2);
             Files.createDirectory(destPath);
-        } catch (IOException e ) {
+        } catch (IOException e) {
             fail(e.getMessage());
         }
 

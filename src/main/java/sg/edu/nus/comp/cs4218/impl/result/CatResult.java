@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class CatResult extends Result{
+public class CatResult extends Result {
     private List<String> lines = List.of();
 
     public CatResult(List<String> lines) {
@@ -35,7 +35,7 @@ public class CatResult extends Result{
 
         if (isLineNumber) {
             result = IntStream.rangeClosed(1, lines.size())
-                    .mapToObj(index -> String.format(STRING_LABEL_VALUE_PAIR, index, lines.get(index-1)))
+                    .mapToObj(index -> String.format(STRING_LABEL_VALUE_PAIR, index, lines.get(index - 1)))
                     .collect(Collectors.toList());
         }
 

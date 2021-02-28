@@ -1,13 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.Environment;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
 
 class RegexArgumentTest {
 
@@ -25,10 +29,6 @@ class RegexArgumentTest {
 
     private RegexArgument regexArgument;
 
-    private String resolveArg(String arg) {
-        return Paths.get(TESTDIR, arg).toString();
-    }
-
     @BeforeAll
     static void setupBeforeAll() {
         Environment.currentDirectory = TESTDIR;
@@ -37,6 +37,10 @@ class RegexArgumentTest {
     @AfterAll
     static void tearDownAfterAll() {
         Environment.currentDirectory = ORIGINAL_DIR;
+    }
+
+    private String resolveArg(String arg) {
+        return Paths.get(TESTDIR, arg).toString();
     }
 
     @BeforeEach

@@ -1,9 +1,13 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,34 +19,32 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_INPUT;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class IORedirectionHandlerTest {
 
     private static final String RESOURCES_PATH = "src/test/resources";
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
     private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "IORedirectionHandlerTest";
-
-    private final String STRING_REDIR_INPUT = String.valueOf(CHAR_REDIR_INPUT);
-    private final String STRING_REDIR_OUTPUT = String.valueOf(CHAR_REDIR_OUTPUT);
-
     private static final String FILE_1 = "file1.txt"; // exists
     private static final String FILE_2 = "file2.txt"; // exists
     private static final String FILE_3 = "file3.txt"; // does not exist
-
+    private final String STRING_REDIR_INPUT = String.valueOf(CHAR_REDIR_INPUT);
+    private final String STRING_REDIR_OUTPUT = String.valueOf(CHAR_REDIR_OUTPUT);
     private final Path file3 = Paths.get(TESTDIR, FILE_3);
 
     private IORedirectionHandler redirHandler;
     private ArgumentResolver argumentResolver;
     private InputStream stdin;
     private OutputStream stdout;
-
-    private void buildRedirHandler(List<String> argsList) {
-        redirHandler = new IORedirectionHandler(argsList, stdin, stdout, argumentResolver);
-    }
 
     @BeforeAll
     static void setupBeforeAll() {
@@ -52,6 +54,10 @@ class IORedirectionHandlerTest {
     @AfterAll
     static void tearDownAfterAll() {
         Environment.currentDirectory = ORIGINAL_DIR;
+    }
+
+    private void buildRedirHandler(List<String> argsList) {
+        redirHandler = new IORedirectionHandler(argsList, stdin, stdout, argumentResolver);
     }
 
     @BeforeEach

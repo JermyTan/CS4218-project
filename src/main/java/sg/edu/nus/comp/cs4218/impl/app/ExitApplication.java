@@ -1,11 +1,11 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import sg.edu.nus.comp.cs4218.app.ExitInterface;
 import sg.edu.nus.comp.cs4218.exception.ExitException;
 import sg.edu.nus.comp.cs4218.impl.util.SystemExit;
-
-import java.io.InputStream;
-import java.io.OutputStream;
 
 public class ExitApplication implements ExitInterface {
 
@@ -18,8 +18,8 @@ public class ExitApplication implements ExitInterface {
     /**
      * Runs the exit application.
      *
-     * @param args array of arguments for the application, not used.
-     * @param stdin an InputStream, not used.
+     * @param args   array of arguments for the application, not used.
+     * @param stdin  an InputStream, not used.
      * @param stdout an OutputStream, not used.
      */
     @Override

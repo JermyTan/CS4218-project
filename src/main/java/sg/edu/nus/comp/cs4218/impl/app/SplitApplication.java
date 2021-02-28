@@ -1,16 +1,29 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.app.SplitInterface;
-import sg.edu.nus.comp.cs4218.exception.SplitException;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.impl.parser.SplitArgsParser;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_BYTE_COUNT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_LINE_COUNT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.app.SplitInterface;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.SplitException;
+import sg.edu.nus.comp.cs4218.impl.parser.SplitArgsParser;
 
 public class SplitApplication implements SplitInterface {
 
@@ -45,7 +58,7 @@ public class SplitApplication implements SplitInterface {
         } else {
             int linesPerFile;
             try {
-                linesPerFile  = hasNoOfLinesOrBytes ? Integer.parseInt(noOfLinesOrBytes) : DEFAULT_LINES;
+                linesPerFile = hasNoOfLinesOrBytes ? Integer.parseInt(noOfLinesOrBytes) : DEFAULT_LINES;
             } catch (NumberFormatException e) {
                 throw new SplitException(ERR_ILLEGAL_LINE_COUNT, e);
             }
@@ -90,16 +103,16 @@ public class SplitApplication implements SplitInterface {
         }
         String appendage = matcher.group(2);
         switch (appendage) {
-            case "":
-                return noOfBytes;
-            case "b":
-                return noOfBytes * 512;
-            case "k":
-                return noOfBytes * 1024;
-            case "m":
-                return noOfBytes * 1048576;
-            default:
-                throw new SplitException(ERR_ILLEGAL_BYTE_COUNT);
+        case "":
+            return noOfBytes;
+        case "b":
+            return noOfBytes * 512;
+        case "k":
+            return noOfBytes * 1024;
+        case "m":
+            return noOfBytes * 1048576;
+        default:
+            throw new SplitException(ERR_ILLEGAL_BYTE_COUNT);
         }
     }
 
@@ -173,7 +186,7 @@ public class SplitApplication implements SplitInterface {
                         writer.close();
                     }
                     String fileName = Environment.currentDirectory + File.separator + prefix + generateSuffix(linesRead / linesPerFile + 1);
-                    writer = new PrintWriter(fileName, "UTF-8");
+                    writer = new PrintWriter(fileName, StandardCharsets.UTF_8);
                 }
                 writer.println(line);
                 linesRead++;

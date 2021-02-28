@@ -1,8 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+import static java.nio.file.StandardOpenOption.WRITE;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static java.nio.file.StandardOpenOption.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -94,7 +103,7 @@ public class TeeApplication implements TeeInterface {
                 Files.write(filePath, content, CREATE, WRITE, isAppend ? APPEND : TRUNCATE_EXISTING);
 
                 return new TeeResult();
-                
+
             } catch (Exception e) {
                 throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND, e);
             }
@@ -118,7 +127,7 @@ public class TeeApplication implements TeeInterface {
         List<String> result = teeFromInputStream(stdin);
 
         if (fileNames != null) {
-            for (String fileName: fileNames) {
+            for (String fileName : fileNames) {
                 teeToFile(isAppend, result, fileName).outputError();
             }
         }
