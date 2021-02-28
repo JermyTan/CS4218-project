@@ -1,8 +1,24 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READ_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import sg.edu.nus.comp.cs4218.app.CatInterface;
 import sg.edu.nus.comp.cs4218.exception.CatException;
@@ -12,13 +28,6 @@ import sg.edu.nus.comp.cs4218.impl.parser.CatArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.CatResult;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("PMD.GodClass")
 public class CatApplication implements CatInterface {
@@ -112,7 +121,7 @@ public class CatApplication implements CatInterface {
         if (stdin == null) {
             throw new CatException(ERR_NO_ISTREAM);
         }
-        
+
         try {
             return new CatResult(IOUtils.getLinesFromInputStream(stdin));
         } catch (Exception e) {
@@ -132,7 +141,7 @@ public class CatApplication implements CatInterface {
 
         List<String> result = new ArrayList<>();
 
-        for (String fileName: fileNames) {
+        for (String fileName : fileNames) {
             CatResult content = computeCatFile(fileName);
 
             content.outputError();
@@ -176,7 +185,7 @@ public class CatApplication implements CatInterface {
 
         List<String> result = new ArrayList<>();
 
-        for (String fileName: fileNames) {
+        for (String fileName : fileNames) {
             CatResult content = fileName.equals(STRING_STDIN_FLAG)
                     ? computeCatStdin(stdin)
                     : computeCatFile(fileName);

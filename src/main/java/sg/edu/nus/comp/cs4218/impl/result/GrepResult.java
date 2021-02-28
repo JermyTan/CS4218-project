@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GrepResult extends Result {
-    private String label = "";
+    private String label = STRING_EMPTY;
     private List<String> lines = List.of();
 
     public GrepResult(String label, List<String> lines) {

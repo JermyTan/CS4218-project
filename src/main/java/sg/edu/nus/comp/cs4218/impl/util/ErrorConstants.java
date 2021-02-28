@@ -19,6 +19,10 @@ public final class ErrorConstants {
     public static final String ERR_TOO_MANY_ARGS = "Too many arguments";
     public static final String ERR_INVALID_ARG = "Invalid argument";
 
+    // Options related
+    public static final String ERR_OPTION_REQUIRES_ARGUMENT = "Option requires an argument";
+    public static final String ERR_TOO_MANY_OPTIONS = "Too many options";
+
     // Files and folders related
     public static final String ERR_FILE_NOT_FOUND = "No such file or directory";
     public static final String ERR_READING_FILE = "Could not read file";
@@ -49,6 +53,13 @@ public final class ErrorConstants {
     public static final String ERR_NO_FOLDERS = "No folder names are supplied";
     public static final String ERR_FILE_EXISTS = "File or directory already exists";
     public static final String ERR_TOP_LEVEL_MISSING = "Top level folders do not exist";
+
+    // `split` related
+    public static final String ERR_ILLEGAL_LINE_COUNT = "Illegal line count";
+    public static final String ERR_ILLEGAL_BYTE_COUNT = "Illegal byte count";
+
+    // `mv` related
+    public static final String ERR_CANNOT_RENAME = "Failed to rename";
 
     // General constants
     public static final String ERR_INVALID_APP = "Invalid app";

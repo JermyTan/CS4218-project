@@ -1,14 +1,16 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.app.EchoInterface;
-import sg.edu.nus.comp.cs4218.exception.EchoException;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_WHITESPACE;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_WHITESPACE;
+import sg.edu.nus.comp.cs4218.app.EchoInterface;
+import sg.edu.nus.comp.cs4218.exception.EchoException;
 
 /**
  * The echo command writes its arguments separated by spaces and terminates by a newline on the
@@ -23,8 +25,8 @@ public class EchoApplication implements EchoInterface {
     /**
      * Runs the echo application with the specified arguments.
      *
-     * @param args array of arguments for the application.
-     * @param stdin an InputStream, not used.
+     * @param args   array of arguments for the application.
+     * @param stdin  an InputStream, not used.
      * @param stdout an OutputStream. Elements of args will be output to stdout, separated by a
      *               space character.
      * @throws EchoException

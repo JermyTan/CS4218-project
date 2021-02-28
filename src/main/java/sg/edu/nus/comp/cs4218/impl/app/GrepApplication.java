@@ -1,5 +1,30 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_REGEX;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READ_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
+
 import sg.edu.nus.comp.cs4218.app.GrepInterface;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
@@ -10,19 +35,6 @@ import sg.edu.nus.comp.cs4218.impl.result.GrepResult;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
-
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
-
 @SuppressWarnings("PMD.GodClass")
 public class GrepApplication implements GrepInterface {
 
@@ -31,8 +43,8 @@ public class GrepApplication implements GrepInterface {
     /**
      * Runs the grep application with the specified arguments.
      *
-     * @param args array of arguments for the application.
-     * @param stdin an InputStream. Can be used to read in lines from stdin.
+     * @param args   array of arguments for the application.
+     * @param stdin  an InputStream. Can be used to read in lines from stdin.
      * @param stdout an OutputStream. Lines which match supplied pattern will be output to stdout,
      *               separated by a newline character.
      * @throws GrepException if the file(s) specified do not exist or are unreadable.
@@ -101,7 +113,7 @@ public class GrepApplication implements GrepInterface {
         return grepFromFiles(pattern, isCaseInsensitive, isCountLines, isPrefixFileName, fileNames);
     }
 
-    private Pattern processRegexPattern(String pattern, boolean isCaseInsensitive) throws GrepException{
+    private Pattern processRegexPattern(String pattern, boolean isCaseInsensitive) throws GrepException {
         try {
             return isCaseInsensitive
                     ? Pattern.compile(pattern, Pattern.CASE_INSENSITIVE)
@@ -160,7 +172,7 @@ public class GrepApplication implements GrepInterface {
         }
     }
 
-    private GrepResult computeGrepFromStdin(Pattern grepPattern, InputStream stdin) throws GrepException{
+    private GrepResult computeGrepFromStdin(Pattern grepPattern, InputStream stdin) throws GrepException {
         if (grepPattern == null) {
             throw new GrepException(ERR_NO_REGEX);
         }
@@ -198,7 +210,7 @@ public class GrepApplication implements GrepInterface {
         Pattern grepPattern = processRegexPattern(pattern, isCaseInsensitive);
         List<String> result = new ArrayList<>();
 
-        for (String fileName: fileNames) {
+        for (String fileName : fileNames) {
             GrepResult content = computeGrepFromFile(grepPattern, fileName);
 
             content.outputError();
@@ -266,14 +278,14 @@ public class GrepApplication implements GrepInterface {
         Pattern grepPattern = processRegexPattern(pattern, isCaseInsensitive);
         List<String> result = new ArrayList<>();
 
-        for (String fileName: fileNames) {
+        for (String fileName : fileNames) {
             GrepResult content = fileName.equals(STRING_STDIN_FLAG)
                     ? computeGrepFromStdin(grepPattern, stdin)
                     : computeGrepFromFile(grepPattern, fileName);
 
             content.outputError();
 
-            String contentString = content.formatToString(isCountLines, true);
+            String contentString = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
 
             if (!contentString.isEmpty()) {
                 result.add(contentString);

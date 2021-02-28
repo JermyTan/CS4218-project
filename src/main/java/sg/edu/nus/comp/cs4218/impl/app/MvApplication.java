@@ -1,9 +1,13 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.app.MvInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.MvException;
-import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,40 +15,59 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import sg.edu.nus.comp.cs4218.app.MvInterface;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.MvException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public class MvApplication implements MvInterface {
 
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws MvException {
         MvArgsParser parser = new MvArgsParser();
 
         try {
             parser.parse(args);
+        } catch (InvalidArgsException e) {
+            throw new MvException(e.getMessage(), e);
+        }
 
-            boolean isOverwrite = parser.isOverwrite();
-            String target = parser.getTarget();
-            List<String> srcFiles = parser.getSrcFiles();
-            if (parser.isFormatOne()) {
-                String srcFile = srcFiles.get(0);
+        boolean isNotOverwrite = parser.isNotOverwrite();
+        String destFile = parser.getDestFile();
+        String[] srcFiles = parser.getSrcFiles().toArray(String[]::new);
 
-                if (!isOverwrite && new File(target).exists()) {
+        try {
+            if (isFormatOne(destFile)) {
+                if (srcFiles.length > 1) {
+                    throw new InvalidArgsException(ERR_TOO_MANY_ARGS);
+                }
+
+                String srcFile = srcFiles[0];
+
+                Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
+                if (isNotOverwrite && Files.exists(destPath)) {
                     return;
                 }
 
-                mvSrcFileToDestFile(srcFile, target);
+                mvSrcFileToDestFile(srcFile, destFile);
+
             } else {
-                if (!isOverwrite) {
-                    srcFiles = filterSrcFiles(srcFiles, target);
+                if (isNotOverwrite) {
+                    srcFiles = filterSrcFiles(destFile, srcFiles);
+
+                    // Return if srcFiles becomes empty after filtering
+                    if (srcFiles.length == 0) {
+                        return;
+                    }
                 }
 
-                mvFilesToFolder(target, srcFiles.toArray(String[]::new));
+                mvFilesToFolder(destFile, srcFiles);
             }
+
         } catch (Exception e) {
             throw new MvException(e.getMessage(), e);
         }
@@ -52,8 +75,8 @@ public class MvApplication implements MvInterface {
 
     @Override
     public String mvSrcFileToDestFile(String srcFile, String destFile) throws Exception {
-        Path srcPath = Paths.get(srcFile);
-        Path destPath = Paths.get(destFile);
+        Path srcPath = IOUtils.resolveAbsoluteFilePath(srcFile);
+        Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
 
         // srcFile must exist
         if (Files.notExists(srcPath)) {
@@ -86,7 +109,7 @@ public class MvApplication implements MvInterface {
         try {
             Files.move(srcPath, destPath, REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new Exception(e.getMessage(), e);
+            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_CANNOT_RENAME), e);
         }
 
         return null;
@@ -94,7 +117,7 @@ public class MvApplication implements MvInterface {
 
     @Override
     public String mvFilesToFolder(String destFolder, String... fileNames) throws Exception {
-        Path destPath = Paths.get(destFolder);
+        Path destPath = IOUtils.resolveAbsoluteFilePath(destFolder);
 
         // `destFolder` must exist
         if (Files.notExists(destPath)) {
@@ -120,26 +143,27 @@ public class MvApplication implements MvInterface {
     }
 
     /**
-     *
+     * @param destFile target file
      * @param srcFiles file paths for files to be moved to the target directory
-     * @param target target directory
      * @return srcFiles that do not overwrite existing file in the target directory after mv
      */
-    private List<String> filterSrcFiles(List<String> srcFiles, String target) {
-        List<String> filtered = new ArrayList<>();
-        for (String srcFile : srcFiles) {
-            String fileName = new File(srcFile).getName();
-            String destFile = target + File.separator + fileName;
-            if (new File(destFile).exists()) {
-                continue;
-            }
-            filtered.add(srcFile);
-        }
+    private String[] filterSrcFiles(String destFile, String... srcFiles) throws ShellException {
+        Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
 
-        return filtered;
+        return Arrays.stream(srcFiles)
+                .filter(srcFile -> {
+                    String fileName = new File(srcFile).getName();
+                    return Files.notExists(destPath.resolve(fileName));
+                })
+                .toArray(String[]::new);
     }
 
     private String constructRenameErrorMsg(String srcFile, String destFile, String error) {
         return String.format("rename %s to %s: %s", srcFile, destFile, error);
+    }
+
+    private boolean isFormatOne(String destFile) throws ShellException {
+        Path target = IOUtils.resolveAbsoluteFilePath(destFile);
+        return Files.notExists(target) || !Files.isDirectory(target);
     }
 }

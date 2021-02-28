@@ -99,7 +99,7 @@ public final class StringUtils {
      * Performs c * n (as in python).
      *
      * @param character char to be multiplied.
-     * @param num if num is < 0, num is assumed to be 0.
+     * @param num       if num is < 0, num is assumed to be 0.
      * @return string result of c * n.
      */
     public static String multiplyChar(char character, int num) {

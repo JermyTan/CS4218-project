@@ -1,18 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
-import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 
 /**
  * A Call Command is a sub-command consisting of at least one non-keyword or quoted.

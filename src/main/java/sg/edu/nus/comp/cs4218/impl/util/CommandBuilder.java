@@ -1,18 +1,22 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
-import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
-import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_PIPE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_SEMICOLON;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import sg.edu.nus.comp.cs4218.Command;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
+import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
+import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 
 @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions"})
 public final class CommandBuilder {
@@ -76,48 +80,48 @@ public final class CommandBuilder {
             commandSubstring = commandSubstring.substring(1);
 
             switch (firstChar) {
-                case CHAR_REDIR_INPUT:
-                case CHAR_REDIR_OUTPUT:
-                    if (tokens.isEmpty()) {
-                        // cannot start a new command with redirection
-                        throw new ShellException(ERR_SYNTAX);
-                    } else {
-                        // add as a separate token on its own
-                        tokens.add(String.valueOf(firstChar));
-                    }
-                    break;
-
-                case CHAR_PIPE:
-                    if (tokens.isEmpty()) {
-                        // cannot start a new command with pipe
-                        throw new ShellException(ERR_SYNTAX);
-                    } else {
-                        // add CallCommand as part of a PipeCommand
-                        callCmdsForPipe.add(new CallCommand(tokens, appRunner, argumentResolver));
-                        tokens = new LinkedList<>();
-                    }
-                    break;
-
-                case CHAR_SEMICOLON:
-                    if (tokens.isEmpty()) {
-                        // cannot start a new command with semicolon
-                        throw new ShellException(ERR_SYNTAX);
-                    } else if (callCmdsForPipe.isEmpty()) {
-                        // add CallCommand as part of a SequenceCommand
-                        cmdsForSequence.add(new CallCommand(tokens, appRunner, argumentResolver));
-                    } else {
-                        // add CallCommand as part of ongoing PipeCommand
-                        callCmdsForPipe.add(new CallCommand(tokens, appRunner, argumentResolver));
-
-                        // add PipeCommand as part of a SequenceCommand
-                        cmdsForSequence.add(new PipeCommand(callCmdsForPipe));
-                        callCmdsForPipe = new LinkedList<>();
-                    }
-                    break;
-
-                default:
-                    // encountered a mismatched quote
+            case CHAR_REDIR_INPUT:
+            case CHAR_REDIR_OUTPUT:
+                if (tokens.isEmpty()) {
+                    // cannot start a new command with redirection
                     throw new ShellException(ERR_SYNTAX);
+                } else {
+                    // add as a separate token on its own
+                    tokens.add(String.valueOf(firstChar));
+                }
+                break;
+
+            case CHAR_PIPE:
+                if (tokens.isEmpty()) {
+                    // cannot start a new command with pipe
+                    throw new ShellException(ERR_SYNTAX);
+                } else {
+                    // add CallCommand as part of a PipeCommand
+                    callCmdsForPipe.add(new CallCommand(tokens, appRunner, argumentResolver));
+                    tokens = new LinkedList<>();
+                }
+                break;
+
+            case CHAR_SEMICOLON:
+                if (tokens.isEmpty()) {
+                    // cannot start a new command with semicolon
+                    throw new ShellException(ERR_SYNTAX);
+                } else if (callCmdsForPipe.isEmpty()) {
+                    // add CallCommand as part of a SequenceCommand
+                    cmdsForSequence.add(new CallCommand(tokens, appRunner, argumentResolver));
+                } else {
+                    // add CallCommand as part of ongoing PipeCommand
+                    callCmdsForPipe.add(new CallCommand(tokens, appRunner, argumentResolver));
+
+                    // add PipeCommand as part of a SequenceCommand
+                    cmdsForSequence.add(new PipeCommand(callCmdsForPipe));
+                    callCmdsForPipe = new LinkedList<>();
+                }
+                break;
+
+            default:
+                // encountered a mismatched quote
+                throw new ShellException(ERR_SYNTAX);
             }
         }
 

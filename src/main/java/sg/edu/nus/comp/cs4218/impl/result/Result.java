@@ -1,13 +1,16 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
-/** Base class to represent the computed result of an application for a SINGLE input stream. */
+/**
+ * Base class to represent the computed result of an application for a SINGLE input stream.
+ */
 public class Result {
     protected boolean isError = false;
-    protected String errorMessage = "";
+    protected String errorMessage = STRING_EMPTY;
 
     protected Result(boolean isError) {
         this.isError = isError;
@@ -41,4 +44,4 @@ public class Result {
     public boolean hasError() {
         return isError;
     }
- }
+}

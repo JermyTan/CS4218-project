@@ -1,8 +1,12 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_BACK_QUOTE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_DOUBLE_QUOTE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_SINGLE_QUOTE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_SPACE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -12,7 +16,9 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import sg.edu.nus.comp.cs4218.Command;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 @SuppressWarnings("PMD.ExcessiveMethodLength")
 public class ArgumentResolver {
@@ -156,11 +162,11 @@ public class ArgumentResolver {
                 .collect(Collectors.toList());
     }
 
-    public RegexArgument makeRegexArgument() {
+    private RegexArgument makeRegexArgument() {
         return new RegexArgument();
     }
 
-    public RegexArgument makeRegexArgument(String str) {
+    private RegexArgument makeRegexArgument(String str) {
         return new RegexArgument(str);
     }
 

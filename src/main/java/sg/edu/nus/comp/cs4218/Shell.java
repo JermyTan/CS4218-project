@@ -1,9 +1,9 @@
 package sg.edu.nus.comp.cs4218;
 
+import java.io.OutputStream;
+
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
-
-import java.io.OutputStream;
 
 public interface Shell {
 

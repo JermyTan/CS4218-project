@@ -4,7 +4,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 
 public class WcResult extends Result {
-    private String label = "";
+    private String label = STRING_EMPTY;
     private long numLines = 0;
     private long numWords = 0;
     private long numBytes = 0;
@@ -41,9 +41,9 @@ public class WcResult extends Result {
 
         return String.format(
                 "%s%s%s%s",
-                isLines ? String.format("%s%s", numLines, CHAR_TAB) : "",
-                isWords ? String.format("%s%s", numWords, CHAR_TAB) : "",
-                isBytes ? String.format("%s%s", numBytes, CHAR_TAB) : "",
+                isLines ? String.format("%s%s", numLines, CHAR_TAB) : STRING_EMPTY,
+                isWords ? String.format("%s%s", numWords, CHAR_TAB) : STRING_EMPTY,
+                isBytes ? String.format("%s%s", numBytes, CHAR_TAB) : STRING_EMPTY,
                 label
         ).trim();
     }

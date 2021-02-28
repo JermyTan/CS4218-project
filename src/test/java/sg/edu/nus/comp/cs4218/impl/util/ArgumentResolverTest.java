@@ -1,11 +1,12 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ArgumentResolverTest {
     private ArgumentResolver argumentResolver;
@@ -82,6 +83,16 @@ class ArgumentResolverTest {
             List<String> args = argumentResolver.resolveOneArgument(arg);
             assertEquals(1, args.size());
             assertEquals("hello 'world'", args.get(0));
+        });
+    }
+
+    @Test
+    public void resolveOneArgument_QuotedAsterisk_AsteriskRemains() {
+        String arg = "\"hello *\"";
+        assertDoesNotThrow(() -> {
+            List<String> args = argumentResolver.resolveOneArgument(arg);
+            assertEquals(1, args.size());
+            assertEquals("hello *", args.get(0));
         });
     }
 }

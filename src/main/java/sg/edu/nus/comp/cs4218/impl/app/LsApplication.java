@@ -1,13 +1,15 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.app.LsInterface;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.exception.LsException;
-import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
-import sg.edu.nus.comp.cs4218.impl.result.LsResult;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
-import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.File;
 import java.io.InputStream;
@@ -22,11 +24,14 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import sg.edu.nus.comp.cs4218.app.LsInterface;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.LsException;
+import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
+import sg.edu.nus.comp.cs4218.impl.result.LsResult;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public class LsApplication implements LsInterface {
     private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
@@ -34,8 +39,8 @@ public class LsApplication implements LsInterface {
     /**
      * Runs the ls application with the specified arguments.
      *
-     * @param args array of arguments for the application.
-     * @param stdin an InputStream, not used.
+     * @param args   array of arguments for the application.
+     * @param stdin  an InputStream, not used.
      * @param stdout an OutputStream. Contents in the given directories will be output to stdout.
      * @throws LsException if the file(s) specified do not exist or are unreadable.
      */
@@ -72,7 +77,7 @@ public class LsApplication implements LsInterface {
         }
     }
 
-    private LsResult listFolder(boolean isFoldersOnly, String folderName) throws LsException{
+    private LsResult listFolder(boolean isFoldersOnly, String folderName) throws LsException {
         if (folderName == null) {
             throw new LsException(ERR_INVALID_FILES);
         }
@@ -118,13 +123,13 @@ public class LsApplication implements LsInterface {
 
         List<LsResult> result = new ArrayList<>();
 
-        for (String folderName: folderNames) {
+        for (String folderName : folderNames) {
             LsResult content = listFolder(isFoldersOnly, folderName);
 
             result.add(content);
 
             if (isRecursive) {
-                for (File file: content.getFiles()) {
+                for (File file : content.getFiles()) {
                     if (!file.isDirectory()) {
                         continue;
                     }

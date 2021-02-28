@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
-public class LsResult extends Result{
-    private String label = "";
+public class LsResult extends Result {
+    private String label = STRING_EMPTY;
     private List<File> files = List.of();
 
     public LsResult(String label, List<File> files) {
