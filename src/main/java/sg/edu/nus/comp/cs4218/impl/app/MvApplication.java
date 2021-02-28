@@ -1,9 +1,12 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.app.MvInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.MvException;
-import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +14,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import sg.edu.nus.comp.cs4218.app.MvInterface;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.MvException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public class MvApplication implements MvInterface {
 
@@ -33,7 +39,8 @@ public class MvApplication implements MvInterface {
             if (parser.isFormatOne()) {
                 String srcFile = srcFiles.get(0);
 
-                if (!isOverwrite && new File(target).exists()) {
+                Path targetPath = IOUtils.resolveAbsoluteFilePath(target);
+                if (!isOverwrite && Files.exists(targetPath)) {
                     return;
                 }
 
@@ -41,6 +48,11 @@ public class MvApplication implements MvInterface {
             } else {
                 if (!isOverwrite) {
                     srcFiles = filterSrcFiles(srcFiles, target);
+
+                    // Return if srcFiles becomes empty after filtering
+                    if (srcFiles.isEmpty()) {
+                        return;
+                    }
                 }
 
                 mvFilesToFolder(target, srcFiles.toArray(String[]::new));
@@ -52,8 +64,8 @@ public class MvApplication implements MvInterface {
 
     @Override
     public String mvSrcFileToDestFile(String srcFile, String destFile) throws Exception {
-        Path srcPath = Paths.get(srcFile);
-        Path destPath = Paths.get(destFile);
+        Path srcPath = IOUtils.resolveAbsoluteFilePath(srcFile);
+        Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
 
         // srcFile must exist
         if (Files.notExists(srcPath)) {
@@ -86,7 +98,7 @@ public class MvApplication implements MvInterface {
         try {
             Files.move(srcPath, destPath, REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new Exception(e.getMessage(), e);
+            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_CANNOT_RENAME), e);
         }
 
         return null;
@@ -94,7 +106,7 @@ public class MvApplication implements MvInterface {
 
     @Override
     public String mvFilesToFolder(String destFolder, String... fileNames) throws Exception {
-        Path destPath = Paths.get(destFolder);
+        Path destPath = IOUtils.resolveAbsoluteFilePath(destFolder);
 
         // `destFolder` must exist
         if (Files.notExists(destPath)) {
@@ -120,17 +132,18 @@ public class MvApplication implements MvInterface {
     }
 
     /**
-     *
      * @param srcFiles file paths for files to be moved to the target directory
-     * @param target target directory
+     * @param target   target directory
      * @return srcFiles that do not overwrite existing file in the target directory after mv
      */
-    private List<String> filterSrcFiles(List<String> srcFiles, String target) {
+    private List<String> filterSrcFiles(List<String> srcFiles, String target) throws ShellException {
         List<String> filtered = new ArrayList<>();
+        Path targetPath = IOUtils.resolveAbsoluteFilePath(target);
+
         for (String srcFile : srcFiles) {
             String fileName = new File(srcFile).getName();
-            String destFile = target + File.separator + fileName;
-            if (new File(destFile).exists()) {
+            Path destPath = targetPath.resolve(fileName);
+            if (Files.exists(destPath)) {
                 continue;
             }
             filtered.add(srcFile);

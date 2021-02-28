@@ -7,8 +7,8 @@ public interface CpInterface extends Application {
      * copy content of source file to destination file
      *
      * @param isRecursive Copy folders (directories) recursively
-     * @param srcFile  of path to source file
-     * @param destFile of path to destination file
+     * @param srcFile     of path to source file
+     * @param destFile    of path to destination file
      * @throws Exception
      */
     String cpSrcFileToDestFile(Boolean isRecursive, String srcFile, String destFile) throws Exception;
@@ -17,11 +17,7 @@ public interface CpInterface extends Application {
      * copy files to destination folder
      *
      * @param isRecursive Copy folders (directories) recursively
-<<<<<<< HEAD
-     * @param destFolder of path to destination folder
-=======
      * @param destFolder  of path to destination folder
->>>>>>> main
      * @param fileNames   Array of String of file names
      * @throws Exception
      */

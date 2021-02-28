@@ -1,6 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -10,13 +10,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import sg.edu.nus.comp.cs4218.Environment;
 
 @SuppressWarnings("PMD.AvoidStringBufferField")
 public final class RegexArgument {
-    private StringBuilder plaintext;
-    private StringBuilder regex;
+    private final StringBuilder plaintext;
+    private final StringBuilder regex;
     private boolean isRegex;
 
     public RegexArgument() {
@@ -75,7 +74,7 @@ public final class RegexArgument {
             Pattern regexPattern = Pattern.compile(regex.toString());
 
             String modifiedPlaintext = plaintext.toString().replaceAll("\\\\", "/");
-            String tokens[] = modifiedPlaintext.split("/");
+            String[] tokens = modifiedPlaintext.split("/");
 
             String dir = "";
             for (int i = 0; i < tokens.length - 1; i++) {
@@ -87,7 +86,7 @@ public final class RegexArgument {
 
             File currentDir = Paths.get(dir).toFile();
             if (!isAbsolute) {
-                currentDir = Paths.get(dir).toAbsolutePath().toFile();
+                currentDir = Paths.get(Environment.currentDirectory, dir).normalize().toFile();
             }
 
             globbedFiles = traverseAndFilter(regexPattern, currentDir, isAbsolute, onlyDirectories);

@@ -3,7 +3,6 @@ package sg.edu.nus.comp.cs4218.impl.parser;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 

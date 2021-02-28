@@ -1,17 +1,21 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.app.WcInterface;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.exception.WcException;
-import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
-import sg.edu.nus.comp.cs4218.impl.result.WcResult;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
-import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READ_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -20,10 +24,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
+import sg.edu.nus.comp.cs4218.app.WcInterface;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.exception.WcException;
+import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
+import sg.edu.nus.comp.cs4218.impl.result.WcResult;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.GodClass")
 public class WcApplication implements WcInterface {
@@ -124,9 +134,8 @@ public class WcApplication implements WcInterface {
             long numLines = lines.size();
             long numWords = lines.stream().map(StringUtils::tokenize).flatMap(Stream::of).count();
             long numBytes = filePath == null
-                    ? lines.stream().mapToInt(line -> line.getBytes().length).sum() + numWords
+                    ? lines.stream().mapToInt(line -> line.getBytes().length).sum() + numLines
                     : Files.size(filePath);
-
 
             return new WcResult(label, numLines, numWords, numBytes);
 
@@ -164,7 +173,7 @@ public class WcApplication implements WcInterface {
         }
     }
 
-    private WcResult computeStatisticsFromStdin(InputStream stdin) throws WcException{
+    private WcResult computeStatisticsFromStdin(InputStream stdin) throws WcException {
         if (stdin == null) {
             throw new WcException(ERR_NO_ISTREAM);
         }
@@ -210,7 +219,7 @@ public class WcApplication implements WcInterface {
 
         List<WcResult> result = new ArrayList<>();
 
-        for (String fileName: fileNames) {
+        for (String fileName : fileNames) {
             WcResult statistics = computeStatisticsFromFile(fileName);
 
             statistics.outputError();
@@ -261,7 +270,7 @@ public class WcApplication implements WcInterface {
 
         List<WcResult> result = new ArrayList<>();
 
-        for (String fileName: fileNames) {
+        for (String fileName : fileNames) {
             WcResult statistics = fileName.equals(STRING_STDIN_FLAG)
                     ? computeStatisticsFromStdin(stdin)
                     : computeStatisticsFromFile(fileName);

@@ -1,8 +1,8 @@
 package sg.edu.nus.comp.cs4218.app;
 
-import sg.edu.nus.comp.cs4218.Application;
-
 import java.io.InputStream;
+
+import sg.edu.nus.comp.cs4218.Application;
 
 public interface PasteInterface extends Application {
     /**
@@ -10,7 +10,7 @@ public interface PasteInterface extends Application {
      * arg is specified, echo back the Stdin.
      *
      * @param isSerial Paste one file at a time instead of in parallel
-     * @param stdin InputStream containing arguments from Stdin
+     * @param stdin    InputStream containing arguments from Stdin
      * @throws Exception
      */
     String mergeStdin(Boolean isSerial, InputStream stdin) throws Exception;
@@ -19,7 +19,7 @@ public interface PasteInterface extends Application {
      * Returns string of line-wise concatenated (tab-separated) files. If only one file is
      * specified, echo back the file content.
      *
-     * @param isSerial Paste one file at a time instead of in parallel
+     * @param isSerial  Paste one file at a time instead of in parallel
      * @param fileNames Array of file names to be read and merged
      * @throws Exception
      */
@@ -28,8 +28,8 @@ public interface PasteInterface extends Application {
     /**
      * Returns string of line-wise concatenated (tab-separated) files and Stdin arguments.
      *
-     * @param isSerial Paste one file at a time instead of in parallel
-     * @param stdin    InputStream containing arguments from Stdin
+     * @param isSerial  Paste one file at a time instead of in parallel
+     * @param stdin     InputStream containing arguments from Stdin
      * @param fileNames Array of file names to be read and merged
      * @throws Exception
      */

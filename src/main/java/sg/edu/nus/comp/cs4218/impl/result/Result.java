@@ -4,7 +4,9 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
-/** Base class to represent the computed result of an application for a SINGLE input stream. */
+/**
+ * Base class to represent the computed result of an application for a SINGLE input stream.
+ */
 public class Result {
     protected boolean isError = false;
     protected String errorMessage = "";
@@ -41,4 +43,4 @@ public class Result {
     public boolean hasError() {
         return isError;
     }
- }
+}

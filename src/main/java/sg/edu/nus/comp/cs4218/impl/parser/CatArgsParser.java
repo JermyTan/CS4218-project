@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
