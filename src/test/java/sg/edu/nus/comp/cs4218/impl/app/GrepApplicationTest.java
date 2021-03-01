@@ -3,16 +3,16 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,9 +35,11 @@ class GrepApplicationTest {
     private static final String FILENAME_FLAG = CHAR_FLAG_PREFIX + FILENAME_LETTER;
 
     private static final String DEFAULT_DIRNAME = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "WcApplicationTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "GrepApplicationTest";
     private static final String TEST_FILENAME = "bsd1.txt";
     private static final String TEST_FILENAME_2 = "bsd2.txt";
+    private static final String NON_EXISTENT_FILE = "non-existent.txt";
+    private static final String TEST_FOLDER = "folder";
 
     private static final String NEW_LINE_CHAR = System.getProperty("line.separator");
     private static final String TEST_LINE_1 = "Copyright (c) The Regents of the University of California.";
@@ -74,28 +76,45 @@ class GrepApplicationTest {
     private static File testDir;
     private static File testFile;
     private static File testFile2;
+    private static Path testFolder;
     private static InputStream testInputStream;
     private static OutputStream testOutputStream;
+    private OutputStream stderr;
 
     private final GrepApplication grepApp = new GrepApplication();
 
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
+    }
+
     @BeforeAll
-    static void setUpBeforeAll() throws Exception {
+    static void setUpBeforeAll() throws IOException {
         testDir = new File(TEST_DIR);
         testDir.mkdir();
         Environment.currentDirectory = TEST_DIR;
+
         testFile = new File(TEST_DIR + File.separator + TEST_FILENAME);
         testFile.createNewFile();
         Files.writeString(testFile.toPath(), TEST_STRING);
         testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), TEST_STRING);
+        testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
+        Files.createDirectory(testFolder);
     }
 
     @AfterAll
-    static void tearDownAfterAll() {
+    static void tearDownAfterAll() throws IOException {
         testFile.delete();
         testFile2.delete();
+        Files.delete(testFolder);
+
         Environment.currentDirectory = DEFAULT_DIRNAME;
         testDir.delete();
     }
@@ -122,6 +141,12 @@ class GrepApplicationTest {
     void run_SingleArgNullInputStream_ThrowsException() {
         String[] args = {"test"};
         assertThrows(GrepException.class, () -> grepApp.run(args, null, testOutputStream));
+    }
+
+    @Test
+    void run_SingleArgNullOutputStream_ThrowsException() {
+        String[] args = {"test"};
+        assertThrows(GrepException.class, () -> grepApp.run(args, testInputStream, null));
     }
 
     @Test
@@ -242,6 +267,34 @@ class GrepApplicationTest {
                 GrepException.class,
                 () -> grepApp.grepFromFiles("test", false, false, false, TEST_FILENAME, null)
         );
+    }
+
+    @Test
+    public void grepFromFiles_FileDoesNotExist_WritesErrToStderr() {
+        captureErr();
+
+        assertDoesNotThrow(() -> {
+            grepApp.grepFromFiles("test", false, false, false, NON_EXISTENT_FILE);
+
+            assertEquals(new GrepException(
+                            String.format(STRING_LABEL_VALUE_PAIR, NON_EXISTENT_FILE, ERR_FILE_NOT_FOUND)
+                    ).getMessage() + STRING_NEWLINE,
+                    getErrOutput());
+        });
+    }
+
+    @Test
+    public void grepFromFiles_DirectorySupplied_WritesErrToStderr() {
+        captureErr();
+
+        assertDoesNotThrow(() -> {
+            grepApp.grepFromFiles("test", false, false, false, TEST_FOLDER);
+
+            assertEquals(new GrepException(
+                            String.format(STRING_LABEL_VALUE_PAIR, TEST_FOLDER, ERR_IS_DIR)
+                    ).getMessage() + STRING_NEWLINE,
+                    getErrOutput());
+        });
     }
 
     @Test

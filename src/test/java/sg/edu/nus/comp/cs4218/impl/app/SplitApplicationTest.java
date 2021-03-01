@@ -9,20 +9,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.app.SplitApplication.DEFAULT_LINES;
 import static sg.edu.nus.comp.cs4218.impl.app.SplitApplication.DEFAULT_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_BYTE_COUNT;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_LINE_COUNT;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_OPTION_REQUIRES_ARGUMENT;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_OPTIONS;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_SPLIT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -44,6 +41,8 @@ class SplitApplicationTest {
     private static final String DEFAULT_DIRNAME = Environment.currentDirectory;
     private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "SplitApplicationTest";
     private static final String TEST_FILENAME = "test.txt";
+    private static final String NON_EXISTENT_FILE = "non-existent.txt";
+    private static final String TEST_FOLDER = "folder";
     private static final String TEST_STRING = "The quick brown fox jumped over the lazy dog.\n"; // 46 bytes
     private static final String XAA = "xaa";
     private static final String XAB = "xab";
@@ -55,6 +54,7 @@ class SplitApplicationTest {
 
     private static File testFile;
     private static File testDir;
+    private static Path testFolder;
     private static InputStream testStream;
 
     private final SplitApplication splitApp = new SplitApplication();
@@ -94,6 +94,8 @@ class SplitApplicationTest {
     void setUp() throws Exception {
         testFile = new File(TEST_DIR + File.separator + TEST_FILENAME);
         testFile.createNewFile();
+        testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
+        Files.createDirectory(testFolder);
         testStream = generateStream(generateString(0));
     }
 
@@ -482,6 +484,22 @@ class SplitApplicationTest {
         byte[] expectedLastContent = Arrays.copyOfRange(testContent, 1048576, 2000000);
         byte[] actualLastContent = Files.readAllBytes(lastFile.toPath());
         assertArrayEquals(expectedLastContent, actualLastContent);
+    }
+
+    @Test
+    public void splitFileByBytes_FileDoesNotExist_ThrowsException() {
+        Throwable exception = assertThrows(SplitException.class, () -> {
+            splitApp.splitFileByBytes(NON_EXISTENT_FILE, null, "16");
+        });
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_SPLIT, ERR_FILE_NOT_FOUND), exception.getMessage());
+    }
+
+    @Test
+    public void splitFileByBytes_DirectorySupplied_ThrowsException() {
+        Throwable exception = assertThrows(SplitException.class, () -> {
+            splitApp.splitFileByBytes(TEST_FOLDER, null, "16");
+        });
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_SPLIT, ERR_IS_DIR), exception.getMessage());
     }
 
     @Test

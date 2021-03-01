@@ -3,16 +3,16 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -39,12 +39,26 @@ class WcApplicationTest {
     private static final String TEST_FILENAME_2 = "test2.txt";
     private static final String TEST_FILENAME_3 = "test3.txt";
     private static final String TEST_STRING = "The quick brown fox jumped over the lazy dog.\n"; // 9 words 46 bytes
+    private static final String NON_EXISTENT_FILE = "non-existent.txt";
+    private static final String TEST_FOLDER = "folder";
 
     private static File testDir;
+    private static Path testFolder;
     private static InputStream testInputStream;
     private static OutputStream testOutputStream;
+    private OutputStream stderr;
 
     private final WcApplication wcApp = new WcApplication();
+
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
+    }
 
     @BeforeAll
     static void setUpBeforeAll() {
@@ -76,9 +90,12 @@ class WcApplicationTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         testInputStream = createInputStream(generateString(0));
         testOutputStream = new ByteArrayOutputStream();
+
+        testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
+        Files.createDirectory(testFolder);
     }
 
     @AfterEach
@@ -101,6 +118,12 @@ class WcApplicationTest {
         String[] args = {"-c"};
         assertThrows(WcException.class,
                 () -> wcApp.run(args, null, testOutputStream));
+    }
+
+    @Test
+    void run_SingleLegalFlagNullStdout_ThrowsException() {
+        String[] args = {"-c"};
+        assertThrows(WcException.class, () -> wcApp.run(args, testInputStream, null));
     }
 
     @Test
@@ -242,19 +265,16 @@ class WcApplicationTest {
     @Test
     void countFromFiles_NullFileNames_ThrowsException() {
         assertThrows(WcException.class, () -> wcApp.countFromFiles(false, false, false, (String[]) null));
-
     }
 
     @Test
     void countFromFiles_FileNamesContainNull_ThrowsException() {
         assertThrows(WcException.class, () -> wcApp.countFromFiles(false, false, false, TEST_FILENAME_1, null));
-
     }
 
     @Test
     void countFromFiles_EmptyFileNames_ThrowsException() {
         assertThrows(WcException.class, () -> wcApp.countFromFiles(false, false, false));
-
     }
 
     @Test
@@ -363,9 +383,36 @@ class WcApplicationTest {
     }
 
     @Test
+    public void countFromFiles_FileDoesNotExist_WritesErrToStderr() {
+        captureErr();
+
+        assertDoesNotThrow(() -> {
+            wcApp.countFromFiles(false, false, false, NON_EXISTENT_FILE);
+
+            assertEquals(new WcException(
+                            String.format(STRING_LABEL_VALUE_PAIR, NON_EXISTENT_FILE, ERR_FILE_NOT_FOUND)
+                    ).getMessage() + STRING_NEWLINE,
+                    getErrOutput());
+        });
+    }
+
+    @Test
+    public void countFromFiles_DirectorySupplied_WritesErrToStderr() {
+        captureErr();
+
+        assertDoesNotThrow(() -> {
+            wcApp.countFromFiles(false, false, false, TEST_FOLDER);
+
+            assertEquals(new WcException(
+                            String.format(STRING_LABEL_VALUE_PAIR, TEST_FOLDER, ERR_IS_DIR)
+                    ).getMessage() + STRING_NEWLINE,
+                    getErrOutput());
+        });
+    }
+
+    @Test
     void countFromFileAndStdin_NullStdin_ThrowsException() {
         assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(false, false, false, null, TEST_FILENAME_1));
-
     }
 
     @Test
@@ -376,13 +423,11 @@ class WcApplicationTest {
     @Test
     void countFromFileAndStdin_FileNamesContainNull_ThrowsException() {
         assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(false, false, false, testInputStream, TEST_FILENAME_1, null));
-
     }
 
     @Test
     void countFromFileAndStdin_EmptyFileNames_ThrowsException() {
         assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(false, false, false, testInputStream));
-
     }
 
     @Test

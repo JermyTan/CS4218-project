@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
@@ -32,26 +31,32 @@ class EchoApplicationTest {
     }
 
     @Test
-    public void constructResult_Blank_ShouldWriteBlank() throws EchoException {
-        assertEquals("", app.constructResult(EMPTY));
-        assertEquals("  ", app.constructResult(SPACE));
+    public void constructResult_Blank_ShouldWriteBlank(){
+        assertDoesNotThrow(() -> {
+            assertEquals("", app.constructResult(EMPTY));
+            assertEquals("  ", app.constructResult(SPACE));
+        });
     }
 
     @Test
-    public void constructResult_AlphanumericWithoutDoubleQuotes_ShouldWrite() throws EchoException {
-        assertEquals("ABC 123", app.constructResult(STRING_1));
-        assertEquals("0 5 abc", app.constructResult(STRING_2));
-        assertEquals("'\"A*B*C\"'", app.constructResult(STRING_5));
+    public void constructResult_AlphanumericWithoutDoubleQuotes_ShouldWrite() {
+        assertDoesNotThrow(() -> {
+            assertEquals("ABC 123", app.constructResult(STRING_1));
+            assertEquals("0 5 abc", app.constructResult(STRING_2));
+            assertEquals("'\"A*B*C\"'", app.constructResult(STRING_5));
+        });
     }
 
     @Test
-    public void constructResult_SpecialCharacters_ShouldWriteAsIs() throws EchoException {
-        assertEquals("!@#$%^&*()_+{}|:<>?.,/~", app.constructResult(STRING_3));
+    public void constructResult_SpecialCharacters_ShouldWriteAsIs() {
+        assertDoesNotThrow(() -> {
+            assertEquals("!@#$%^&*()_+{}|:<>?.,/~", app.constructResult(STRING_3));
+        });
     }
 
 
     @Test
-    public void constructResult_Null_ShouldThrow() throws EchoException {
+    public void constructResult_Null_ShouldThrow() {
         Throwable error = assertThrows(EchoException.class, () -> app.constructResult(STRING_4));
         assertEquals("echo: " + ERR_NULL_ARGS, error.getMessage());
     }
