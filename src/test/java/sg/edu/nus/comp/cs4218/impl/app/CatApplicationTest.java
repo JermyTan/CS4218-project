@@ -88,7 +88,7 @@ class CatApplicationTest {
     }
 
     @Test
-    public void run_NullArgs_Allowed() {
+    public void run_NullArgs_Success() {
         assertDoesNotThrow(() -> app.run(null, stdin, stdout));
     }
 
@@ -184,6 +184,12 @@ class CatApplicationTest {
     }
 
     @Test
+    public void catFiles_NullIsLineNumber_ThrowsException() {
+        Throwable exception = assertThrows(CatException.class, () -> app.catFiles(null, FILE_1, FILE_2));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NULL_ARGS), exception.getMessage());
+    }
+
+    @Test
     public void catFiles_ValidArgs_ReturnsFileContent() {
         String expected = "line1" + STRING_NEWLINE + "line2" + STRING_NEWLINE + "line3";
 
@@ -228,6 +234,12 @@ class CatApplicationTest {
     }
 
     @Test
+    public void catStdin_NullIsLineNumber_ThrowsException() {
+        Throwable exception = assertThrows(CatException.class, () -> app.catStdin(null, stdin));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NULL_ARGS), exception.getMessage());
+    }
+
+    @Test
     public void catStdin_ReadFromStdin_ReturnStdinContent() {
         String expected = "Hello world" + STRING_NEWLINE + "CS4218";
         provideInput(expected);
@@ -260,6 +272,12 @@ class CatApplicationTest {
     public void catFileAndStdin_FilenamesContainNull_ThrowsException() {
         Throwable exception = assertThrows(CatException.class, () -> app.catFileAndStdin(false, stdin, FILE_1, null));
         assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_INVALID_FILES), exception.getMessage());
+    }
+
+    @Test
+    public void catFileAndStdin_NullIsLineNumber_ThrowsException() {
+        Throwable exception = assertThrows(CatException.class, () -> app.catFileAndStdin(null, stdin, FILE_1));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NULL_ARGS), exception.getMessage());
     }
 
     @Test

@@ -22,6 +22,7 @@ import java.util.List;
 import sg.edu.nus.comp.cs4218.app.TeeInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.TeeException;
 import sg.edu.nus.comp.cs4218.impl.parser.TeeArgsParser;
@@ -122,6 +123,10 @@ public class TeeApplication implements TeeInterface {
         // okay for fileNames itself to be null but not okay if it contains any null values
         if (fileNames != null && CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new TeeException(ERR_INVALID_FILES);
+        }
+
+        if (isAppend == null) {
+            throw new TeeException(ERR_NULL_ARGS);
         }
 
         List<String> result = teeFromInputStream(stdin);

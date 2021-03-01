@@ -9,6 +9,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_REGEX;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READ_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
@@ -26,6 +27,7 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.app.GrepInterface;
+import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
@@ -207,6 +209,10 @@ public class GrepApplication implements GrepInterface {
             throw new GrepException(ERR_INVALID_FILES);
         }
 
+        if (CollectionUtils.isAnyNull(isCaseInsensitive, isCountLines, isPrefixFileName)) {
+            throw new GrepException(ERR_NULL_ARGS);
+        }
+
         Pattern grepPattern = processRegexPattern(pattern, isCaseInsensitive);
         List<String> result = new ArrayList<>();
 
@@ -241,6 +247,10 @@ public class GrepApplication implements GrepInterface {
             throw new GrepException(ERR_READ_STREAM);
         }
 
+        if (CollectionUtils.isAnyNull(isCaseInsensitive, isCountLines, isPrefixFileName)) {
+            throw new GrepException(ERR_NULL_ARGS);
+        }
+
         Pattern grepPattern = processRegexPattern(pattern, isCaseInsensitive);
 
         GrepResult result = computeGrepFromStdin(grepPattern, stdin);
@@ -273,6 +283,10 @@ public class GrepApplication implements GrepInterface {
 
         if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new GrepException(ERR_INVALID_FILES);
+        }
+
+        if (CollectionUtils.isAnyNull(isCaseInsensitive, isCountLines, isPrefixFileName)) {
+            throw new GrepException(ERR_NULL_ARGS);
         }
 
         Pattern grepPattern = processRegexPattern(pattern, isCaseInsensitive);

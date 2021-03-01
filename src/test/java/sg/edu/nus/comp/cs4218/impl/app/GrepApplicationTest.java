@@ -113,27 +113,31 @@ class GrepApplicationTest {
     }
 
     @Test
-    void testRun_WhenNullArgs_ShouldThrowException() {
+    void run_NullArgs_ThrowsException() {
         String[] args = {null};
         assertThrows(GrepException.class, () -> grepApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
-    void testRun_WhenIllegalFlagWrongLetter_ShouldThrowException() {
+    void run_SingleArgNullInputStream_ThrowsException() {
+        String[] args = {"test"};
+        assertThrows(GrepException.class, () -> grepApp.run(args, null, testOutputStream));
+    }
+
+    @Test
+    void run_IllegalFlagWrongLetter_ThrowsException() {
         String[] args = {"-a"};
-        assertThrows(GrepException.class,
-                () -> grepApp.run(args, testInputStream, testOutputStream));
+        assertThrows(GrepException.class, () -> grepApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
-    void testRun_WhenIllegalFlagLegalLetterWrongCase_ShouldThrowException() {
+    void run_IllegalFlagLegalLetterWrongCase_ThrowsException() {
         String[] args = {"-C"};
-        assertThrows(GrepException.class,
-                () -> grepApp.run(args, testInputStream, testOutputStream));
+        assertThrows(GrepException.class, () -> grepApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
-    void testRun_WhenFilenameDash_ShouldUseStdin() {
+    void run_FilenameDash_UseStdin() {
         String[] args = {"Copyright", "-"};
         assertDoesNotThrow(() -> grepApp.run(args, testInputStream, testOutputStream));
         List<String> result = testOutputStream.toString().lines().collect(Collectors.toList());
@@ -142,7 +146,39 @@ class GrepApplicationTest {
     }
 
     @Test
-    void testGrepFromStdin_WhenFindWord_ShouldPrintLine() {
+    void grepFromStdin_NullPattern_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromStdin(null, false, false, false, testInputStream)
+        );
+    }
+
+    @Test
+    void grepFromStdin_NullStdin_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromStdin("test", false, false, false, null)
+        );
+    }
+
+    @Test
+    void grepFromStdin_NullFlags_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromStdin("test", null, false, false, testInputStream)
+        );
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromStdin("test", false, null, false, testInputStream)
+        );
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromStdin("test", false, false, null, testInputStream)
+        );
+    }
+
+    @Test
+    void grepFromStdin_FindWord_ReturnsLine() {
         String output = assertDoesNotThrow(() -> grepApp.grepFromStdin("Copyright", false, false, false, testInputStream));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(1, result.size());
@@ -150,15 +186,7 @@ class GrepApplicationTest {
     }
 
     @Test
-    void testGrepFromFiles_WhenOneFileFindPhrase_ShouldPrintLine() {
-        String output = assertDoesNotThrow(() -> grepApp.grepFromFiles("The Regents of the University of California", false, false, false, TEST_FILENAME));
-        List<String> result = output.lines().collect(Collectors.toList());
-        assertEquals(1, result.size());
-        assertEquals(TEST_LINE_1, result.get(0));
-    }
-
-    @Test
-    void testGrepFromStdin_WhenFindRegex_ShouldPrintLine() {
+    void grepFromStdin_FindRegex_ReturnsLines() {
         String output = assertDoesNotThrow(() -> grepApp.grepFromStdin("\\bdistribution\\b", false, false, false, testInputStream));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(1, result.size());
@@ -166,7 +194,7 @@ class GrepApplicationTest {
     }
 
     @Test
-    void testGrepFromStdin_WhenFindWord_ShouldPrintLines() {
+    void grepFromStdin_FindWord_ReturnsLines() {
         String output = assertDoesNotThrow(() -> grepApp.grepFromStdin("Redistribution", false, false, false, testInputStream));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(3, result.size());
@@ -176,31 +204,7 @@ class GrepApplicationTest {
     }
 
     @Test
-    void testGrepFromFiles_WhenOneFileFindPhrase_ShouldPrintLines() {
-        String output = assertDoesNotThrow(
-                () -> grepApp.grepFromFiles(
-                        "the above copyright notice, this list of conditions and the following disclaimer",//NOPMD
-                        false,
-                        false,
-                        false, TEST_FILENAME)
-        );
-        List<String> result = output.lines().collect(Collectors.toList());
-        assertEquals(2, result.size());
-        assertEquals(TEST_LINE_4, result.get(0));
-        assertEquals(TEST_LINE_5, result.get(1));
-    }
-
-    @Test
-    void testGrepFromFiles_WhenOneFileFindWordWithInsensitiveFlag_ShouldPrintLines() {
-        String output = assertDoesNotThrow(() -> grepApp.grepFromFiles("Regents", true, false, false, TEST_FILENAME));
-        List<String> result = output.lines().collect(Collectors.toList());
-        assertEquals(2, result.size());
-        assertEquals(TEST_LINE_1, result.get(0));
-        assertEquals(TEST_LINE_6, result.get(1));
-    }
-
-    @Test
-    void testGrepFromStdin_WhenFindPhraseWithCountFlag_ShouldPrintCount() {
+    void grepFromStdin_FindPhraseWithCountFlag_ReturnsCount() {
         String output = assertDoesNotThrow(() -> grepApp.grepFromStdin("the above copyright notice, this list of conditions and the following disclaimer", false, true, false, testInputStream));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(1, result.size());
@@ -208,7 +212,7 @@ class GrepApplicationTest {
     }
 
     @Test
-    void testGrepFromStdin_WhenFindPhraseWithFilenameFlag_ShouldPrintFilenameAndLines() {
+    void grepFromStdin_FindPhraseWithFilenameFlag_ReturnsFilenameAndLines() {
         String output = assertDoesNotThrow(() -> grepApp.grepFromStdin("the above copyright notice, this list of conditions and the following disclaimer", false, false, true, testInputStream));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(2, result.size());
@@ -217,7 +221,96 @@ class GrepApplicationTest {
     }
 
     @Test
-    void testGrepFromFiles_WhenOneFileFindRegexWithFilenameFlag_ShouldPrintFilenameAndLines() {
+    void grepFromFiles_EmptyFileNames_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFiles("test", false, false, false)
+        );
+    }
+
+    @Test
+    void grepFromFiles_NullFileNames_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFiles("test", false, false, false, (String[]) null)
+        );
+    }
+
+    @Test
+    void grepFromFiles_FileNamesContainNull_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFiles("test", false, false, false, TEST_FILENAME, null)
+        );
+    }
+
+    @Test
+    void grepFromFiles_NullPattern_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFiles(null, false, false, false, TEST_FILENAME)
+        );
+    }
+
+    @Test
+    void grepFromFiles_NullFlags_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFiles("test", null, false, false, TEST_FILENAME)
+        );
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFiles("test", false, null, false, TEST_FILENAME)
+        );
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFiles("test", false, false, null, TEST_FILENAME)
+        );
+    }
+
+    @Test
+    void grepFromFiles_OneFileFindPhrase_ReturnsLine() {
+        String output = assertDoesNotThrow(
+                () -> grepApp.grepFromFiles(
+                        "The Regents of the University of California",
+                        false,
+                        false,
+                        false,
+                        TEST_FILENAME)
+        );
+        List<String> result = output.lines().collect(Collectors.toList());
+        assertEquals(1, result.size());
+        assertEquals(TEST_LINE_1, result.get(0));
+    }
+
+    @Test
+    void grepFromFiles_OneFileFindPhrase_ReturnsLines() {
+        String output = assertDoesNotThrow(
+                () -> grepApp.grepFromFiles(
+                        "the above copyright notice, this list of conditions and the following disclaimer",//NOPMD
+                        false,
+                        false,
+                        false,
+                        TEST_FILENAME
+                )
+        );
+        List<String> result = output.lines().collect(Collectors.toList());
+        assertEquals(2, result.size());
+        assertEquals(TEST_LINE_4, result.get(0));
+        assertEquals(TEST_LINE_5, result.get(1));
+    }
+
+    @Test
+    void grepFromFiles_OneFileFindWordWithInsensitiveFlag_ReturnsLines() {
+        String output = assertDoesNotThrow(() -> grepApp.grepFromFiles("Regents", true, false, false, TEST_FILENAME));
+        List<String> result = output.lines().collect(Collectors.toList());
+        assertEquals(2, result.size());
+        assertEquals(TEST_LINE_1, result.get(0));
+        assertEquals(TEST_LINE_6, result.get(1));
+    }
+
+    @Test
+    void grepFromFiles_OneFileFindRegexWithFilenameFlag_ReturnsFilenameAndLines() {
         String output = assertDoesNotThrow(() -> grepApp.grepFromFiles("\\bdistribution\\b", false, false, true, TEST_FILENAME));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(1, result.size());
@@ -225,7 +318,7 @@ class GrepApplicationTest {
     }
 
     @Test
-    void testGrepFromFiles_WhenMultipleFilesFindPhraseWithFilenameFlag_ShouldPrintFilenamesAndLines() {
+    void grepFromFiles_MultipleFilesFindPhraseWithFilenameFlag_ReturnsFilenamesAndLines() {
         String output = assertDoesNotThrow(() -> grepApp.grepFromFiles("the above copyright notice, this list of conditions and the following disclaimer", false, false, true, TEST_FILENAME, TEST_FILENAME_2));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(4, result.size());
@@ -236,12 +329,67 @@ class GrepApplicationTest {
     }
 
     @Test
-    void testGrepFromFileAndStdin_WhenFindPhraseWithAllFlags_ShouldPrintFilenamesAndCounts() {
+    void grepFromFileAndStdin_NullStdin_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFileAndStdin("test", false, false, false, null, TEST_FILENAME)
+        );
+    }
+
+    @Test
+    void grepFromFileAndStdin_EmptyFileNames_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFileAndStdin("test", false, false, false, testInputStream)
+        );
+    }
+
+    @Test
+    void grepFromFileAndStdin_NullFileNames_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFileAndStdin("test", false, false, false, testInputStream, (String[]) null)
+        );
+    }
+
+    @Test
+    void grepFromFileAndStdin_FileNamesContainNull_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFileAndStdin("test", false, false, false, testInputStream, TEST_FILENAME, null)
+        );
+    }
+
+    @Test
+    void grepFromFileAndStdin_NullPattern_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFileAndStdin(null, false, false, false, testInputStream, TEST_FILENAME)
+        );
+    }
+
+    @Test
+    void grepFromFileAndStdin_NullFlags_ThrowsException() {
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFileAndStdin("test", null, false, false, testInputStream, TEST_FILENAME)
+        );
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFileAndStdin("test", false, null, false, testInputStream, TEST_FILENAME)
+        );
+        assertThrows(
+                GrepException.class,
+                () -> grepApp.grepFromFileAndStdin("test", false, false, null, testInputStream, TEST_FILENAME)
+        );
+    }
+
+    @Test
+    void grepFromFileAndStdin_FindPhraseWithAllFlags_ReturnsFilenamesAndCounts() {
         String output = assertDoesNotThrow(() -> grepApp.grepFromFileAndStdin("The Regents", true, true, true, testInputStream, TEST_FILENAME, TEST_FILENAME_2));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(2, result.size());
         assertEquals(TEST_FILENAME + ": 2", result.get(0));
         assertEquals(TEST_FILENAME_2 + ": 2", result.get(1));
     }
-
 }

@@ -9,6 +9,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_LS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
@@ -91,7 +92,7 @@ class LsApplicationTest {
     }
 
     @Test
-    public void run_NullArgs_Allowed() {
+    public void run_NullArgs_Success() {
         assertDoesNotThrow(() -> app.run(null, stdin, stdout));
     }
 
@@ -251,8 +252,24 @@ class LsApplicationTest {
                     ).getMessage() + STRING_NEWLINE,
                     getErrOutput());
         });
+    }
 
-        System.setErr(System.err);
+    @Test
+    public void listFolderContent_NullFlags_ThrowsException() {
+        Throwable exception1 = assertThrows(LsException.class, () ->
+                app.listFolderContent(null, false, false, FOLDER_1)
+        );
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_LS, ERR_NULL_ARGS), exception1.getMessage());
+
+        Throwable exception2 = assertThrows(LsException.class, () ->
+                app.listFolderContent(false, null, false, FOLDER_1)
+        );
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_LS, ERR_NULL_ARGS), exception2.getMessage());
+
+        Throwable exception3 = assertThrows(LsException.class, () ->
+                app.listFolderContent(false, false, null, FOLDER_1)
+        );
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_LS, ERR_NULL_ARGS), exception3.getMessage());
     }
 
     @Test

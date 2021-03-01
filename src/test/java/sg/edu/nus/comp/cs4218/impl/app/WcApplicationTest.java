@@ -76,7 +76,7 @@ class WcApplicationTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         testInputStream = createInputStream(generateString(0));
         testOutputStream = new ByteArrayOutputStream();
     }
@@ -91,27 +91,34 @@ class WcApplicationTest {
     }
 
     @Test
-    void testRun_WhenNullArgs_ShouldThrowException() {
+    void run_NullArgs_ThrowsException() {
         String[] args = {null};
         assertThrows(WcException.class, () -> wcApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
-    void testRun_WhenIllegalFlagWrongLetter_ShouldThrowException() {
+    void run_SingleLegalFlagNullStdin_ThrowsException() {
+        String[] args = {"-c"};
+        assertThrows(WcException.class,
+                () -> wcApp.run(args, null, testOutputStream));
+    }
+
+    @Test
+    void run_IllegalFlagWrongLetter_ThrowsException() {
         String[] args = {"-a"};
         assertThrows(WcException.class,
                 () -> wcApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
-    void testRun_WhenIllegalFlagUppercaseOfLegalLetter_ShouldThrowException() {
+    void run_IllegalFlagUppercaseOfLegalLetter_ThrowsException() {
         String[] args = {"-C"};
         assertThrows(WcException.class,
                 () -> wcApp.run(args, testInputStream, testOutputStream));
     }
 
     @Test
-    void testRun_WhenFilenameDash_ShouldUseStdin() {
+    void run_FilenameDash_UseStdin() {
         int testLines = 1;
         testInputStream = createInputStream(generateString(testLines));
 
@@ -128,7 +135,7 @@ class WcApplicationTest {
     }
 
     @Test
-    void testRun_WhenStdin_ShouldCountLinesWordsBytes() {
+    void run_Stdin_CountsLinesWordsBytes() {
         int testLines = 1;
         testInputStream = createInputStream(generateString(testLines));
 
@@ -145,7 +152,7 @@ class WcApplicationTest {
     }
 
     @Test
-    void testRun_WhenStdinLinesFlag_ShouldCountLines() {
+    void run_StdinLinesFlag_CountsLines() {
         int testLines = 10;
         testInputStream = createInputStream(generateString(testLines));
 
@@ -158,21 +165,7 @@ class WcApplicationTest {
     }
 
     @Test
-    void testCountFromStdin_WhenLinesWords_ShouldCountLinesWords() {
-        int testLines = 10;
-        testInputStream = createInputStream(generateString(testLines));
-
-        String output = assertDoesNotThrow(() -> wcApp.countFromStdin(false, true, true, testInputStream));
-        String[] result = output.split(REGEX);
-
-        int lines = Integer.parseInt(result[0]);
-        int words = Integer.parseInt(result[1]);
-        assertEquals(testLines, lines);
-        assertEquals(getWordCount(testLines), words);
-    }
-
-    @Test
-    void testRun_WhenStdinBytesWordsFlagsTogether_ShouldCountWordsBytes() {
+    void run_StdinBytesWordsFlagsTogether_CountsWordsBytes() {
         int testLines = 10;
         testInputStream = createInputStream(generateString(testLines));
 
@@ -187,7 +180,92 @@ class WcApplicationTest {
     }
 
     @Test
-    void testCountFromFiles_WhenOneFileLinesWords_ShouldCountLinesWords() throws Exception {
+    void run_MultipleFilesWordsFlag_CountsWords() throws Exception {
+        int testLines1 = 2;
+        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
+        testFile1.createNewFile();
+        Files.writeString(testFile1.toPath(), generateString(testLines1));
+
+        int testLines2 = 4;
+        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
+        testFile2.createNewFile();
+        Files.writeString(testFile2.toPath(), generateString(testLines2));
+
+        int testLines3 = 6;
+        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
+        testFile3.createNewFile();
+        Files.writeString(testFile3.toPath(), generateString(testLines3));
+
+        String[] args = {WORDS_FLAG, TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3};
+        assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
+        String[] result = testOutputStream.toString().split(REGEX);
+
+        int words1 = Integer.parseInt(result[0]);
+        assertEquals(getWordCount(testLines1), words1);
+
+        int words2 = Integer.parseInt(result[2]);
+        assertEquals(getWordCount(testLines2), words2);
+
+        int words3 = Integer.parseInt(result[4]);
+        assertEquals(getWordCount(testLines3), words3);
+
+        int wordsTotal = Integer.parseInt(result[6]);
+        assertEquals(getWordCount(testLines1) + getWordCount(testLines2) + getWordCount(testLines3), wordsTotal);
+    }
+
+    @Test
+    void countFromStdin_NullStdin_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromStdin(false, false, false, null));
+    }
+
+    @Test
+    void countFromStdin_NullFlags_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromStdin(null, false, false, testInputStream));
+        assertThrows(WcException.class, () -> wcApp.countFromStdin(false, null, false, testInputStream));
+        assertThrows(WcException.class, () -> wcApp.countFromStdin(false, false, null, testInputStream));
+    }
+
+    @Test
+    void countFromStdin_LinesWords_CountsLinesWords() {
+        int testLines = 10;
+        testInputStream = createInputStream(generateString(testLines));
+
+        String output = assertDoesNotThrow(() -> wcApp.countFromStdin(false, true, true, testInputStream));
+        String[] result = output.split(REGEX);
+
+        int lines = Integer.parseInt(result[0]);
+        int words = Integer.parseInt(result[1]);
+        assertEquals(testLines, lines);
+        assertEquals(getWordCount(testLines), words);
+    }
+
+    @Test
+    void countFromFiles_NullFileNames_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromFiles(false, false, false, (String[]) null));
+
+    }
+
+    @Test
+    void countFromFiles_FileNamesContainNull_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromFiles(false, false, false, TEST_FILENAME_1, null));
+
+    }
+
+    @Test
+    void countFromFiles_EmptyFileNames_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromFiles(false, false, false));
+
+    }
+
+    @Test
+    void countFromFiles_NullFlags_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromFiles(null, false, false, TEST_FILENAME_1));
+        assertThrows(WcException.class, () -> wcApp.countFromFiles(false, null, false, TEST_FILENAME_1));
+        assertThrows(WcException.class, () -> wcApp.countFromFiles(false, false, null, TEST_FILENAME_1));
+    }
+
+    @Test
+    void countFromFiles_OneFileLinesWords_CountsLinesWords() throws Exception {
         int testLines = 10;
         File testFile = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
         testFile.createNewFile();
@@ -203,7 +281,7 @@ class WcApplicationTest {
     }
 
     @Test
-    void testCountFromFiles_WhenMultipleFiles_ShouldCountLinesWordsBytes() throws Exception {
+    void countFromFiles_MultipleFiles_CountsLinesWordsBytes() throws Exception {
         int testLines1 = 2;
         File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
         testFile1.createNewFile();
@@ -252,41 +330,7 @@ class WcApplicationTest {
     }
 
     @Test
-    void testRun_WhenMultipleFilesWordsFlag_ShouldCountWords() throws Exception {
-        int testLines1 = 2;
-        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
-        testFile1.createNewFile();
-        Files.writeString(testFile1.toPath(), generateString(testLines1));
-
-        int testLines2 = 4;
-        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
-        testFile2.createNewFile();
-        Files.writeString(testFile2.toPath(), generateString(testLines2));
-
-        int testLines3 = 6;
-        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
-        testFile3.createNewFile();
-        Files.writeString(testFile3.toPath(), generateString(testLines3));
-
-        String[] args = {WORDS_FLAG, TEST_FILENAME_1, TEST_FILENAME_2, TEST_FILENAME_3};
-        assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
-        String[] result = testOutputStream.toString().split(REGEX);
-
-        int words1 = Integer.parseInt(result[0]);
-        assertEquals(getWordCount(testLines1), words1);
-
-        int words2 = Integer.parseInt(result[2]);
-        assertEquals(getWordCount(testLines2), words2);
-
-        int words3 = Integer.parseInt(result[4]);
-        assertEquals(getWordCount(testLines3), words3);
-
-        int wordsTotal = Integer.parseInt(result[6]);
-        assertEquals(getWordCount(testLines1) + getWordCount(testLines2) + getWordCount(testLines3), wordsTotal);
-    }
-
-    @Test
-    void testCountFromFiles_WhenMultipleFilesWordsFlag_ShouldCountWords() throws Exception {
+    void countFromFiles_MultipleFilesWordsFlag_CountsWords() throws Exception {
         int testLines1 = 2;
         File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
         testFile1.createNewFile();
@@ -319,7 +363,37 @@ class WcApplicationTest {
     }
 
     @Test
-    void testCountFromFileAndStdin_WhenMultipleFiles_ShouldCountLinesWordsBytes() throws Exception {
+    void countFromFileAndStdin_NullStdin_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(false, false, false, null, TEST_FILENAME_1));
+
+    }
+
+    @Test
+    void countFromFileAndStdin_NullFileNames_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(false, false, false, testInputStream, (String[]) null));
+    }
+
+    @Test
+    void countFromFileAndStdin_FileNamesContainNull_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(false, false, false, testInputStream, TEST_FILENAME_1, null));
+
+    }
+
+    @Test
+    void countFromFileAndStdin_EmptyFileNames_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(false, false, false, testInputStream));
+
+    }
+
+    @Test
+    void countFromFileAndStdin_NullFlags_ThrowsException() {
+        assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(null, false, false, testInputStream, TEST_FILENAME_1));
+        assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(false, null, false, testInputStream, TEST_FILENAME_1));
+        assertThrows(WcException.class, () -> wcApp.countFromFileAndStdin(false, false, null, testInputStream, TEST_FILENAME_1));
+    }
+
+    @Test
+    void countFromFileAndStdin_MultipleFiles_CountsLinesWordsBytes() throws Exception {
         int testLines1 = 2;
         File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
         testFile1.createNewFile();

@@ -4,6 +4,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
@@ -25,6 +26,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.app.LsInterface;
+import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
@@ -156,6 +158,10 @@ public class LsApplication implements LsInterface {
         // okay for folderNames itself to be null but not okay if it contains any null values
         if (folderNames != null && CollectionUtils.isAnyNull((Object[]) folderNames)) {
             throw new LsException(ERR_INVALID_FILES);
+        }
+
+        if (CollectionUtils.isAnyNull(isFoldersOnly, isRecursive, isSortByExt)) {
+            throw new LsException(ERR_NULL_ARGS);
         }
 
         String[] nonNullFolderNames = Objects.requireNonNullElse(folderNames, new String[]{STRING_EMPTY});

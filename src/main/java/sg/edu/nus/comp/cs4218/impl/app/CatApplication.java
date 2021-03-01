@@ -7,6 +7,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READ_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
@@ -139,6 +140,10 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_INVALID_FILES);
         }
 
+        if (isLineNumber == null) {
+            throw new CatException(ERR_NULL_ARGS);
+        }
+
         List<String> result = new ArrayList<>();
 
         for (String fileName : fileNames) {
@@ -162,6 +167,10 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_NO_ISTREAM);
         }
 
+        if (isLineNumber == null) {
+            throw new CatException(ERR_NULL_ARGS);
+        }
+
         CatResult result = computeCatStdin(stdin);
 
         result.outputError();
@@ -181,6 +190,10 @@ public class CatApplication implements CatInterface {
 
         if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new CatException(ERR_INVALID_FILES);
+        }
+
+        if (isLineNumber == null) {
+            throw new CatException(ERR_NULL_ARGS);
         }
 
         List<String> result = new ArrayList<>();

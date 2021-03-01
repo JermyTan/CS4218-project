@@ -106,7 +106,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenNullArgs_ShouldThrowException() {
+    void run_NullArgs_ThrowsException() {
         String[] args = {null};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
@@ -115,7 +115,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenIllegalOptionWrongLetter_ShouldThrowException() {
+    void run_IllegalOptionWrongLetter_ThrowsException() {
         String illegalFlag = "r";
         String[] args = {CHAR_FLAG_PREFIX + illegalFlag, DEFAULT_OPTION_ARG};
         Throwable thrown = assertThrows(SplitException.class,
@@ -125,7 +125,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenIllegalOptionUppercaseOfLegalLetter_ShouldThrowException() {
+    void run_IllegalOptionUppercaseOfLegalLetter_ThrowsException() {
         String illegalFlag = "B";
         String[] args = {CHAR_FLAG_PREFIX + illegalFlag, LINES_OPTION};
         Throwable thrown = assertThrows(SplitException.class,
@@ -135,7 +135,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenTooManyLegalOptions_ShouldThrowException() {
+    void run_TooManyLegalOptions_ThrowsException() {
         String[] args = {BYTES_OPTION, DEFAULT_OPTION_ARG, LINES_OPTION, DEFAULT_OPTION_ARG};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
@@ -144,7 +144,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenLegalOptionNoArg_ShouldThrowException() {
+    void run_LegalOptionNoArg_ThrowsException() {
         String[] args = {LINES_OPTION};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
@@ -153,7 +153,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenLegalOptionTooManyArgs_ShouldThrowException() {
+    void run_LegalOptionTooManyArgs_ThrowsException() {
         String[] args = {LINES_OPTION, DEFAULT_OPTION_ARG, TEST_FILENAME, DEFAULT_PREFIX, "extra"};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
@@ -162,7 +162,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenNoOptionTooManyArgs_ShouldThrowException() {
+    void run_NoOptionTooManyArgs_ThrowsException() {
         String[] args = {TEST_FILENAME, DEFAULT_PREFIX, "extra"};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
@@ -171,7 +171,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenLinesOptionNotANumber_ShouldThrowException() {
+    void run_LinesOptionNotANumber_ThrowsException() {
         String[] args = {LINES_OPTION, "abc"};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
@@ -180,7 +180,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitStdinByLines_WhenInvalidNumber_ShouldThrowException() {
+    void splitStdinByLines_InvalidNumber_ThrowsException() {
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.splitStdinByLines(testStream, null, -100));
         Exception expected = new SplitException(ERR_ILLEGAL_LINE_COUNT);
@@ -188,7 +188,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenBytesOptionNotANumber_ShouldThrowException() {
+    void run_BytesOptionNotANumber_ThrowsException() {
         String[] args = {BYTES_OPTION, "abc"};
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.run(args, testStream, null));
@@ -197,7 +197,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitStdinByBytes_WhenNotANumber_ShouldThrowException() {
+    void splitStdinByBytes_NotANumber_ThrowsException() {
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.splitStdinByBytes(testStream, null, "def"));
         Exception expected = new SplitException(ERR_ILLEGAL_BYTE_COUNT);
@@ -205,7 +205,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitStdinByBytes_WhenInvalidNumber_ShouldThrowException() {
+    void splitStdinByBytes_InvalidNumber_ThrowsException() {
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.splitStdinByBytes(testStream, null, "0"));
         Exception expected = new SplitException(ERR_ILLEGAL_BYTE_COUNT);
@@ -213,7 +213,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitStdinByBytes_WhenInvalidAppendage_ShouldThrowException() {
+    void splitStdinByBytes_InvalidAppendage_ThrowsException() {
         Throwable thrown = assertThrows(SplitException.class,
                 () -> splitApp.splitStdinByBytes(testStream, null, "1024a"));
         Exception expected = new SplitException(ERR_ILLEGAL_BYTE_COUNT);
@@ -221,7 +221,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_WhenFilenameDash_ShouldUseStdin() throws Exception {
+    void run_FilenameDash_UseStdin() throws Exception {
         String expectedContent = generateString(1);
         testStream = generateStream(expectedContent);
         String[] args = {LINES_OPTION, "1", "-"};
@@ -233,7 +233,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When676LinesStdin_ShouldGenerateCorrectFilenames() {
+    void run_676LinesStdin_GenerateCorrectFilenames() {
         String testContent = generateString(676);
         testStream = generateStream(testContent);
         String[] args = {LINES_OPTION, "1"};
@@ -245,7 +245,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When676LinesFilePrefix_ShouldGenerateCorrectFilenames() throws Exception {
+    void run_676LinesFilePrefix_GenerateCorrectFilenames() throws Exception {
         Files.writeString(testFile.toPath(), generateString(676));
         String[] args = {LINES_OPTION, "1", TEST_FILENAME, "prefix_"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
@@ -256,7 +256,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When1353BytesStdinPrefix_ShouldGenerateCorrectFilenames() {
+    void run_1353BytesStdinPrefix_GenerateCorrectFilenames() {
         byte[] testContent = generateBytes(1353);
         testStream = generateStream(testContent);
         String[] args = {BYTES_OPTION, "1"};
@@ -268,7 +268,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When1LineStdin_ShouldNotSplit() throws Exception {
+    void run_1LineStdin_NoSplit() throws Exception {
         String expectedContent = generateString(1);
         testStream = generateStream(expectedContent);
         String[] args = {};
@@ -282,7 +282,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When1000LinesFile_ShouldNotSplit() throws Exception {
+    void run_1000LinesFile_NoSplit() throws Exception {
         String expectedContent = generateString(1000);
         Files.writeString(testFile.toPath(), expectedContent);
         String[] args = {TEST_FILENAME};
@@ -296,7 +296,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When1500LinesStdin_ShouldGet2Splits() throws Exception {
+    void run_1500LinesStdin_2Splits() throws Exception {
         testStream = generateStream(generateString(1500));
         String[] args = {};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
@@ -316,7 +316,7 @@ class SplitApplicationTest {
 
 
     @Test
-    void testRun_When4000LinesFile_ShouldGet4Splits() throws Exception {
+    void run_4000LinesFile_4Splits() throws Exception {
         Files.writeString(testFile.toPath(), generateString(4000));
         String[] args = {TEST_FILENAME};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
@@ -335,7 +335,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitStdinByLines_When3LinesOption8LinesStdin_ShouldGet3Splits() throws Exception {
+    void splitStdinByLines_3LinesOption8LinesStdin_3Splits() throws Exception {
         testStream = generateStream(generateString(8));
         assertDoesNotThrow(() -> splitApp.splitStdinByLines(testStream, null, 3));
         File firstFile = new File(TEST_DIR + File.separator + XAA);
@@ -353,7 +353,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitFileByLines_When20LinesOption100LinesFile_ShouldGet5Splits() throws Exception {
+    void splitFileByLines_20LinesOption100LinesFile_5Splits() throws Exception {
         Files.writeString(testFile.toPath(), generateString(100));
         assertDoesNotThrow(() -> splitApp.splitFileByLines(TEST_FILENAME, null, 20));
         File firstFile = new File(TEST_DIR + File.separator + XAA);
@@ -371,7 +371,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When20LinesOption100LinesFile_ShouldGet5Splits() throws Exception {
+    void run_20LinesOption100LinesFile_5Splits() throws Exception {
         Files.writeString(testFile.toPath(), generateString(100));
         String[] args = {LINES_OPTION, "20", TEST_FILENAME};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
@@ -390,7 +390,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitStdinByBytes_When16BytesOption46BytesStdin_ShouldGet3Splits() throws Exception {
+    void splitStdinByBytes_16BytesOption46BytesStdin_3Splits() throws Exception {
         byte[] testContent = generateBytes(46);
         testStream = generateStream(testContent);
         assertDoesNotThrow(() -> splitApp.splitStdinByBytes(testStream, null, "16"));
@@ -409,7 +409,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitFileByBytes_When8BytesOption16BytesFile_ShouldGet2Splits() throws Exception {
+    void splitFileByBytes_8BytesOption16BytesFile_2Splits() throws Exception {
         byte[] testContent = generateBytes(16);
         Files.write(testFile.toPath(), testContent);
         assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME, null, "8"));
@@ -428,7 +428,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitStdinByBytes_When16bBytesOption2048BytesStdin_ShouldGet2Splits() throws Exception {
+    void splitStdinByBytes_16bBytesOption2048BytesStdin_2Splits() throws Exception {
         byte[] testContent = generateBytes(16384);
         testStream = generateStream(testContent);
         assertDoesNotThrow(() -> splitApp.splitStdinByBytes(testStream, null, "16b"));
@@ -447,7 +447,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitFileByBytes_When2kBytesOption8000BytesFile_ShouldGet4Splits() throws Exception {
+    void splitFileByBytes_2kBytesOption8000BytesFile_4Splits() throws Exception {
         byte[] testContent = generateBytes(8000);
         Files.write(testFile.toPath(), testContent);
         assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME, null, "2k"));
@@ -466,7 +466,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testSplitStdinByBytes_When1mBytesOption2000000BytesStdin_ShouldGet2Splits() throws Exception {
+    void splitStdinByBytes_1mBytesOption2000000BytesStdin_2Splits() throws Exception {
         byte[] testContent = generateBytes(2000000);
         testStream = generateStream(testContent);
         assertDoesNotThrow(() -> splitApp.splitStdinByBytes(testStream, null, "1m"));
@@ -485,7 +485,7 @@ class SplitApplicationTest {
     }
 
     @Test
-    void testRun_When1mBytesOption2000000BytesStdin_ShouldGet2Splits() throws Exception {
+    void run_1mBytesOption2000000BytesStdin_2Splits() throws Exception {
         byte[] testContent = generateBytes(2000000);
         testStream = generateStream(testContent);
         String[] args = {BYTES_OPTION, "1m"};

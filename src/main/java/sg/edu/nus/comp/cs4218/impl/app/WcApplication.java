@@ -7,6 +7,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READ_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
 import sg.edu.nus.comp.cs4218.app.WcInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
@@ -217,6 +219,10 @@ public class WcApplication implements WcInterface {
             throw new WcException(ERR_INVALID_FILES);
         }
 
+        if (CollectionUtils.isAnyNull(isBytes, isLines, isWords)) {
+            throw new WcException(ERR_NULL_ARGS);
+        }
+
         List<WcResult> result = new ArrayList<>();
 
         for (String fileName : fileNames) {
@@ -239,6 +245,10 @@ public class WcApplication implements WcInterface {
     ) throws WcException {
         if (stdin == null) {
             throw new WcException(ERR_NO_ISTREAM);
+        }
+
+        if (CollectionUtils.isAnyNull(isBytes, isLines, isWords)) {
+            throw new WcException(ERR_NULL_ARGS);
         }
 
         WcResult statistics = computeStatisticsFromStdin(stdin);
@@ -266,6 +276,10 @@ public class WcApplication implements WcInterface {
 
         if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
             throw new WcException(ERR_INVALID_FILES);
+        }
+
+        if (CollectionUtils.isAnyNull(isBytes, isLines, isWords)) {
+            throw new WcException(ERR_NULL_ARGS);
         }
 
         List<WcResult> result = new ArrayList<>();
