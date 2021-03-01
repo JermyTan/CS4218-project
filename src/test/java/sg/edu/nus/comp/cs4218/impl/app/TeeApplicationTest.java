@@ -40,8 +40,8 @@ class TeeApplicationTest {
     private static final String OUTPUT_FILE_3 = "output3.txt";
     private static final String INPUT_FILE_1 = "input1.txt";
 
-    private static final String[] ARGS_1 = {"tee", OUTPUT_FILE_1, OUTPUT_FILE_2};
-    private static final String[] ARGS_2 = {"tee", "-a", OUTPUT_FILE_1};
+    private static final String[] ARGS_1 = {OUTPUT_FILE_1 , OUTPUT_FILE_2};
+    private static final String[] ARGS_2 = {"-a", OUTPUT_FILE_1};
 
     private static final String FOLDER = "folder";
 
