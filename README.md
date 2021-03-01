@@ -1,6 +1,7 @@
 # CS4218 Project Codebase
 
 [![Build Status](https://www.travis-ci.com/nus-cs4218/cs4218-project-ay2021-s2-2021-team12.svg?token=Xw6nHZzuJ4sB4zSroK2t&branch=main)](https://www.travis-ci.com/nus-cs4218/cs4218-project-ay2021-s2-2021-team12)
+[![codecov](https://codecov.io/gh/nus-cs4218/cs4218-project-ay2021-s2-2021-team12/branch/main/graph/badge.svg?token=HLLQE3YOFH)](https://codecov.io/gh/nus-cs4218/cs4218-project-ay2021-s2-2021-team12)
 
 ## Contributions Guidelines
 

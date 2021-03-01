@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 
@@ -11,6 +12,10 @@ public class WcResult extends Result {
 
     public WcResult(String label, long numLines, long numWords, long numBytes) {
         super(false);
+
+        if (label == null) {
+            throw new IllegalArgumentException(ERR_NULL_ARGS);
+        }
 
         this.label = label;
         this.numLines = numLines;

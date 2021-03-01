@@ -38,7 +38,7 @@ import sg.edu.nus.comp.cs4218.impl.app.CpApplication;
 public class CpApplicationTest {
 
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "CpApplicationTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "CpApplicationTest";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -48,13 +48,13 @@ public class CpApplicationTest {
     private static final String FOLDER_2 = "folder2";
     private static final String FOLDER_3 = "folder3";
 
-    private final Path file1 = Paths.get(TESTDIR, FILE_1); // exists
-    private final Path file2 = Paths.get(TESTDIR, FILE_2); // does not exist
-    private final Path file3 = Paths.get(TESTDIR, FILE_3); // exists
+    private final Path file1 = Paths.get(TEST_DIR, FILE_1); // exists
+    private final Path file2 = Paths.get(TEST_DIR, FILE_2); // does not exist
+    private final Path file3 = Paths.get(TEST_DIR, FILE_3); // exists
 
-    private final Path folder1 = Paths.get(TESTDIR, FOLDER_1); // exists
-    private final Path folder2 = Paths.get(TESTDIR, FOLDER_2); // does not exist
-    private final Path folder3 = Paths.get(TESTDIR, FOLDER_3); // exists
+    private final Path folder1 = Paths.get(TEST_DIR, FOLDER_1); // exists
+    private final Path folder2 = Paths.get(TEST_DIR, FOLDER_2); // does not exist
+    private final Path folder3 = Paths.get(TEST_DIR, FOLDER_3); // exists
 
     private final List<Path> paths = List.of(file1, file2, file3, folder1, folder2, folder3);
     private final InputStream stdin = mock(InputStream.class);
@@ -63,7 +63,7 @@ public class CpApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
+        Environment.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
@@ -154,11 +154,11 @@ public class CpApplicationTest {
         verifyNoInteractions(stdout);
 
         // Dir not copied
-        Path destPath1 = Paths.get(TESTDIR, FOLDER_3, FOLDER_1);
+        Path destPath1 = Paths.get(TEST_DIR, FOLDER_3, FOLDER_1);
         assertTrue(Files.notExists(destPath1));
 
         // Only file3.txt is copied
-        Path destPath2 = Paths.get(TESTDIR, FOLDER_3, FILE_3);
+        Path destPath2 = Paths.get(TEST_DIR, FOLDER_3, FILE_3);
         checkContent(file3, destPath2);
     }
 
@@ -175,7 +175,7 @@ public class CpApplicationTest {
         verifyNoInteractions(stdout);
 
         // Dir copied into folder3
-        Path destPath1 = Paths.get(TESTDIR, FOLDER_3, FOLDER_1);
+        Path destPath1 = Paths.get(TEST_DIR, FOLDER_3, FOLDER_1);
         assertTrue(Files.exists(destPath1));
         // File copied over as well
         assertTrue(Files.exists(destPath1.resolve(FILE_1)));
@@ -266,7 +266,7 @@ public class CpApplicationTest {
     public void cpFilesToFolder_SrcFolderContainsDestFolder_ThrowsException() {
         // Create dir folder1/folder2/
         try {
-            Path destPath = Paths.get(TESTDIR, FOLDER_1, FOLDER_2);
+            Path destPath = Paths.get(TEST_DIR, FOLDER_1, FOLDER_2);
             Files.createDirectory(destPath);
         } catch (IOException e) {
             fail(e.getMessage());

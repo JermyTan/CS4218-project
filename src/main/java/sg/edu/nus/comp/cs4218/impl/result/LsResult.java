@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
@@ -18,6 +19,10 @@ public class LsResult extends Result {
 
     public LsResult(String label, List<File> files) {
         super(false);
+
+        if (label == null || files == null) {
+            throw new IllegalArgumentException(ERR_NULL_ARGS);
+        }
 
         this.label = label;
         this.files = List.copyOf(files);

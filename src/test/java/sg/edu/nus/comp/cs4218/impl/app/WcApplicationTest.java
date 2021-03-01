@@ -34,7 +34,7 @@ class WcApplicationTest {
     private static final String REGEX = "\\s+";
 
     private static final String DEFAULT_DIRNAME = Environment.currentDirectory;
-    private static final String TEST_DIRNAME = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "WcApplicationTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "WcApplicationTest";
     private static final String TEST_FILENAME_1 = "test1.txt";
     private static final String TEST_FILENAME_2 = "test2.txt";
     private static final String TEST_FILENAME_3 = "test3.txt";
@@ -48,9 +48,9 @@ class WcApplicationTest {
 
     @BeforeAll
     static void setUpBeforeAll() {
-        testDir = new File(TEST_DIRNAME);
+        testDir = new File(TEST_DIR);
         testDir.mkdir();
-        Environment.currentDirectory = TEST_DIRNAME;
+        Environment.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
@@ -189,7 +189,7 @@ class WcApplicationTest {
     @Test
     void testCountFromFiles_WhenOneFileLinesWords_ShouldCountLinesWords() throws Exception {
         int testLines = 10;
-        File testFile = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_1);
+        File testFile = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
         testFile.createNewFile();
         Files.writeString(testFile.toPath(), generateString(testLines));
 
@@ -205,17 +205,17 @@ class WcApplicationTest {
     @Test
     void testCountFromFiles_WhenMultipleFiles_ShouldCountLinesWordsBytes() throws Exception {
         int testLines1 = 2;
-        File testFile1 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_1);
+        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
         testFile1.createNewFile();
         Files.writeString(testFile1.toPath(), generateString(testLines1));
 
         int testLines2 = 4;
-        File testFile2 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_2);
+        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), generateString(testLines2));
 
         int testLines3 = 6;
-        File testFile3 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_3);
+        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
@@ -254,17 +254,17 @@ class WcApplicationTest {
     @Test
     void testRun_WhenMultipleFilesWordsFlag_ShouldCountWords() throws Exception {
         int testLines1 = 2;
-        File testFile1 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_1);
+        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
         testFile1.createNewFile();
         Files.writeString(testFile1.toPath(), generateString(testLines1));
 
         int testLines2 = 4;
-        File testFile2 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_2);
+        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), generateString(testLines2));
 
         int testLines3 = 6;
-        File testFile3 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_3);
+        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
@@ -288,17 +288,17 @@ class WcApplicationTest {
     @Test
     void testCountFromFiles_WhenMultipleFilesWordsFlag_ShouldCountWords() throws Exception {
         int testLines1 = 2;
-        File testFile1 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_1);
+        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
         testFile1.createNewFile();
         Files.writeString(testFile1.toPath(), generateString(testLines1));
 
         int testLines2 = 4;
-        File testFile2 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_2);
+        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), generateString(testLines2));
 
         int testLines3 = 6;
-        File testFile3 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_3);
+        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
@@ -321,17 +321,17 @@ class WcApplicationTest {
     @Test
     void testCountFromFileAndStdin_WhenMultipleFiles_ShouldCountLinesWordsBytes() throws Exception {
         int testLines1 = 2;
-        File testFile1 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_1);
+        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
         testFile1.createNewFile();
         Files.writeString(testFile1.toPath(), generateString(testLines1));
 
         int testLines2 = 4;
-        File testFile2 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_2);
+        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), generateString(testLines2));
 
         int testLines3 = 6;
-        File testFile3 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_3);
+        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 

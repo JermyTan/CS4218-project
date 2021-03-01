@@ -35,7 +35,7 @@ class GrepApplicationTest {
     private static final String FILENAME_FLAG = CHAR_FLAG_PREFIX + FILENAME_LETTER;
 
     private static final String DEFAULT_DIRNAME = Environment.currentDirectory;
-    private static final String TEST_DIRNAME = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "WcApplicationTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "WcApplicationTest";
     private static final String TEST_FILENAME = "bsd1.txt";
     private static final String TEST_FILENAME_2 = "bsd2.txt";
 
@@ -81,13 +81,13 @@ class GrepApplicationTest {
 
     @BeforeAll
     static void setUpBeforeAll() throws Exception {
-        testDir = new File(TEST_DIRNAME);
+        testDir = new File(TEST_DIR);
         testDir.mkdir();
-        Environment.currentDirectory = TEST_DIRNAME;
-        testFile = new File(TEST_DIRNAME + File.separator + TEST_FILENAME);
+        Environment.currentDirectory = TEST_DIR;
+        testFile = new File(TEST_DIR + File.separator + TEST_FILENAME);
         testFile.createNewFile();
         Files.writeString(testFile.toPath(), TEST_STRING);
-        testFile2 = new File(TEST_DIRNAME + File.separator + TEST_FILENAME_2);
+        testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), TEST_STRING);
     }

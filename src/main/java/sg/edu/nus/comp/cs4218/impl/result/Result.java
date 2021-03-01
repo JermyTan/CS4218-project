@@ -9,7 +9,7 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
  * Base class to represent the computed result of an application for a SINGLE input stream.
  */
 public class Result {
-    protected boolean isError = false;
+    protected boolean isError;
     protected String errorMessage = STRING_EMPTY;
 
     protected Result(boolean isError) {
@@ -35,13 +35,5 @@ public class Result {
         }
 
         System.err.println(errorMessage);
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public boolean hasError() {
-        return isError;
     }
 }

@@ -46,7 +46,7 @@ import sg.edu.nus.comp.cs4218.exception.MvException;
 class MvApplicationTest {
 
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "MvApplicationTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "MvApplicationTest";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -56,13 +56,13 @@ class MvApplicationTest {
     private static final String FOLDER_2 = "folder2";
     private static final String FOLDER_3 = "folder3";
 
-    private final Path file1 = Paths.get(TESTDIR, FILE_1); // exists
-    private final Path file2 = Paths.get(TESTDIR, FILE_2); // does not exist
-    private final Path file3 = Paths.get(TESTDIR, FILE_3); // exists
+    private final Path file1 = Paths.get(TEST_DIR, FILE_1); // exists
+    private final Path file2 = Paths.get(TEST_DIR, FILE_2); // does not exist
+    private final Path file3 = Paths.get(TEST_DIR, FILE_3); // exists
 
-    private final Path folder1 = Paths.get(TESTDIR, FOLDER_1); // exists
-    private final Path folder2 = Paths.get(TESTDIR, FOLDER_2); // does not exist
-    private final Path folder3 = Paths.get(TESTDIR, FOLDER_3); // exists
+    private final Path folder1 = Paths.get(TEST_DIR, FOLDER_1); // exists
+    private final Path folder2 = Paths.get(TEST_DIR, FOLDER_2); // does not exist
+    private final Path folder3 = Paths.get(TEST_DIR, FOLDER_3); // exists
 
     private final List<Path> paths = List.of(file1, file2, file3, folder1, folder2, folder3);
     private final InputStream stdin = mock(InputStream.class);
@@ -71,7 +71,7 @@ class MvApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
+        Environment.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
@@ -145,10 +145,10 @@ class MvApplicationTest {
 
     @Test
     public void run_MoveFiles_CorrectMethodCall() {
-        Path destPath1 = Paths.get(TESTDIR, FOLDER_3, FILE_1);
+        Path destPath1 = Paths.get(TEST_DIR, FOLDER_3, FILE_1);
         assertTrue(Files.notExists(destPath1));
 
-        Path destPath2 = Paths.get(TESTDIR, FOLDER_3, FILE_3);
+        Path destPath2 = Paths.get(TEST_DIR, FOLDER_3, FILE_3);
         assertTrue(Files.notExists(destPath2));
 
         assertDoesNotThrow(() -> app.run(new String[]{FILE_1, FILE_3, FOLDER_3}, stdin, stdout));
@@ -176,7 +176,7 @@ class MvApplicationTest {
 
     @Test
     public void run_DoesNotOverwrite_FileNotMoved() {
-        Path destPath = Paths.get(TESTDIR, FOLDER_1, FILE_1);
+        Path destPath = Paths.get(TEST_DIR, FOLDER_1, FILE_1);
         String originalFileContent = destPath.toString();
         assertDoesNotThrow(() -> createFileWithContent(destPath, originalFileContent));
 
@@ -191,7 +191,7 @@ class MvApplicationTest {
     @Test
     public void run_DoesNotOverwrite_ConflictingFilesUnmoved() {
         // folder1 contains file1.txt only
-        Path destPath = Paths.get(TESTDIR, FOLDER_1, FILE_1);
+        Path destPath = Paths.get(TEST_DIR, FOLDER_1, FILE_1);
         String originalFileContent = destPath.toString();
         assertDoesNotThrow(() -> createFileWithContent(destPath, originalFileContent));
 
@@ -199,7 +199,7 @@ class MvApplicationTest {
         assertDoesNotThrow(() -> app.run(new String[]{"-n", FILE_1, FILE_3, FOLDER_1}, stdin, stdout));
 
         // Only file3.txt moved
-        assertTrue(Files.exists(Paths.get(TESTDIR, FOLDER_1, FILE_3)));
+        assertTrue(Files.exists(Paths.get(TEST_DIR, FOLDER_1, FILE_3)));
 
         // folder1/file1.txt content not overwritten
         assertDoesNotThrow(() -> {
@@ -229,7 +229,7 @@ class MvApplicationTest {
 
     @Test
     public void mvSrcFileToDestFile_DifferentDirectorySameFileName_FileRenamed() {
-        Path destPath = Paths.get(TESTDIR, FOLDER_1, FILE_1);
+        Path destPath = Paths.get(TEST_DIR, FOLDER_1, FILE_1);
 
         assertTrue(Files.exists(file1));
         assertTrue(Files.notExists(destPath));
@@ -242,7 +242,7 @@ class MvApplicationTest {
 
     @Test
     public void mvSrcFileToDestFile_DifferentDirectoryDifferentFileName_FileRenamed() {
-        Path destPath = Paths.get(TESTDIR, FOLDER_1, FILE_2);
+        Path destPath = Paths.get(TEST_DIR, FOLDER_1, FILE_2);
 
         assertTrue(Files.exists(file1));
         assertTrue(Files.notExists(destPath));
@@ -282,7 +282,7 @@ class MvApplicationTest {
 
     @Test
     public void mvSrcFileToDestFile_DifferentDirectorySameFolderName_FolderRenamed() {
-        Path destPath = Paths.get(TESTDIR, FOLDER_3, FOLDER_1);
+        Path destPath = Paths.get(TEST_DIR, FOLDER_3, FOLDER_1);
 
         assertTrue(Files.exists(folder1));
         assertTrue(Files.notExists(destPath));
@@ -295,7 +295,7 @@ class MvApplicationTest {
 
     @Test
     public void mvSrcFileToDestFile_DifferentDirectoryDifferentFolderName_FolderRenamed() {
-        Path destPath = Paths.get(TESTDIR, FOLDER_3, FOLDER_2);
+        Path destPath = Paths.get(TEST_DIR, FOLDER_3, FOLDER_2);
 
         assertTrue(Files.exists(folder1));
         assertTrue(Files.notExists(destPath));
@@ -407,7 +407,7 @@ class MvApplicationTest {
     public void mvFilesToFolder_SrcFolderContainsDestFolder_ThrowsException() {
         // Create dir folder1/folder2
         try {
-            Path destPath = Paths.get(TESTDIR, FOLDER_1, FOLDER_2);
+            Path destPath = Paths.get(TEST_DIR, FOLDER_1, FOLDER_2);
             Files.createDirectory(destPath);
         } catch (IOException e) {
             fail(e.getMessage());
@@ -422,7 +422,7 @@ class MvApplicationTest {
 
     @Test
     public void mvFilesToFolder_SingleFile_FileMoved() {
-        Path destPath = Paths.get(TESTDIR, FOLDER_1, FILE_1);
+        Path destPath = Paths.get(TEST_DIR, FOLDER_1, FILE_1);
         assertTrue(Files.notExists(destPath));
 
         assertDoesNotThrow(() -> app.mvFilesToFolder(FOLDER_1, FILE_1));
@@ -433,10 +433,10 @@ class MvApplicationTest {
 
     @Test
     public void mvFilesToFolder_MultipleFiles_FilesMoved() {
-        Path destPath1 = Paths.get(TESTDIR, FOLDER_1, FILE_1);
+        Path destPath1 = Paths.get(TEST_DIR, FOLDER_1, FILE_1);
         assertTrue(Files.notExists(destPath1));
 
-        Path destPath2 = Paths.get(TESTDIR, FOLDER_1, FILE_3);
+        Path destPath2 = Paths.get(TEST_DIR, FOLDER_1, FILE_3);
         assertTrue(Files.notExists(destPath2));
 
         assertDoesNotThrow(() -> app.mvFilesToFolder(FOLDER_1, FILE_1, FILE_3));

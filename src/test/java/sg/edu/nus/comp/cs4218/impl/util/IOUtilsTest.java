@@ -24,13 +24,13 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 class IOUtilsTest {
 
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "IOUtilsTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "IOUtilsTest";
     private final static String TEST_TXT = "test.txt";
     private final static String NON_EXISTENT_TEXT = "test" + File.separator + "test1.txt";
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
+        Environment.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
