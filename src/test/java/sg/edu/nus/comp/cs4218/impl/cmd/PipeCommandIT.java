@@ -1,19 +1,29 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
+import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 
 class PipeCommandIT {
 
@@ -32,10 +42,6 @@ class PipeCommandIT {
     private final ArgumentResolver argumentResolver = new ArgumentResolver();
     private PipeCommand command;
 
-    private void buildCommand(List<CallCommand> callCommands) throws ShellException {
-        command = new PipeCommand(callCommands);
-    }
-
     @BeforeAll
     static void setupBeforeAll() {
         Environment.currentDirectory = TEST_DIR;
@@ -44,6 +50,10 @@ class PipeCommandIT {
     @AfterAll
     static void tearDownAfterAll() {
         Environment.currentDirectory = ORIGINAL_DIR;
+    }
+
+    private void buildCommand(List<CallCommand> callCommands) throws ShellException {
+        command = new PipeCommand(callCommands);
     }
 
     @BeforeEach
