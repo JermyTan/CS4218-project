@@ -1,21 +1,21 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.exception.EchoException;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PipedOutputStream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.exception.EchoException;
 
 class EchoApplicationTest {
-
-    private EchoApplication app;
 
     private static final String[] EMPTY = {""};
     private static final String[] SPACE = {"  "};
@@ -24,15 +24,11 @@ class EchoApplicationTest {
     private static final String[] STRING_3 = {"!@#$%^&*()_+{}|:<>?.,/~"};
     private static final String[] STRING_4 = null;
     private static final String[] STRING_5 = {"'\"A*B*C\"'"};
-
+    private EchoApplication app;
 
     @BeforeEach
     void setup() {
         app = new EchoApplication();
-    }
-
-    @AfterEach
-    void tearDown() {
     }
 
     @Test

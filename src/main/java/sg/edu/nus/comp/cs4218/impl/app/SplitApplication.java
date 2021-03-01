@@ -1,6 +1,12 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_BYTE_COUNT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_LINE_COUNT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
@@ -26,6 +32,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.SplitException;
 import sg.edu.nus.comp.cs4218.impl.parser.SplitArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.GodClass")
 public class SplitApplication implements SplitInterface {
@@ -151,17 +158,19 @@ public class SplitApplication implements SplitInterface {
             throw new SplitException(ERR_NO_ISTREAM);
         }
 
-        if (prefix == null || prefix.trim().isEmpty()) {
-            prefix = DEFAULT_PREFIX;
-        }
-
         if (linesPerFile < 1) {
             throw new SplitException(ERR_ILLEGAL_LINE_COUNT);
         }
 
+        String validPrefix = prefix;
+
+        if (prefix == null || StringUtils.isBlank(prefix)) {
+            validPrefix = DEFAULT_PREFIX;
+        }
+
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
-            PrintWriter writer = null;
+            PrintWriter writer = null;//NOPMD
             int linesRead = 0;
             String line;
             while ((line = reader.readLine()) != null) {
@@ -169,7 +178,7 @@ public class SplitApplication implements SplitInterface {
                     if (writer != null) {
                         writer.close();
                     }
-                    String fileName = Environment.currentDirectory + File.separator + prefix + generateSuffix(linesRead / linesPerFile + 1);
+                    String fileName = Environment.currentDirectory + File.separator + validPrefix + generateSuffix(linesRead / linesPerFile + 1);
                     writer = new PrintWriter(fileName, StandardCharsets.UTF_8);
                 }
                 writer.println(line);
@@ -190,8 +199,14 @@ public class SplitApplication implements SplitInterface {
             throw new SplitException(ERR_NO_ISTREAM);
         }
 
-        if (prefix == null || prefix.trim().isEmpty()) {
-            prefix = DEFAULT_PREFIX;
+        if (bytesPerFile == null) {
+            throw new SplitException(ERR_NULL_ARGS);
+        }
+
+        String validPrefix = prefix;
+
+        if (prefix == null || StringUtils.isBlank(prefix)) {
+            validPrefix = DEFAULT_PREFIX;
         }
 
         try {
@@ -201,8 +216,8 @@ public class SplitApplication implements SplitInterface {
             int pieceNo = 1;
             int bytesRead;
             while ((bytesRead = stdin.read(buffer, 0, numOfBytesPerFile)) != -1) {
-                String fileName = Environment.currentDirectory + File.separator + prefix + generateSuffix(pieceNo);
-                FileOutputStream outputStream = new FileOutputStream(fileName);
+                String fileName = Environment.currentDirectory + File.separator + validPrefix + generateSuffix(pieceNo);
+                FileOutputStream outputStream = new FileOutputStream(fileName);//NOPMD
                 outputStream.write(buffer, 0, bytesRead);
                 outputStream.close();
                 pieceNo++;

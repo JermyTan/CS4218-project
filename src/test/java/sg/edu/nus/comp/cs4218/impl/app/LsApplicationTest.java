@@ -1,28 +1,44 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.LsException;
-
-import java.io.*;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_LS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.LsException;
+
 class LsApplicationTest {
 
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "LsApplicationTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "LsApplicationTest";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -45,7 +61,7 @@ class LsApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
+        Environment.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
@@ -69,13 +85,20 @@ class LsApplicationTest {
     }
 
     @Test
-    public void run_ArgsContainNull_ThrowsException() {
-        assertThrows(LsException.class, () -> app.run(new String[]{null}, stdin, stdout));
+    public void run_NullOutputStream_ThrowsException() {
+        Throwable exception = assertThrows(LsException.class, () -> app.run(new String[]{}, stdin, null));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_LS, ERR_NO_OSTREAM), exception.getMessage());
     }
 
     @Test
-    public void run_NullOutputStream_ThrowsException() {
-        assertThrows(LsException.class, () -> app.run(new String[]{}, stdin, null));
+    public void run_NullArgs_Allowed() {
+        assertDoesNotThrow(() -> app.run(null, stdin, stdout));
+    }
+
+    @Test
+    public void run_ArgsContainNull_ThrowsException() {
+        Throwable exception = assertThrows(LsException.class, () -> app.run(new String[]{null}, stdin, stdout));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_LS, ERR_NULL_ARGS), exception.getMessage());
     }
 
     @Test

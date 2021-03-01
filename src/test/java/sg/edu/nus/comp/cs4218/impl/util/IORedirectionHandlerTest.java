@@ -33,13 +33,13 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 class IORedirectionHandlerTest {
 
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "IORedirectionHandlerTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "IORedirectionHandlerTest";
     private static final String FILE_1 = "file1.txt"; // exists
     private static final String FILE_2 = "file2.txt"; // exists
     private static final String FILE_3 = "file3.txt"; // does not exist
     private final String STRING_REDIR_INPUT = String.valueOf(CHAR_REDIR_INPUT);
     private final String STRING_REDIR_OUTPUT = String.valueOf(CHAR_REDIR_OUTPUT);
-    private final Path file3 = Paths.get(TESTDIR, FILE_3);
+    private final Path file3 = Paths.get(TEST_DIR, FILE_3);
 
     private IORedirectionHandler redirHandler;
     private ArgumentResolver argumentResolver;
@@ -48,7 +48,7 @@ class IORedirectionHandlerTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
+        Environment.currentDirectory = TEST_DIR;
     }
 
     @AfterAll

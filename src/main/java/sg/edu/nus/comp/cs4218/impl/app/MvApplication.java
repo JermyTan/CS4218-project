@@ -85,7 +85,7 @@ public class MvApplication implements MvInterface {
 
         // Cannot rename a file/folder to a existing directory
         if (Files.isDirectory(destPath)) {
-            throw new Exception(ERR_IS_DIR);
+            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_IS_DIR));
         }
 
         // When renaming a file, destFile must belong to a existing directory

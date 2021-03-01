@@ -1,9 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
 import java.io.File;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Objects;
 
 public final class StringUtils {
     public static final String STRING_LABEL_VALUE_PAIR = "%s: %s";
@@ -30,23 +27,6 @@ public final class StringUtils {
     }
 
     /**
-     * Returns the non-null and trimmed strings.
-     *
-     * @param strings strings to be sanitized.
-     * @return an array of non-null and trimmed strings.
-     */
-    public static String[] sanitizeStrings(String... strings) {
-        if (strings == null) {
-            return new String[0];
-        }
-
-        return Arrays.stream(strings)
-                .filter(Objects::nonNull)
-                .map(String::trim)
-                .toArray(String[]::new);
-    }
-
-    /**
      * Returns the file extension of file name.
      *
      * @param fileName file name whose extension will be retrieved.
@@ -66,20 +46,6 @@ public final class StringUtils {
         }
 
         return trimmedFileName.substring(extensionPeriodIndex + 1);
-    }
-
-    /**
-     * Returns the file separator defined for a particular system.
-     * Used for RegexArgument parsing only.
-     *
-     * @return string of file separator.
-     */
-    public static String fileSeparator() {
-        // We need to escape \ in Windows...
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {//NOPMD
-            return '\\' + File.separator;
-        }
-        return File.separator;
     }
 
     /**
@@ -119,12 +85,13 @@ public final class StringUtils {
         return str.trim().split("\\s+");
     }
 
+    /*
     /**
      * Checks if a string can be represented as a number.
      *
      * @param str string possibly representing a number.
      * @return true if str can be represented as a number.
-     */
+
     public static boolean isNumber(String str) {
         BigInteger bigInt;
         try {
@@ -134,4 +101,36 @@ public final class StringUtils {
         }
         return !bigInt.toString().isEmpty();
     }
+
+    /**
+     * Returns the non-null and trimmed strings.
+     *
+     * @param strings strings to be sanitized.
+     * @return an array of non-null and trimmed strings.
+
+    public static String[] sanitizeStrings(String... strings) {
+        if (strings == null) {
+            return new String[0];
+        }
+
+        return Arrays.stream(strings)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .toArray(String[]::new);
+    }
+
+    /**
+     * Returns the file separator defined for a particular system.
+     * Used for RegexArgument parsing only.
+     *
+     * @return string of file separator.
+
+    public static String fileSeparator() {
+        // We need to escape \ in Windows...
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {//NOPMD
+            return '\\' + File.separator;
+        }
+        return File.separator;
+    }
+     */
 }

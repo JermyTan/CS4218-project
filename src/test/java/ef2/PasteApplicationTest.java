@@ -1,20 +1,31 @@
 package ef2;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.impl.app.PasteApplication;
-
-import java.io.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.impl.app.PasteApplication;
 
 @Disabled
 class PasteApplicationTest {
 
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "PasteApplicationTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "PasteApplicationTest";
 
     private static final String FILE_1 = "file1.txt"; // exists
     private static final String FILE_2 = "file2.txt"; // exists
@@ -31,7 +42,7 @@ class PasteApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
+        Environment.currentDirectory = TEST_DIR;
     }
 
     @AfterAll

@@ -1,6 +1,11 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.multiplyChar;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SPACE_FILE_TXT;
@@ -23,21 +28,30 @@ class SplitArgsParserTest {
     private final static String INVALID_OPTION_2 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_SPLIT_BY_LINES, CHAR_FLAG_PREFIX);
     private final static String INVALID_OPTION_3 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_SPLIT_BY_LINES, FLAG_IS_SPLIT_BY_BYTES + 1);
     private final static String INVALID_OPTION_4 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_SPLIT_BY_LINES, FLAG_IS_SPLIT_BY_BYTES);
-    private final static String[] VALID_NO_VALUE_ARGS = new String[] {};
-    private final static String[] VALID_SINGLE_VALUE_ARGS_1 = new String[] {String.valueOf(CHAR_FLAG_PREFIX)};
-    private final static String[] VALID_SINGLE_VALUE_ARGS_2 = new String[] {STRING_SPACE_FILE_TXT};
-    private final static String[] VALID_MULTI_VALUES_ARGS_1 = new String[] {STRING_SPACE_FILE_TXT, STRING_UNDERSCORE_FILE_TXT};
-    private final static String[] VALID_MULTI_VALUES_ARGS_2 = new String[] {VALID_OPTION_1, STRING_UNICODE_NAME_FILE, STRING_SPACE_FILE_TXT, STRING_UNDERSCORE_FILE_TXT};
-    private final static String[] VALID_MULTI_VALUES_ARGS_3 = new String[] {STRING_SPACE_FILE_TXT, VALID_OPTION_2};
-    private final static String[] VALID_MULTI_VALUES_ARGS_4 = new String[] {String.valueOf(CHAR_FLAG_PREFIX), String.valueOf(CHAR_FLAG_PREFIX)};
-    private final static String[] INVALID_ARGS_1 = new String[] {INVALID_OPTION_1};
-    private final static String[] INVALID_ARGS_2 = new String[] {INVALID_OPTION_2, STRING_UNICODE_NAME_FILE};
-    private final static String[] INVALID_ARGS_3 = new String[] {STRING_SPACE_FILE_TXT, INVALID_OPTION_3, STRING_UNICODE_NAME_FILE};
-    private final static String[] INVALID_ARGS_4 = new String[] {STRING_SPACE_FILE_TXT, STRING_UNICODE_NAME_FILE, null};
-    private final static String[] INVALID_ARGS_5 = new String[] {String.valueOf(CHAR_FLAG_PREFIX), INVALID_OPTION_4};
-    private final static String[] INVALID_ARGS_6 = new String[] {VALID_OPTION_1};
-    private final static String[] INVALID_ARGS_7 = new String[] {VALID_OPTION_2};
-    private final static String[] INVALID_ARGS_8 = new String[] {STRING_UNICODE_NAME_FILE, STRING_SPACE_FILE_TXT, STRING_UNDERSCORE_FILE_TXT};
+    private final static String[] VALID_NO_VALUE_ARGS = new String[]{};
+    private final static String[] VALID_SINGLE_VALUE_ARGS_1 = new String[]{String.valueOf(CHAR_FLAG_PREFIX)};
+    private final static String[] VALID_SINGLE_VALUE_ARGS_2 = new String[]{STRING_SPACE_FILE_TXT};
+    private final static String[] VALID_MULTI_VALUES_ARGS_1 = new String[]{STRING_SPACE_FILE_TXT,
+            STRING_UNDERSCORE_FILE_TXT};
+    private final static String[] VALID_MULTI_VALUES_ARGS_2 = new String[]{VALID_OPTION_1,
+            STRING_UNICODE_NAME_FILE,
+            STRING_SPACE_FILE_TXT,
+            STRING_UNDERSCORE_FILE_TXT};
+    private final static String[] VALID_MULTI_VALUES_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT, VALID_OPTION_2};
+    private final static String[] VALID_MULTI_VALUES_ARGS_4 = new String[]{String.valueOf(CHAR_FLAG_PREFIX),
+            String.valueOf(CHAR_FLAG_PREFIX)};
+    private final static String[] INVALID_ARGS_1 = new String[]{INVALID_OPTION_1};
+    private final static String[] INVALID_ARGS_2 = new String[]{INVALID_OPTION_2, STRING_UNICODE_NAME_FILE};
+    private final static String[] INVALID_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
+            INVALID_OPTION_3,
+            STRING_UNICODE_NAME_FILE};
+    private final static String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_UNICODE_NAME_FILE, null};
+    private final static String[] INVALID_ARGS_5 = new String[]{String.valueOf(CHAR_FLAG_PREFIX), INVALID_OPTION_4};
+    private final static String[] INVALID_ARGS_6 = new String[]{VALID_OPTION_1};
+    private final static String[] INVALID_ARGS_7 = new String[]{VALID_OPTION_2};
+    private final static String[] INVALID_ARGS_8 = new String[]{STRING_UNICODE_NAME_FILE,
+            STRING_SPACE_FILE_TXT,
+            STRING_UNDERSCORE_FILE_TXT};
 
     private SplitArgsParser parser;
 

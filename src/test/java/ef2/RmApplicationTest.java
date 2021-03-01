@@ -1,8 +1,12 @@
 package ef2;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,15 +18,21 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
 
 @Disabled
 class RmApplicationTest {
 
     private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "RmApplicationTest";
+    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "RmApplicationTest";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -33,11 +43,11 @@ class RmApplicationTest {
     private static final String FOLDER_3 = "folder3";
     private static final String EMPTY_FOLDER = "emptyFolder";
 
-    private final Path file1 = Paths.get(TESTDIR, FILE_1);
-    private final Path file2 = Paths.get(TESTDIR, FILE_2);
-    private final Path folder1 = Paths.get(TESTDIR, FOLDER_1);
-    private final Path folder2 = Paths.get(TESTDIR, FOLDER_2);
-    private final Path emptyFolder = Paths.get(TESTDIR, EMPTY_FOLDER);
+    private final Path file1 = Paths.get(TEST_DIR, FILE_1);
+    private final Path file2 = Paths.get(TEST_DIR, FILE_2);
+    private final Path folder1 = Paths.get(TEST_DIR, FOLDER_1);
+    private final Path folder2 = Paths.get(TEST_DIR, FOLDER_2);
+    private final Path emptyFolder = Paths.get(TEST_DIR, EMPTY_FOLDER);
 
     private final List<Path> paths = List.of(file1, file2, folder1, folder2, emptyFolder);
     private final InputStream stdin = mock(InputStream.class);
@@ -46,7 +56,7 @@ class RmApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
+        Environment.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
