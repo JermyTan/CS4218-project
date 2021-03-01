@@ -16,7 +16,7 @@ import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.CommandBuilder;
 
 @Disabled
-public class CommandBuilderSequenceCommandTest {
+public class CommandBuilderIT {
     @Test
     void parseCommand_SequenceCommandString_SequenceCommand() {
         assertDoesNotThrow(() -> {
