@@ -27,7 +27,6 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.app.GrepInterface;
-import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;

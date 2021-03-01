@@ -17,7 +17,7 @@ public final class ErrorConstants {
     public static final String ERR_MISSING_ARG = "Missing argument(s)";
     public static final String ERR_NULL_ARGS = "Null argument(s)";
     public static final String ERR_TOO_MANY_ARGS = "Too many arguments";
-    public static final String ERR_INVALID_ARG = "Invalid argument";
+    public static final String ERR_INVALID_ARGS = "Invalid argument(s)";
 
     // Options related
     public static final String ERR_OPTION_REQUIRES_ARGUMENT = "Option requires an argument";

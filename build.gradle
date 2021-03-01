@@ -14,7 +14,7 @@ repositories {
 pmd {
     ruleSetFiles = files('PMD.Rules.xml')
     ruleSets = []
-    ignoreFailures = true // switch to false when building for production
+    ignoreFailures = false // switch to false when building for production
     toolVersion = '6.31.0'
     consoleOutput = true
 }

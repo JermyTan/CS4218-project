@@ -1,9 +1,9 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
@@ -11,18 +11,12 @@ import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.Environment;
 
 class GrepResultTest {
     private OutputStream stderr;
@@ -39,17 +33,20 @@ class GrepResultTest {
 
     @Test
     void initialization_NullErrorMessage_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new GrepResult(null) {});
+        assertThrows(IllegalArgumentException.class, () -> new GrepResult(null) {
+        });
     }
 
     @Test
     void initialization_NullLabelOrLines_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new GrepResult(null, List.of(STRING_SINGLE_WORD)) {});
-        assertThrows(IllegalArgumentException.class, () -> new GrepResult(STRING_SINGLE_WORD, null) {});
+        assertThrows(IllegalArgumentException.class, () -> new GrepResult(null, List.of(STRING_SINGLE_WORD)) {
+        });
+        assertThrows(IllegalArgumentException.class, () -> new GrepResult(STRING_SINGLE_WORD, null) {
+        });
     }
 
     @Test
-    void outputError_EmptyErrorMessage_DoNothing() {
+    void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
         new GrepResult("").outputError();
@@ -58,7 +55,7 @@ class GrepResultTest {
     }
 
     @Test
-    void outputError_WhitespacesOnlyErrorMessage_DoNothing() {
+    void outputError_WhitespacesOnlyErrorMessage_DoesNothing() {
         captureErr();
 
         new GrepResult(STRING_BLANK).outputError();

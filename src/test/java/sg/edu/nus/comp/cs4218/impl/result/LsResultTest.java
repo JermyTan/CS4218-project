@@ -1,7 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
@@ -13,7 +13,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -44,17 +43,20 @@ class LsResultTest {
 
     @Test
     void initialization_NullErrorMessage_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new LsResult(null) {});
+        assertThrows(IllegalArgumentException.class, () -> new LsResult(null) {
+        });
     }
 
     @Test
     void initialization_NullLabelOrFiles_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new LsResult(null, List.of(new File(TEST_FILE_1))) {});
-        assertThrows(IllegalArgumentException.class, () -> new LsResult(STRING_SINGLE_WORD, null) {});
+        assertThrows(IllegalArgumentException.class, () -> new LsResult(null, List.of(new File(TEST_FILE_1))) {
+        });
+        assertThrows(IllegalArgumentException.class, () -> new LsResult(STRING_SINGLE_WORD, null) {
+        });
     }
 
     @Test
-    void outputError_EmptyErrorMessage_DoNothing() {
+    void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
         new LsResult("").outputError();
@@ -63,7 +65,7 @@ class LsResultTest {
     }
 
     @Test
-    void outputError_WhitespacesOnlyErrorMessage_DoNothing() {
+    void outputError_WhitespacesOnlyErrorMessage_DoesNothing() {
         captureErr();
 
         new LsResult(STRING_BLANK).outputError();

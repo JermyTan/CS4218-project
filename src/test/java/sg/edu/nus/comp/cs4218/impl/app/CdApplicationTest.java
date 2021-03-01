@@ -1,23 +1,27 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.CdException;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_CD;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+
+import java.io.File;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.CdException;
 
 class CdApplicationTest {
 
@@ -72,13 +76,13 @@ class CdApplicationTest {
 
     @Test
     void run_MissingArgs_ShouldThrow() {
-        Throwable exception = assertThrows(CdException.class, () ->app.run(ARGS_2, System.in, System.out));
+        Throwable exception = assertThrows(CdException.class, () -> app.run(ARGS_2, System.in, System.out));
         assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CD, ERR_MISSING_ARG), exception.getMessage());
     }
 
     @Test
     void run_MoreThanOneArgs_ShouldThrow() {
-        Throwable exception = assertThrows(CdException.class, () ->app.run(ARGS_3, System.in, System.out));
+        Throwable exception = assertThrows(CdException.class, () -> app.run(ARGS_3, System.in, System.out));
         assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CD, ERR_TOO_MANY_ARGS), exception.getMessage());
     }
 

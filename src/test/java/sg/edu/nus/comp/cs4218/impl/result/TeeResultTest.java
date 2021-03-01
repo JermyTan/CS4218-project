@@ -1,16 +1,15 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,11 +28,12 @@ class TeeResultTest {
 
     @Test
     void initialization_NullErrorMessage_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new TeeResult(null) {});
+        assertThrows(IllegalArgumentException.class, () -> new TeeResult(null) {
+        });
     }
 
     @Test
-    void outputError_EmptyErrorMessage_DoNothing() {
+    void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
         new TeeResult("").outputError();
@@ -42,7 +42,7 @@ class TeeResultTest {
     }
 
     @Test
-    void outputError_WhitespacesOnlyErrorMessage_DoNothing() {
+    void outputError_WhitespacesOnlyErrorMessage_DoesNothing() {
         captureErr();
 
         new TeeResult(STRING_BLANK).outputError();

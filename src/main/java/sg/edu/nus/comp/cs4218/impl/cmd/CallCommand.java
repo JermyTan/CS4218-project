@@ -1,16 +1,19 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 
 /**
@@ -23,8 +26,16 @@ public class CallCommand implements Command {
     private final ApplicationRunner appRunner;
     private final ArgumentResolver argumentResolver;
 
-    public CallCommand(List<String> argsList, ApplicationRunner appRunner, ArgumentResolver argumentResolver) {
-        this.argsList = argsList;
+    public CallCommand(List<String> argsList, ApplicationRunner appRunner, ArgumentResolver argumentResolver) throws ShellException {
+        if (
+                CollectionUtils.isAnyNull(argsList, appRunner, argumentResolver)
+                        || argsList.stream().anyMatch(Objects::isNull)
+                        || argsList.isEmpty()
+        ) {
+            throw new ShellException(ERR_INVALID_ARGS);
+        }
+
+        this.argsList = new ArrayList<>(argsList);
         this.appRunner = appRunner;
         this.argumentResolver = argumentResolver;
     }
@@ -32,10 +43,6 @@ public class CallCommand implements Command {
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException {
-        if (argsList == null || argsList.isEmpty()) {
-            throw new ShellException(ERR_SYNTAX);
-        }
-
         // Handle IO redirection
         IORedirectionHandler redirHandler = new IORedirectionHandler(argsList, stdin, stdout, argumentResolver);
         redirHandler.extractRedirOptions();

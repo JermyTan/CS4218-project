@@ -1,6 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
@@ -31,7 +33,7 @@ class EchoApplicationTest {
     }
 
     @Test
-    public void constructResult_Blank_ShouldWriteBlank(){
+    public void constructResult_Blank_ShouldWriteBlank() {
         assertDoesNotThrow(() -> {
             assertEquals("", app.constructResult(EMPTY));
             assertEquals("  ", app.constructResult(SPACE));

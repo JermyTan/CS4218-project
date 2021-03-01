@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
@@ -31,16 +32,18 @@ class CatResultTest {
 
     @Test
     void initialization_NullErrorMessage_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new CatResult((String) null) {});
+        assertThrows(IllegalArgumentException.class, () -> new CatResult((String) null) {
+        });
     }
 
     @Test
     void initialization_NullLines_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new CatResult((List<String>) null) {});
+        assertThrows(IllegalArgumentException.class, () -> new CatResult((List<String>) null) {
+        });
     }
 
     @Test
-    void outputError_EmptyErrorMessage_DoNothing() {
+    void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
         new CatResult("").outputError();
@@ -49,7 +52,7 @@ class CatResultTest {
     }
 
     @Test
-    void outputError_WhitespacesOnlyErrorMessage_DoNothing() {
+    void outputError_WhitespacesOnlyErrorMessage_DoesNothing() {
         captureErr();
 
         new CatResult(STRING_BLANK).outputError();

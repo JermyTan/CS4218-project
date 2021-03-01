@@ -1,26 +1,37 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 /**
- * A Pipe Command is a sub-command consisting of two Call Commands separated with a pipe,
- * or a Pipe Command and a Call Command separated with a pipe.
+ * A Pipe Command is a command consisting of multiple Call Commands separated with a pipe.
  * <p>
- * Command format: <Call> | <Call> or <Pipe> | <Call>
+ * Command format: <Call> | <Call> ...
  */
 public class PipeCommand implements Command {
     private final List<CallCommand> callCommands;
 
-    public PipeCommand(List<CallCommand> callCommands) {
-        this.callCommands = callCommands;
+    public PipeCommand(List<CallCommand> callCommands) throws ShellException {
+        if (
+                callCommands == null
+                        || callCommands.stream().anyMatch(Objects::isNull)
+                        || callCommands.size() < 2
+        ) {
+            throw new ShellException(ERR_INVALID_ARGS);
+        }
+
+        this.callCommands = new ArrayList<>(callCommands);
     }
 
     @Override
@@ -34,11 +45,6 @@ public class PipeCommand implements Command {
 
         for (int i = 0; i < callCommands.size(); i++) {
             CallCommand callCommand = callCommands.get(i);
-
-            if (absAppException != null || shellException != null) {
-                callCommand.terminate();
-                continue;
-            }
 
             try {
                 nextOutputStream = new ByteArrayOutputStream();

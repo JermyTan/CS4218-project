@@ -1,12 +1,23 @@
 package ef2;
 
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.spy;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,11 +25,18 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.spy;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
+
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Disabled
 public class UniqApplicationTest {
 
@@ -26,11 +44,11 @@ public class UniqApplicationTest {
     private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "UniqApplicationTest";
 
     private static final String INPUT_1 = "Hello World" + STRING_NEWLINE + "Hello World"
-                                        + "Alice" + STRING_NEWLINE + "Alice" + STRING_NEWLINE
-                                        + "Bob" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob";
+            + "Alice" + STRING_NEWLINE + "Alice" + STRING_NEWLINE
+            + "Bob" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob";
     private static final String INPUT_2 = "AAA" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "CCC";
     private static final String INPUT_3 = "AAA" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "BBB"
-                                        + STRING_NEWLINE + "AAA" + STRING_NEWLINE + "AAA";
+            + STRING_NEWLINE + "AAA" + STRING_NEWLINE + "AAA";
 
     private static final String INPUT_EMPTY = "";
 
@@ -54,10 +72,19 @@ public class UniqApplicationTest {
 
 
     private final List<Path> paths = List.of(in1, in2, in3, in4, out1, out2, out3);
+    private final ByteArrayOutputStream STD_OUTPUT = new ByteArrayOutputStream();
     private InputStream inputStream;
     private UniqApplication app;
 
-    private final ByteArrayOutputStream STD_OUTPUT = new ByteArrayOutputStream();
+    @BeforeAll
+    static void setupBeforeAll() {
+        Environment.currentDirectory = TESTDIR;
+    }
+
+    @AfterAll
+    static void tearDownAfterAll() {
+        Environment.currentDirectory = ORIGINAL_DIR;
+    }
 
     private void createFileWithContent(Path path, String content) throws IOException {
         Files.createFile(path);
@@ -79,16 +106,6 @@ public class UniqApplicationTest {
         } catch (Exception e) {
             return e.getMessage();
         }
-    }
-
-    @BeforeAll
-    static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
-    }
-
-    @AfterAll
-    static void tearDownAfterAll() {
-        Environment.currentDirectory = ORIGINAL_DIR;
     }
 
     @BeforeEach
@@ -136,7 +153,7 @@ public class UniqApplicationTest {
     public void uniqFromFile_NoFlag_RemovesAdjacentDup() throws AbstractApplicationException {
         String result1 = app.uniqFromFile(false, false, false, INPUT_FILE_1, OUTPUT_FILE_1);
         String expected1 = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob" + STRING_NEWLINE + "Alice"
-                        + STRING_NEWLINE + "Bob" + STRING_NEWLINE;
+                + STRING_NEWLINE + "Bob" + STRING_NEWLINE;
 
         String result2 = app.uniqFromFile(false, false, false, INPUT_FILE_2, OUTPUT_FILE_2);
         String expected2 = "AAA" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "CCC" + STRING_NEWLINE;
@@ -228,9 +245,9 @@ public class UniqApplicationTest {
     public void uniqFromFile_IsAllRepeated_DisplaysAllDup() throws AbstractApplicationException {
 
         String expected1 = "Hello World" + STRING_NEWLINE + "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE
-                        + "Alice" + STRING_NEWLINE;
+                + "Alice" + STRING_NEWLINE;
         String expected3 = "BBB" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "AAA" + STRING_NEWLINE
-                        + "AAA" + STRING_NEWLINE;
+                + "AAA" + STRING_NEWLINE;
 
         String result1 = app.uniqFromFile(false, false, true, INPUT_FILE_1, OUTPUT_FILE_1);
         String result2 = app.uniqFromFile(false, false, true, INPUT_FILE_2, OUTPUT_FILE_2);

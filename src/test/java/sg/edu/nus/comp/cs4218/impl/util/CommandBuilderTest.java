@@ -15,6 +15,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class CommandBuilderTest {
     @Test
     void parseCommand_EmptyString_ThrowsException() {
@@ -70,7 +71,7 @@ class CommandBuilderTest {
         assertDoesNotThrow(() -> {
             Command command = CommandBuilder.parseCommand("  echo hello world", new ApplicationRunner());
             assertEquals(CallCommand.class, command.getClass());
-            assertEquals(List.of("echo", "hello", "world"), ((CallCommand) command).getArgsList());//NOPMD
+            assertEquals(List.of("echo", "hello", "world"), ((CallCommand) command).getArgsList());
         });
     }
 

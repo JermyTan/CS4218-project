@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
@@ -28,16 +29,20 @@ class ResultTest {
 
     @Test
     void initialization_NullErrorMessage_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new Result(false, null) {});
-        assertThrows(IllegalArgumentException.class, () -> new Result(true, null) {});
+        assertThrows(IllegalArgumentException.class, () -> new Result(false, null) {
+        });
+        assertThrows(IllegalArgumentException.class, () -> new Result(true, null) {
+        });
     }
 
     @Test
-    void outputError_EmptyErrorMessage_DoNothing() {
+    void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
-        new Result(false) {}.outputError();
-        new Result(true) {}.outputError();
+        new Result(false) {
+        }.outputError();
+        new Result(true) {
+        }.outputError();
         new Result(false, "").outputError();
         new Result(true, "").outputError();
 
@@ -45,7 +50,7 @@ class ResultTest {
     }
 
     @Test
-    void outputError_WhitespacesOnlyErrorMessage_DoNothing() {
+    void outputError_WhitespacesOnlyErrorMessage_DoesNothing() {
         captureErr();
 
         new Result(false, STRING_BLANK).outputError();
@@ -55,7 +60,7 @@ class ResultTest {
     }
 
     @Test
-    void outputError_IsNotError_DoNothing() {
+    void outputError_IsNotError_DoesNothing() {
         captureErr();
 
         new Result(false, STRING_SINGLE_WORD).outputError();

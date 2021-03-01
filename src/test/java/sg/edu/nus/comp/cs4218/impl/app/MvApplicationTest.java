@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_MV;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
@@ -361,7 +361,7 @@ class MvApplicationTest {
         String destFile = Paths.get(FOLDER_1, FOLDER_2).toString();
 
         Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
-        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARG), exception.getMessage());
+        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARGS), exception.getMessage());
     }
 
     @Test

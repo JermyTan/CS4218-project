@@ -26,31 +26,47 @@ import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class PipeCommandTest {
 
     private final InputStream stdin = mock(InputStream.class);
     private final OutputStream stdout = mock(OutputStream.class);
-    private PipeCommand command;
 
-    private void buildCommand(List<CallCommand> callCommands) {
-        command = new PipeCommand(callCommands);
+    @Test
+    public void initialization_NullCallCommands_ThrowsException() {
+        assertThrows(ShellException.class, () -> new PipeCommand(null));
     }
 
     @Test
-    public void evaluate_ZeroCallCommand_DoesNothing() {
-        buildCommand(new ArrayList<>());
+    public void initialization_EmptyCallCommands_ThrowsException() {
+        assertThrows(ShellException.class, () -> new PipeCommand(List.of()));
+    }
 
-        assertDoesNotThrow(() -> command.evaluate(stdin, stdout));
+    @Test
+    public void initialization_OneCallCommand_ThrowsException() {
+        assertThrows(ShellException.class, () -> new PipeCommand(List.of(mock(CallCommand.class))));
+    }
+
+    @Test
+    public void initialization_CallCommandListContainsNull_ThrowsException() {
+        assertThrows(ShellException.class, () -> {
+            List<CallCommand> list = new ArrayList<>();
+            list.add(mock(CallCommand.class));
+            list.add(null);
+            list.add(mock(CallCommand.class));
+
+            new PipeCommand(list);
+        });
     }
 
     @Test
     public void evaluate_TwoCallCommands_CommandsExecuted() {
-        CallCommand command1 = spy(new CallCommand(List.of("echo", "abc"), new ApplicationRunner(), new ArgumentResolver()));
-        CallCommand command2 = mock(CallCommand.class);
-
-        buildCommand(List.of(command1, command2));
-
         assertDoesNotThrow(() -> {
+            CallCommand command1 = spy(new CallCommand(List.of("echo", "abc"), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command2 = mock(CallCommand.class);
+
+            PipeCommand command = new PipeCommand(List.of(command1, command2));
+
             command.evaluate(stdin, stdout);
             ArgumentCaptor<OutputStream> command1Stdout = ArgumentCaptor.forClass(OutputStream.class);
             ArgumentCaptor<InputStream> command2Stdin = ArgumentCaptor.forClass(InputStream.class);
@@ -75,7 +91,7 @@ class PipeCommandTest {
                 .when(command1)
                 .evaluate(eq(stdin), any());
 
-        buildCommand(List.of(command1, command2));
+        PipeCommand command = new PipeCommand(List.of(command1, command2));
 
         assertThrows(ShellException.class, () -> {
             command.evaluate(stdin, stdout);
@@ -92,12 +108,58 @@ class PipeCommandTest {
                 .when(command1)
                 .evaluate(eq(stdin), any());
 
-        buildCommand(List.of(command1, command2));
+        PipeCommand command = new PipeCommand(List.of(command1, command2));
 
         assertThrows(CatException.class, () -> {
             command.evaluate(stdin, stdout);
             verify(command1).evaluate(eq(stdin), any());
             verify(command2, never()).evaluate(any(), eq(stdout));
+        });
+    }
+
+    @Test
+    public void terminate_BeforeEvaluate_DoesNothing() {
+        assertDoesNotThrow(() -> {
+            CallCommand command1 = spy(new CallCommand(List.of("echo", "abc"), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command2 = mock(CallCommand.class);
+
+            PipeCommand command = new PipeCommand(List.of(command1, command2));
+
+            command.terminate();
+
+            command.evaluate(stdin, stdout);
+            ArgumentCaptor<OutputStream> command1Stdout = ArgumentCaptor.forClass(OutputStream.class);
+            ArgumentCaptor<InputStream> command2Stdin = ArgumentCaptor.forClass(InputStream.class);
+
+            // Both commands are executed
+            verify(command1).evaluate(eq(stdin), command1Stdout.capture());
+            verify(command2).evaluate(command2Stdin.capture(), eq(stdout));
+
+            List<String> input = IOUtils.getLinesFromInputStream(command2Stdin.getValue());
+
+            // Check that data ("abc") written to the stdout of command1 is fed into the stdin of command2
+            assertEquals(1, input.size());
+            assertEquals("abc", input.get(0));
+        });
+    }
+
+    @Test
+    public void getCallCommands_NonEmptyCallCommandList_ReturnsNonEmptyCallCommandList() {
+        assertDoesNotThrow(() -> {
+            CallCommand command1 = spy(new CallCommand(List.of("echo", "abc"), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command2 = mock(CallCommand.class);
+
+            List<CallCommand> callCommandList = List.of(command1, command2);
+
+            PipeCommand command = new PipeCommand(callCommandList);
+
+            // test before evaluate
+            assertEquals(callCommandList, command.getCallCommands());
+
+            command.evaluate(stdin, stdout);
+
+            // test after evaluation
+            assertEquals(callCommandList, command.getCallCommands());
         });
     }
 }

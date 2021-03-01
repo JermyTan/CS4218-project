@@ -1,6 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_TEE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
@@ -10,7 +12,16 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PA
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,7 +29,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.TeeException;
@@ -35,7 +50,7 @@ class TeeApplicationTest {
     private static final String OUTPUT_FILE_2 = "output2.txt";
     private static final String OUTPUT_FILE_3 = "output3.txt";
 
-    private static final String[] ARGS_1 = {OUTPUT_FILE_1 , OUTPUT_FILE_2};
+    private static final String[] ARGS_1 = {OUTPUT_FILE_1, OUTPUT_FILE_2};
     private static final String[] ARGS_2 = {"-a", OUTPUT_FILE_1};
 
     private static final String FOLDER = "folder";
@@ -120,7 +135,7 @@ class TeeApplicationTest {
 
     @Test
     public void teeFromStdin_NullFileName_Success() {
-        assertThrows(TeeException.class, () -> app.teeFromStdin(null, inputStream, (String[])null));
+        assertThrows(TeeException.class, () -> app.teeFromStdin(null, inputStream, (String[]) null));
     }
 
     @Test
@@ -235,14 +250,14 @@ class TeeApplicationTest {
         String[] filenames = {OUTPUT_FILE_1, null};
         inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
         Throwable error = assertThrows(TeeException.class, () -> app.teeFromStdin(false, inputStream, filenames));
-        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_TEE,  ERR_INVALID_FILES), error.getMessage());
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_TEE, ERR_INVALID_FILES), error.getMessage());
     }
 
     @Test
     public void teeFromStdin_NoInputStream_WritesToStderr() {
         String[] filenames = {OUTPUT_FILE_1};
         Throwable error = assertThrows(TeeException.class, () -> app.teeFromStdin(false, null, filenames));
-        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_TEE,  ERR_NO_ISTREAM), error.getMessage());
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_TEE, ERR_NO_ISTREAM), error.getMessage());
     }
 
     @Test

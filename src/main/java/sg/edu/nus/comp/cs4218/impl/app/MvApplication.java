@@ -3,7 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
@@ -102,7 +102,7 @@ public class MvApplication implements MvInterface {
 
             // When renaming a folder, destFolder must not contain srcFile
             if (destPath.toAbsolutePath().startsWith(srcPath.toAbsolutePath())) {
-                throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARG));
+                throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARGS));
             }
         }
 

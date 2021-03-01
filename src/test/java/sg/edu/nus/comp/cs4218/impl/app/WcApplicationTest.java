@@ -5,10 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,19 +54,8 @@ class WcApplicationTest {
     private static Path testFolder;
     private static InputStream testInputStream;
     private static OutputStream testOutputStream;
-    private OutputStream stderr;
-
     private final WcApplication wcApp = new WcApplication();
-
-    private void captureErr() {
-        stderr = new ByteArrayOutputStream();
-        System.setErr(new PrintStream(stderr));
-    }
-
-    private String getErrOutput() {
-        System.setErr(System.err);
-        return stderr.toString();
-    }
+    private OutputStream stderr;
 
     @BeforeAll
     static void setUpBeforeAll() {
@@ -71,6 +68,16 @@ class WcApplicationTest {
     static void tearDownAfterAll() {
         testDir.delete();
         Environment.currentDirectory = DEFAULT_DIRNAME;
+    }
+
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
     }
 
     private String generateString(int lines) {

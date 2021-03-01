@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.result;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
@@ -28,16 +29,18 @@ class WcResultTest {
 
     @Test
     void initialization_NullErrorMessage_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new WcResult(null) {});
+        assertThrows(IllegalArgumentException.class, () -> new WcResult(null) {
+        });
     }
 
     @Test
     void initialization_NullLabel_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> new WcResult(null, 0, 0, 0) {});
+        assertThrows(IllegalArgumentException.class, () -> new WcResult(null, 0, 0, 0) {
+        });
     }
 
     @Test
-    void outputError_EmptyErrorMessage_DoNothing() {
+    void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
         new WcResult("").outputError();
@@ -46,7 +49,7 @@ class WcResultTest {
     }
 
     @Test
-    void outputError_WhitespacesOnlyErrorMessage_DoNothing() {
+    void outputError_WhitespacesOnlyErrorMessage_DoesNothing() {
         captureErr();
 
         new WcResult(STRING_BLANK).outputError();

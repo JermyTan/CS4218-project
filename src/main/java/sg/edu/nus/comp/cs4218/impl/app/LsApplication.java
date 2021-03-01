@@ -26,7 +26,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.app.LsInterface;
-import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.LsException;

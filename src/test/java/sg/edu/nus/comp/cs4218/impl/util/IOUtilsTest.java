@@ -40,58 +40,74 @@ class IOUtilsTest {
 
     @Test
     void openInputStream_ExistingFile_Success() {
-        assertDoesNotThrow(() -> {
-            IOUtils.openInputStream(TEST_TXT);
-        });
+        assertDoesNotThrow(() ->
+                IOUtils.openInputStream(
+                        IOUtils.resolveAbsoluteFilePath(TEST_TXT).toString()
+                )
+        );
     }
 
     @Test
     void openInputStream_NonExistingFile_ThrowsException() {
-        assertThrows(ShellException.class, () -> {
-            IOUtils.openInputStream(NON_EXISTENT_TEXT);
-        });
+        assertThrows(ShellException.class, () ->
+                IOUtils.openInputStream(
+                        IOUtils.resolveAbsoluteFilePath(NON_EXISTENT_TEXT).toString()
+                )
+        );
     }
 
     @Test
     void openOutputStream_ExistingFile_Success() {
-        assertDoesNotThrow(() -> {
-            IOUtils.openOutputStream(TEST_TXT);
-        });
+        assertDoesNotThrow(() ->
+                IOUtils.openOutputStream(
+                        IOUtils.resolveAbsoluteFilePath(TEST_TXT).toString()
+                )
+        );
     }
 
     @Test
     void openOutputStream_NonExistingFile_ThrowsException() {
-        assertThrows(ShellException.class, () -> {
-            IOUtils.openOutputStream(NON_EXISTENT_TEXT);
-        });
+        assertThrows(ShellException.class, () ->
+                IOUtils.openOutputStream(
+                        IOUtils.resolveAbsoluteFilePath(NON_EXISTENT_TEXT).toString()
+                )
+        );
     }
 
     @Test
     void closeInputStream_SystemIn_SystemInNotClosed() {
-        assertDoesNotThrow(() -> {
-            IOUtils.closeInputStream(System.in);
-        });
+        assertDoesNotThrow(() ->
+                IOUtils.closeInputStream(System.in)
+        );
     }
 
     @Test
-    void closeInputStream_NullStream_DoNothing() {
-        assertDoesNotThrow(() -> {
-            IOUtils.closeInputStream(null);
-        });
+    void closeInputStream_NullStream_DoesNothing() {
+        assertDoesNotThrow(() ->
+                IOUtils.closeInputStream(null)
+        );
     }
 
     @Test
     void closeInputStream_NonNullStream_Success() {
-        assertDoesNotThrow(() -> {
-            IOUtils.closeInputStream(IOUtils.openInputStream(TEST_TXT));
-        });
+        assertDoesNotThrow(() ->
+                IOUtils.closeInputStream(
+                        IOUtils.openInputStream(
+                                IOUtils.resolveAbsoluteFilePath(TEST_TXT).toString()
+                        )
+                )
+        );
     }
 
     @Test
     void closeInputStream_UnclosableStream_ThrowsException() {
-        assertThrows(ShellException.class, () -> {
-            IOUtils.closeInputStream(new UnclosableInputStream(TEST_TXT));
-        });
+        assertThrows(ShellException.class, () ->
+                IOUtils.closeInputStream(
+                        new UnclosableInputStream(
+                                IOUtils.resolveAbsoluteFilePath(TEST_TXT).toString()
+                        )
+                )
+        );
     }
 
     @Test
@@ -103,24 +119,32 @@ class IOUtilsTest {
     }
 
     @Test
-    void closeOutputStream_NullStream_DoNothing() {
-        assertDoesNotThrow(() -> {
-            IOUtils.closeOutputStream(null);
-        });
+    void closeOutputStream_NullStream_DoesNothing() {
+        assertDoesNotThrow(() ->
+                IOUtils.closeOutputStream(null)
+        );
     }
 
     @Test
     void closeOutputStream_NonNullStream_Success() {
-        assertDoesNotThrow(() -> {
-            IOUtils.closeOutputStream(IOUtils.openOutputStream(TEST_TXT));
-        });
+        assertDoesNotThrow(() ->
+                IOUtils.closeOutputStream(
+                        IOUtils.openOutputStream(
+                                IOUtils.resolveAbsoluteFilePath(TEST_TXT).toString()
+                        )
+                )
+        );
     }
 
     @Test
     void closeOutputStream_UnclosableStream_ThrowsException() {
-        assertThrows(ShellException.class, () -> {
-            IOUtils.closeOutputStream(new UnclosableOutputStream(TEST_TXT));
-        });
+        assertThrows(ShellException.class, () ->
+                IOUtils.closeOutputStream(
+                        new UnclosableOutputStream(
+                                IOUtils.resolveAbsoluteFilePath(TEST_TXT).toString()
+                        )
+                )
+        );
     }
 
     @Test
@@ -136,22 +160,28 @@ class IOUtilsTest {
         );
 
         assertDoesNotThrow(() -> {
-            OutputStream out = IOUtils.openOutputStream(TEST_TXT);
+            OutputStream out = IOUtils.openOutputStream(
+                    IOUtils.resolveAbsoluteFilePath(TEST_TXT).toString()
+            );
             out.write(testString.getBytes());
             out.close();
 
             assertIterableEquals(
                     expected,
-                    IOUtils.getLinesFromInputStream(IOUtils.openInputStream(TEST_TXT))
+                    IOUtils.getLinesFromInputStream(
+                            IOUtils.openInputStream(
+                                    IOUtils.resolveAbsoluteFilePath(TEST_TXT).toString()
+                            )
+                    )
             );
         });
     }
 
     @Test
     void getLinesFromInputStream_NullStream_ThrowsException() {
-        assertThrows(ShellException.class, () -> {
-            IOUtils.getLinesFromInputStream(null);
-        });
+        assertThrows(ShellException.class, () ->
+                IOUtils.getLinesFromInputStream(null)
+        );
     }
 
     private static class UnclosableInputStream extends FileInputStream {

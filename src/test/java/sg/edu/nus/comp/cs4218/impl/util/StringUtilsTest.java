@@ -29,6 +29,7 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class StringUtilsTest {
 
     @Test
@@ -58,7 +59,7 @@ class StringUtilsTest {
         );
 
         List<String> expectedExts = List.of(
-                "txt",//NOPMD
+                "txt",
                 "txt",
                 "txt",
                 "jpg",
