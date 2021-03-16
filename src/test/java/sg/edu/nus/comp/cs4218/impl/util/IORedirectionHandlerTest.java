@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.File;
@@ -17,7 +18,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
@@ -26,14 +27,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class IORedirectionHandlerTest {
 
-    private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "IORedirectionHandlerTest";
+    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "IORedirectionHandlerTest";
     private static final String FILE_1 = "file1.txt"; // exists
     private static final String FILE_2 = "file2.txt"; // exists
     private static final String FILE_3 = "file3.txt"; // does not exist
@@ -48,12 +49,12 @@ class IORedirectionHandlerTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TEST_DIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        Environment.currentDirectory = ORIGINAL_DIR;
+        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
     }
 
     private void buildRedirHandler(List<String> argsList) {
@@ -84,7 +85,7 @@ class IORedirectionHandlerTest {
 
     @Test
     public void extractRedirOptions_EmptyArgList_ThrowsException() {
-        buildRedirHandler(new LinkedList<>());
+        buildRedirHandler(new ArrayList<>());
         assertThrows(ShellException.class, () -> redirHandler.extractRedirOptions());
     }
 

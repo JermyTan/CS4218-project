@@ -12,6 +12,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
@@ -32,13 +33,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 
 class LsApplicationTest {
 
-    private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "LsApplicationTest";
+    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "LsApplicationTest";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -61,12 +62,12 @@ class LsApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TEST_DIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        Environment.currentDirectory = ORIGINAL_DIR;
+        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
     }
 
     private void captureErr() {
@@ -187,9 +188,9 @@ class LsApplicationTest {
     public void run_Recursive_FilesAndSubfoldersListed() {
         Map<String, Set<String>> folders = new HashMap<>();
         folders.put(NESTED_FOLDER + ":", new HashSet<>(List.of(FILE_1, FOLDER_1, FOLDER_2)));
-        folders.put(NESTED_FOLDER + File.separator + FOLDER_1 + ":",
+        folders.put(NESTED_FOLDER + STRING_FILE_SEP + FOLDER_1 + ":",
                 new HashSet<>(List.of(FILE_1, FILE_WO_EXT)));
-        folders.put(NESTED_FOLDER + File.separator + FOLDER_2 + ":",
+        folders.put(NESTED_FOLDER + STRING_FILE_SEP + FOLDER_2 + ":",
                 new HashSet<>(List.of(FILE_1, FILE_2)));
 
         assertDoesNotThrow(() -> app.run(new String[]{"-R", NESTED_FOLDER}, stdin, stdout));
@@ -215,7 +216,7 @@ class LsApplicationTest {
     public void run_SortByExt_FileWithoutExtensionSortedFirst() {
         String expected = FILE_WO_EXT + STRING_NEWLINE + FILE_1 + STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> app.run(new String[]{"-X", NESTED_FOLDER + File.separator + FOLDER_1},
+        assertDoesNotThrow(() -> app.run(new String[]{"-X", NESTED_FOLDER + STRING_FILE_SEP + FOLDER_1},
                 stdin, stdout));
 
         assertEquals(expected, stdout.toString());
@@ -225,7 +226,7 @@ class LsApplicationTest {
     public void run_SortByExt_FilesSortedByExtension() {
         String expected = FILE_1 + STRING_NEWLINE + FILE_2 + STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> app.run(new String[]{"-X", NESTED_FOLDER + File.separator + FOLDER_2},
+        assertDoesNotThrow(() -> app.run(new String[]{"-X", NESTED_FOLDER + STRING_FILE_SEP + FOLDER_2},
                 stdin, stdout));
 
         assertEquals(expected, stdout.toString());

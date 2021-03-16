@@ -3,13 +3,13 @@ package sg.edu.nus.comp.cs4218.impl.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -19,12 +19,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 
 class RegexArgumentTest {
 
-    private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "RegexArgumentTest";
+    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "RegexArgumentTest";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -38,12 +38,12 @@ class RegexArgumentTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TEST_DIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        Environment.currentDirectory = ORIGINAL_DIR;
+        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
     }
 
     private String resolveArg(String arg) {
@@ -77,7 +77,7 @@ class RegexArgumentTest {
         // file1*/
         regexArgument.merge("file1");
         regexArgument.appendAsterisk();
-        regexArgument.merge(File.separator);
+        regexArgument.merge(STRING_FILE_SEP);
 
         List<String> globbedFiles = regexArgument.globFiles();
 
@@ -115,7 +115,7 @@ class RegexArgumentTest {
         // f*/
         regexArgument.merge("f");
         regexArgument.appendAsterisk();
-        regexArgument.merge(File.separator);
+        regexArgument.merge(STRING_FILE_SEP);
 
         List<String> globbedFiles = regexArgument.globFiles();
 
@@ -143,7 +143,7 @@ class RegexArgumentTest {
     public void globFiles_AsteriskSlash_MatchAllFolders() {
         // */
         regexArgument.appendAsterisk();
-        regexArgument.merge(File.separator);
+        regexArgument.merge(STRING_FILE_SEP);
 
         List<String> globbedFiles = regexArgument.globFiles();
 
@@ -155,8 +155,8 @@ class RegexArgumentTest {
 
     @Test
     public void globFiles_AbsolutePath_ReturnsGlobbedFilesSorted() {
-        regexArgument.merge(Environment.currentDirectory);
-        regexArgument.merge(File.separator);
+        regexArgument.merge(EnvironmentHelper.currentDirectory);
+        regexArgument.merge(STRING_FILE_SEP);
         regexArgument.merge("file");
         regexArgument.appendAsterisk();
 

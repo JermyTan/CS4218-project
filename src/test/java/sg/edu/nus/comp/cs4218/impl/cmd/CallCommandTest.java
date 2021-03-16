@@ -8,7 +8,11 @@ import static org.mockito.Mockito.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_CAT;
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_ECHO;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 
 import java.io.File;
 import java.io.InputStream;
@@ -20,17 +24,16 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class CallCommandTest {
 
-    private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "CallCommandTest";
+    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "CallCommandTest";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -41,12 +44,12 @@ class CallCommandTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TEST_DIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        Environment.currentDirectory = ORIGINAL_DIR;
+        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
     }
 
     private void buildCommand(List<String> argsList) throws ShellException {
@@ -63,14 +66,14 @@ class CallCommandTest {
     @Test
     public void initialization_NullAppRunner_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            new CallCommand(List.of("echo", "abc"), null, mock(ArgumentResolver.class));
+            new CallCommand(List.of(APP_ECHO, STRING_SINGLE_WORD), null, mock(ArgumentResolver.class));
         });
     }
 
     @Test
     public void initialization_NullArgumentResolver_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            new CallCommand(List.of("echo", "abc"), mock(ApplicationRunner.class), null);
+            new CallCommand(List.of(APP_ECHO, STRING_SINGLE_WORD), mock(ApplicationRunner.class), null);
         });
     }
 
@@ -83,9 +86,9 @@ class CallCommandTest {
     public void initialization_ArgsListContainsNull_ThrowsException() {
         assertThrows(ShellException.class, () -> {
             List<String> list = new ArrayList<>();
-            list.add("echo");
+            list.add(APP_ECHO);
             list.add(null);
-            list.add("dec");
+            list.add(STRING_SINGLE_WORD);
 
             buildCommand(list);
         });
@@ -94,66 +97,66 @@ class CallCommandTest {
     @Test
     public void evaluate_NoIORedirectionNoQuotingNoGlobingNoCommandSub_AppRunWithCorrectArgs() {
         assertDoesNotThrow(() -> {
-            buildCommand(List.of("echo", "abc"));
+            buildCommand(List.of(APP_ECHO, STRING_SINGLE_WORD));
 
             command.evaluate(stdin, stdout);
 
-            verify(appRunner).runApp("echo", new String[]{"abc"}, stdin, stdout);
+            verify(appRunner).runApp(APP_ECHO, new String[]{STRING_SINGLE_WORD}, stdin, stdout);
         });
     }
 
     @Test
     public void evaluate_HasIORedirectionNoQuotingNoGlobingNoCommandSub_RedirOptionsExtracted() {
         assertDoesNotThrow(() -> {
-            buildCommand(List.of("cat", "<", FILE_1, ">", FILE_2));
+            buildCommand(List.of(APP_CAT, "<", FILE_1, ">", FILE_2));
 
             command.evaluate(stdin, stdout);
 
             // Did not check whether inputStream / outputStream is correctly set here
-            verify(appRunner).runApp(eq("cat"), eq(new String[0]), isA(InputStream.class), isA(OutputStream.class));
+            verify(appRunner).runApp(eq(APP_CAT), eq(new String[0]), isA(InputStream.class), isA(OutputStream.class));
         });
     }
 
     @Test
     public void evaluate_NoIORedirectionHasQuotingNoGlobingNoCommandSub_QuotesUnwrapped() {
         assertDoesNotThrow(() -> {
-            buildCommand(List.of("echo", "'abc'"));
+            buildCommand(List.of(APP_ECHO, "'Test'"));
 
             command.evaluate(stdin, stdout);
 
-            verify(appRunner).runApp("echo", new String[]{"abc"}, stdin, stdout);
+            verify(appRunner).runApp(APP_ECHO, new String[]{STRING_SINGLE_WORD}, stdin, stdout);
         });
     }
 
     @Test
     public void evaluate_NoIORedirectionNoQuotingHasGlobingNoCommandSub_GlobbingCompleted() {
         assertDoesNotThrow(() -> {
-            buildCommand(List.of("echo", "*.txt"));
+            buildCommand(List.of(APP_ECHO, "*.txt"));
 
             command.evaluate(stdin, stdout);
 
             String file1 = IOUtils.resolveAbsoluteFilePath(FILE_1).toString();
             String file2 = IOUtils.resolveAbsoluteFilePath(FILE_2).toString();
-            verify(appRunner).runApp("echo", new String[]{file1, file2}, stdin, stdout);
+            verify(appRunner).runApp(APP_ECHO, new String[]{file1, file2}, stdin, stdout);
         });
     }
 
     @Test
     public void terminate_BeforeEvaluate_DoesNothing() {
         assertDoesNotThrow(() -> {
-            buildCommand(List.of("echo", "'abc'"));
+            buildCommand(List.of(APP_ECHO, STRING_SINGLE_WORD));
 
             command.terminate();
 
             command.evaluate(stdin, stdout);
-            verify(appRunner).runApp("echo", new String[]{"abc"}, stdin, stdout);
+            verify(appRunner).runApp(APP_ECHO, new String[]{STRING_SINGLE_WORD}, stdin, stdout);
         });
     }
 
     @Test
     public void getArgsList_NonEmptyArgsList_ReturnsNonEmptyArgsList() {
         assertDoesNotThrow(() -> {
-            List<String> argsList = List.of("echo", "'abc'");
+            List<String> argsList = List.of(APP_ECHO, STRING_SINGLE_WORD);
             buildCommand(argsList);
 
             // test before evaluate

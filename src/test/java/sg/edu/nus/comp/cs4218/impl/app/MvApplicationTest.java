@@ -19,6 +19,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
@@ -40,13 +41,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 
 class MvApplicationTest {
 
-    private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "MvApplicationTest";
+    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "MvApplicationTest";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -71,12 +72,12 @@ class MvApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TEST_DIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        Environment.currentDirectory = ORIGINAL_DIR;
+        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
     }
 
     private void createFileWithContent(Path path, String content) throws IOException {

@@ -10,6 +10,7 @@ public final class StringUtils {
     public static final String STRING_PARENT_DIR = "..";
     public static final String STRING_WHITESPACE = " ";
     public static final String STRING_STDIN_FLAG = "-";
+    public static final String STRING_FILE_SEP = File.separator;
     public static final char CHAR_FILE_SEP = File.separatorChar;
     public static final char CHAR_TAB = '\t';
     public static final char CHAR_SPACE = ' ';
@@ -128,9 +129,9 @@ public final class StringUtils {
     public static String fileSeparator() {
         // We need to escape \ in Windows...
         if (System.getProperty("os.name").toLowerCase().contains("win")) {//NOPMD
-            return '\\' + File.separator;
+            return '\\' + STRING_FILE_SEP;
         }
-        return File.separator;
+        return STRING_FILE_SEP;
     }
      */
 }

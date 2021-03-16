@@ -11,7 +11,7 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ExitException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.CommandBuilder;
+import sg.edu.nus.comp.cs4218.impl.util.CommandBuilderHelper;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class ShellImpl implements Shell {
@@ -51,7 +51,7 @@ public class ShellImpl implements Shell {
     @Override
     public void parseAndEvaluate(String commandString, OutputStream stdout)
             throws AbstractApplicationException, ShellException {
-        Command command = CommandBuilder.parseCommand(commandString, new ApplicationRunner());
+        Command command = CommandBuilderHelper.parseCommand(commandString, new ApplicationRunner());
         command.evaluate(System.in, stdout);
     }
 }

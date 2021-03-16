@@ -2,10 +2,10 @@ package sg.edu.nus.comp.cs4218.impl.result;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE;

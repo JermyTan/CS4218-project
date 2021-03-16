@@ -19,6 +19,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_OPTION_REQUIRE
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_OPTIONS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
@@ -38,7 +39,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.exception.SplitException;
 
 class SplitApplicationTest {
@@ -47,8 +48,8 @@ class SplitApplicationTest {
     private static final String BYTES_OPTION = CHAR_FLAG_PREFIX + "b";
     private static final String DEFAULT_OPTION_ARG = String.valueOf(DEFAULT_LINES);
 
-    private static final String DEFAULT_DIRNAME = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "SplitApplicationTest";
+    private static final String DEFAULT_DIRNAME = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "SplitApplicationTest";
     private static final String TEST_FILENAME = "test.txt";
     private static final String NON_EXISTENT_FILE = "non-existent.txt";
     private static final String TEST_FOLDER = "folder";
@@ -72,13 +73,13 @@ class SplitApplicationTest {
     static void setUpBeforeAll() {
         testDir = new File(TEST_DIR);
         testDir.mkdir();
-        Environment.currentDirectory = TEST_DIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
         testDir.delete();
-        Environment.currentDirectory = DEFAULT_DIRNAME;
+        EnvironmentHelper.currentDirectory = DEFAULT_DIRNAME;
     }
 
     private String generateString(int lines) {
@@ -101,7 +102,7 @@ class SplitApplicationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        testFile = new File(TEST_DIR + File.separator + TEST_FILENAME);
+        testFile = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME);
         testFile.createNewFile();
         testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
         Files.createDirectory(testFolder);
@@ -237,7 +238,7 @@ class SplitApplicationTest {
         testStream = generateStream(expectedContent);
         String[] args = {LINES_OPTION, "1", "-"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File file = new File(TEST_DIR + File.separator + XAA);
+        File file = new File(TEST_DIR + STRING_FILE_SEP + XAA);
         assertTrue(file.exists());
         String actualContent = new String(Files.readAllBytes(file.toPath()));
         assertEquals(expectedContent, actualContent);
@@ -249,8 +250,8 @@ class SplitApplicationTest {
         testStream = generateStream(testContent);
         String[] args = {LINES_OPTION, "1"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XZZ);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XZZ);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
     }
@@ -260,8 +261,8 @@ class SplitApplicationTest {
         Files.writeString(testFile.toPath(), generateString(676));
         String[] args = {LINES_OPTION, "1", TEST_FILENAME, "prefix_"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File firstFile = new File(TEST_DIR + File.separator + "prefix_aa");
-        File lastFile = new File(TEST_DIR + File.separator + "prefix_zz");
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + "prefix_aa");
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + "prefix_zz");
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
     }
@@ -272,8 +273,8 @@ class SplitApplicationTest {
         testStream = generateStream(testContent);
         String[] args = {BYTES_OPTION, "1"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File firstFile = new File(TEST_DIR + File.separator + "xzaa");
-        File lastFile = new File(TEST_DIR + File.separator + "xzzaa");
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + "xzaa");
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + "xzzaa");
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
     }
@@ -284,8 +285,8 @@ class SplitApplicationTest {
         testStream = generateStream(expectedContent);
         String[] args = {};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File file = new File(TEST_DIR + File.separator + XAA);
-        File overflowFile = new File(TEST_DIR + File.separator + XAB);
+        File file = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAB);
         assertTrue(file.exists());
         assertFalse(overflowFile.exists());
         String actualContent = new String(Files.readAllBytes(file.toPath()));
@@ -298,8 +299,8 @@ class SplitApplicationTest {
         Files.writeString(testFile.toPath(), expectedContent);
         String[] args = {TEST_FILENAME};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File file = new File(TEST_DIR + File.separator + XAA);
-        File overflowFile = new File(TEST_DIR + File.separator + XAB);
+        File file = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAB);
         assertTrue(file.exists());
         assertFalse(overflowFile.exists());
         String actualContent = new String(Files.readAllBytes(file.toPath()));
@@ -311,9 +312,9 @@ class SplitApplicationTest {
         testStream = generateStream(generateString(1500));
         String[] args = {};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAB);
-        File overflowFile = new File(TEST_DIR + File.separator + XAC);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAB);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAC);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -331,9 +332,9 @@ class SplitApplicationTest {
         Files.writeString(testFile.toPath(), generateString(4000));
         String[] args = {TEST_FILENAME};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAD);
-        File overflowFile = new File(TEST_DIR + File.separator + XAE);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAD);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAE);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -349,9 +350,9 @@ class SplitApplicationTest {
     void splitStdinByLines_3LinesOption8LinesStdin_3Splits() throws Exception {
         testStream = generateStream(generateString(8));
         assertDoesNotThrow(() -> splitApp.splitStdinByLines(testStream, null, 3));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAC);
-        File overflowFile = new File(TEST_DIR + File.separator + XAD);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAC);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAD);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -367,9 +368,9 @@ class SplitApplicationTest {
     void splitFileByLines_20LinesOption100LinesFile_5Splits() throws Exception {
         Files.writeString(testFile.toPath(), generateString(100));
         assertDoesNotThrow(() -> splitApp.splitFileByLines(TEST_FILENAME, null, 20));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAE);
-        File overflowFile = new File(TEST_DIR + File.separator + XAF);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAE);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAF);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -386,9 +387,9 @@ class SplitApplicationTest {
         Files.writeString(testFile.toPath(), generateString(100));
         String[] args = {LINES_OPTION, "20", TEST_FILENAME};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAE);
-        File overflowFile = new File(TEST_DIR + File.separator + XAF);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAE);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAF);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -405,9 +406,9 @@ class SplitApplicationTest {
         byte[] testContent = generateBytes(46);
         testStream = generateStream(testContent);
         assertDoesNotThrow(() -> splitApp.splitStdinByBytes(testStream, null, "16"));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAC);
-        File overflowFile = new File(TEST_DIR + File.separator + XAD);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAC);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAD);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -424,9 +425,9 @@ class SplitApplicationTest {
         byte[] testContent = generateBytes(16);
         Files.write(testFile.toPath(), testContent);
         assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME, null, "8"));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAB);
-        File overflowFile = new File(TEST_DIR + File.separator + XAC);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAB);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAC);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -443,9 +444,9 @@ class SplitApplicationTest {
         byte[] testContent = generateBytes(16384);
         testStream = generateStream(testContent);
         assertDoesNotThrow(() -> splitApp.splitStdinByBytes(testStream, null, "16b"));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAB);
-        File overflowFile = new File(TEST_DIR + File.separator + XAC);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAB);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAC);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -462,9 +463,9 @@ class SplitApplicationTest {
         byte[] testContent = generateBytes(8000);
         Files.write(testFile.toPath(), testContent);
         assertDoesNotThrow(() -> splitApp.splitFileByBytes(TEST_FILENAME, null, "2k"));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAD);
-        File overflowFile = new File(TEST_DIR + File.separator + XAE);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAD);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAE);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -481,9 +482,9 @@ class SplitApplicationTest {
         byte[] testContent = generateBytes(2000000);
         testStream = generateStream(testContent);
         assertDoesNotThrow(() -> splitApp.splitStdinByBytes(testStream, null, "1m"));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAB);
-        File overflowFile = new File(TEST_DIR + File.separator + XAC);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAB);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAC);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());
@@ -517,9 +518,9 @@ class SplitApplicationTest {
         testStream = generateStream(testContent);
         String[] args = {BYTES_OPTION, "1m"};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
-        File firstFile = new File(TEST_DIR + File.separator + XAA);
-        File lastFile = new File(TEST_DIR + File.separator + XAB);
-        File overflowFile = new File(TEST_DIR + File.separator + XAC);
+        File firstFile = new File(TEST_DIR + STRING_FILE_SEP + XAA);
+        File lastFile = new File(TEST_DIR + STRING_FILE_SEP + XAB);
+        File overflowFile = new File(TEST_DIR + STRING_FILE_SEP + XAC);
         assertTrue(firstFile.exists());
         assertTrue(lastFile.exists());
         assertFalse(overflowFile.exists());

@@ -2,10 +2,11 @@ package sg.edu.nus.comp.cs4218.impl.result;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 
@@ -18,10 +19,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 
 class LsResultTest {
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "GrepResultTest";
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "GrepResultTest";
     private static final String FILE_NAME_1 = "test.txt";
     private static final String FILE_NAME_2 = "readme.md";
     private static final String FILE_NAME_3 = "unknown";
@@ -59,7 +60,7 @@ class LsResultTest {
     void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
-        new LsResult("").outputError();
+        new LsResult(STRING_EMPTY).outputError();
 
         assertEquals(STRING_EMPTY, getErrOutput());
     }

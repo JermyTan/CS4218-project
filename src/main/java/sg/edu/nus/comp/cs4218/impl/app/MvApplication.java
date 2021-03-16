@@ -8,6 +8,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 
 import java.io.File;
 import java.io.IOException;
@@ -135,7 +136,7 @@ public class MvApplication implements MvInterface {
         }
 
         for (String fileName : fileNames) {
-            String destFile = destFolder + File.separator + new File(fileName).getName();
+            String destFile = destFolder + STRING_FILE_SEP + new File(fileName).getName();
             mvSrcFileToDestFile(fileName, destFile);
         }
 

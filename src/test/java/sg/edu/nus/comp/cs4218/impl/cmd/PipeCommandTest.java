@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,7 +27,6 @@ import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class PipeCommandTest {
 
     private final InputStream stdin = mock(InputStream.class);
@@ -62,7 +62,7 @@ class PipeCommandTest {
     @Test
     public void evaluate_TwoCallCommands_CommandsExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = spy(new CallCommand(List.of("echo", "abc"), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command1 = spy(new CallCommand(List.of("echo", STRING_SINGLE_WORD), new ApplicationRunner(), new ArgumentResolver()));
             CallCommand command2 = mock(CallCommand.class);
 
             PipeCommand command = new PipeCommand(List.of(command1, command2));
@@ -77,9 +77,9 @@ class PipeCommandTest {
 
             List<String> input = IOUtils.getLinesFromInputStream(command2Stdin.getValue());
 
-            // Check that data ("abc") written to the stdout of command1 is fed into the stdin of command2
+            // Check that data is written to the stdout of command1 is fed into the stdin of command2
             assertEquals(1, input.size());
-            assertEquals("abc", input.get(0));
+            assertEquals(STRING_SINGLE_WORD, input.get(0));
         });
     }
 
@@ -120,7 +120,7 @@ class PipeCommandTest {
     @Test
     public void terminate_BeforeEvaluate_DoesNothing() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = spy(new CallCommand(List.of("echo", "abc"), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command1 = spy(new CallCommand(List.of("echo", STRING_SINGLE_WORD), new ApplicationRunner(), new ArgumentResolver()));
             CallCommand command2 = mock(CallCommand.class);
 
             PipeCommand command = new PipeCommand(List.of(command1, command2));
@@ -137,16 +137,16 @@ class PipeCommandTest {
 
             List<String> input = IOUtils.getLinesFromInputStream(command2Stdin.getValue());
 
-            // Check that data ("abc") written to the stdout of command1 is fed into the stdin of command2
+            // Check that data is written to the stdout of command1 is fed into the stdin of command2
             assertEquals(1, input.size());
-            assertEquals("abc", input.get(0));
+            assertEquals(STRING_SINGLE_WORD, input.get(0));
         });
     }
 
     @Test
     public void getCallCommands_NonEmptyCallCommandList_ReturnsNonEmptyCallCommandList() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = spy(new CallCommand(List.of("echo", "abc"), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command1 = spy(new CallCommand(List.of("echo", STRING_SINGLE_WORD), new ApplicationRunner(), new ArgumentResolver()));
             CallCommand command2 = mock(CallCommand.class);
 
             List<CallCommand> callCommandList = List.of(command1, command2);

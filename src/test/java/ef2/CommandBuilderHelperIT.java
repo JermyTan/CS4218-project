@@ -13,14 +13,14 @@ import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.CommandBuilder;
+import sg.edu.nus.comp.cs4218.impl.util.CommandBuilderHelper;
 
 @Disabled
-public class CommandBuilderIT {
+public class CommandBuilderHelperIT {
     @Test
     void parseCommand_SequenceCommandString_SequenceCommand() {
         assertDoesNotThrow(() -> {
-            Command command = CommandBuilder.parseCommand("echo hello world ; cat -n file", new ApplicationRunner());
+            Command command = CommandBuilderHelper.parseCommand("echo hello world ; cat -n file", new ApplicationRunner());
             assertEquals(SequenceCommand.class, command.getClass());
 
             List<Command> otherCommands = ((SequenceCommand) command).getCommands();
@@ -38,7 +38,7 @@ public class CommandBuilderIT {
     @Test
     void parseCommand_SequenceAndPipeCommandString_SequenceCommand() {
         assertDoesNotThrow(() -> {
-            Command command = CommandBuilder.parseCommand("echo hello world| grep he ; cat -n file", new ApplicationRunner());
+            Command command = CommandBuilderHelper.parseCommand("echo hello world| grep he ; cat -n file", new ApplicationRunner());
             assertEquals(SequenceCommand.class, command.getClass());
 
             List<Command> otherCommands = ((SequenceCommand) command).getCommands();

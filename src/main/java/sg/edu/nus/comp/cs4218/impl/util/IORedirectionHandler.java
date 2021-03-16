@@ -7,7 +7,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -19,7 +19,7 @@ public class IORedirectionHandler {
     private final ArgumentResolver argumentResolver;
     private final InputStream origInputStream;
     private final OutputStream origOutputStream;
-    private List<String> noRedirArgsList;
+    private List<String> noRedirArgsList = new ArrayList<>();
     private InputStream inputStream;
     private OutputStream outputStream;
 
@@ -33,13 +33,12 @@ public class IORedirectionHandler {
         this.argumentResolver = argumentResolver;
     }
 
-    @SuppressWarnings("PMD.ExcessiveMethodLength")
-    public void extractRedirOptions() throws AbstractApplicationException, ShellException {
+    public void extractRedirOptions() throws AbstractApplicationException, ShellException { //NOPMD
         if (argsList == null || argsList.isEmpty()) {
             throw new ShellException(ERR_SYNTAX);
         }
 
-        noRedirArgsList = new LinkedList<>();
+        noRedirArgsList = new ArrayList<>();
 
         // extract redirection operators (with their corresponding files) from argsList
         ListIterator<String> argsIterator = argsList.listIterator();

@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,10 +32,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class GrepApplicationTest {
 
     private static final String INSENSITIVE_LETTER = "i";
@@ -43,14 +44,13 @@ class GrepApplicationTest {
     private static final String COUNT_FLAG = CHAR_FLAG_PREFIX + COUNT_LETTER;
     private static final String FILENAME_FLAG = CHAR_FLAG_PREFIX + FILENAME_LETTER;
 
-    private static final String DEFAULT_DIRNAME = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "GrepApplicationTest";
+    private static final String DEFAULT_DIRNAME = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "GrepApplicationTest";
     private static final String TEST_FILENAME = "bsd1.txt";
     private static final String TEST_FILENAME_2 = "bsd2.txt";
     private static final String NON_EXISTENT_FILE = "non-existent.txt";
     private static final String TEST_FOLDER = "folder";
 
-    private static final String NEW_LINE_CHAR = System.getProperty("line.separator");
     private static final String TEST_LINE_1 = "Copyright (c) The Regents of the University of California.";
     private static final String TEST_LINE_2 = "All rights reserved.";
     private static final String TEST_LINE_3 = "Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:";
@@ -67,19 +67,20 @@ class GrepApplicationTest {
             "LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY " +
             "OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF " +
             "SUCH DAMAGE.";
+    private static final String TEST_LINE_7 = "the above copyright notice, this list of conditions and the following disclaimer";
     private static final String TEST_STRING = new StringBuilder()
             .append(TEST_LINE_1)
-            .append(NEW_LINE_CHAR)
+            .append(STRING_NEWLINE)
             .append(TEST_LINE_2)
-            .append(NEW_LINE_CHAR + NEW_LINE_CHAR)
+            .append(STRING_NEWLINE + STRING_NEWLINE)
             .append(TEST_LINE_3)
-            .append(NEW_LINE_CHAR)
+            .append(STRING_NEWLINE)
             .append(TEST_LINE_4)
-            .append(NEW_LINE_CHAR)
+            .append(STRING_NEWLINE)
             .append(TEST_LINE_5)
-            .append(NEW_LINE_CHAR + NEW_LINE_CHAR)
+            .append(STRING_NEWLINE + STRING_NEWLINE)
             .append(TEST_LINE_6)
-            .append(NEW_LINE_CHAR)
+            .append(STRING_NEWLINE)
             .toString();
 
     private static File testDir;
@@ -95,12 +96,12 @@ class GrepApplicationTest {
     static void setUpBeforeAll() throws IOException {
         testDir = new File(TEST_DIR);
         testDir.mkdir();
-        Environment.currentDirectory = TEST_DIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
 
-        testFile = new File(TEST_DIR + File.separator + TEST_FILENAME);
+        testFile = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME);
         testFile.createNewFile();
         Files.writeString(testFile.toPath(), TEST_STRING);
-        testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
+        testFile2 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), TEST_STRING);
         testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
@@ -113,7 +114,7 @@ class GrepApplicationTest {
         testFile2.delete();
         Files.delete(testFolder);
 
-        Environment.currentDirectory = DEFAULT_DIRNAME;
+        EnvironmentHelper.currentDirectory = DEFAULT_DIRNAME;
         testDir.delete();
     }
 
@@ -147,13 +148,13 @@ class GrepApplicationTest {
 
     @Test
     void run_SingleArgNullInputStream_ThrowsException() {
-        String[] args = {"test"};
+        String[] args = {};
         assertThrows(GrepException.class, () -> grepApp.run(args, null, testOutputStream));
     }
 
     @Test
     void run_SingleArgNullOutputStream_ThrowsException() {
-        String[] args = {"test"};
+        String[] args = {STRING_SINGLE_WORD};
         assertThrows(GrepException.class, () -> grepApp.run(args, testInputStream, null));
     }
 
@@ -190,7 +191,7 @@ class GrepApplicationTest {
     void grepFromStdin_NullStdin_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromStdin("test", false, false, false, null)
+                () -> grepApp.grepFromStdin(STRING_SINGLE_WORD, false, false, false, null)
         );
     }
 
@@ -198,15 +199,15 @@ class GrepApplicationTest {
     void grepFromStdin_NullFlags_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromStdin("test", null, false, false, testInputStream)
+                () -> grepApp.grepFromStdin(STRING_SINGLE_WORD, null, false, false, testInputStream)
         );
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromStdin("test", false, null, false, testInputStream)
+                () -> grepApp.grepFromStdin(STRING_SINGLE_WORD, false, null, false, testInputStream)
         );
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromStdin("test", false, false, null, testInputStream)
+                () -> grepApp.grepFromStdin(STRING_SINGLE_WORD, false, false, null, testInputStream)
         );
     }
 
@@ -238,7 +239,7 @@ class GrepApplicationTest {
 
     @Test
     void grepFromStdin_FindPhraseWithCountFlag_ReturnsCount() {
-        String output = assertDoesNotThrow(() -> grepApp.grepFromStdin("the above copyright notice, this list of conditions and the following disclaimer", false, true, false, testInputStream));
+        String output = assertDoesNotThrow(() -> grepApp.grepFromStdin(TEST_LINE_7, false, true, false, testInputStream));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(1, result.size());
         assertEquals("2", result.get(0));
@@ -246,7 +247,7 @@ class GrepApplicationTest {
 
     @Test
     void grepFromStdin_FindPhraseWithFilenameFlag_ReturnsFilenameAndLines() {
-        String output = assertDoesNotThrow(() -> grepApp.grepFromStdin("the above copyright notice, this list of conditions and the following disclaimer", false, false, true, testInputStream));
+        String output = assertDoesNotThrow(() -> grepApp.grepFromStdin(TEST_LINE_7, false, false, true, testInputStream));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(2, result.size());
         assertEquals("(standard input): " + TEST_LINE_4, result.get(0));
@@ -257,7 +258,7 @@ class GrepApplicationTest {
     void grepFromFiles_EmptyFileNames_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFiles("test", false, false, false)
+                () -> grepApp.grepFromFiles(STRING_SINGLE_WORD, false, false, false)
         );
     }
 
@@ -265,7 +266,7 @@ class GrepApplicationTest {
     void grepFromFiles_NullFileNames_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFiles("test", false, false, false, (String[]) null)
+                () -> grepApp.grepFromFiles(STRING_SINGLE_WORD, false, false, false, (String[]) null)
         );
     }
 
@@ -273,7 +274,7 @@ class GrepApplicationTest {
     void grepFromFiles_FileNamesContainNull_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFiles("test", false, false, false, TEST_FILENAME, null)
+                () -> grepApp.grepFromFiles(STRING_SINGLE_WORD, false, false, false, TEST_FILENAME, null)
         );
     }
 
@@ -282,7 +283,7 @@ class GrepApplicationTest {
         captureErr();
 
         assertDoesNotThrow(() -> {
-            grepApp.grepFromFiles("test", false, false, false, NON_EXISTENT_FILE);
+            grepApp.grepFromFiles(STRING_SINGLE_WORD, false, false, false, NON_EXISTENT_FILE);
 
             assertEquals(new GrepException(
                             String.format(STRING_LABEL_VALUE_PAIR, NON_EXISTENT_FILE, ERR_FILE_NOT_FOUND)
@@ -296,7 +297,7 @@ class GrepApplicationTest {
         captureErr();
 
         assertDoesNotThrow(() -> {
-            grepApp.grepFromFiles("test", false, false, false, TEST_FOLDER);
+            grepApp.grepFromFiles(STRING_SINGLE_WORD, false, false, false, TEST_FOLDER);
 
             assertEquals(new GrepException(
                             String.format(STRING_LABEL_VALUE_PAIR, TEST_FOLDER, ERR_IS_DIR)
@@ -317,15 +318,15 @@ class GrepApplicationTest {
     void grepFromFiles_NullFlags_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFiles("test", null, false, false, TEST_FILENAME)
+                () -> grepApp.grepFromFiles(STRING_SINGLE_WORD, null, false, false, TEST_FILENAME)
         );
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFiles("test", false, null, false, TEST_FILENAME)
+                () -> grepApp.grepFromFiles(STRING_SINGLE_WORD, false, null, false, TEST_FILENAME)
         );
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFiles("test", false, false, null, TEST_FILENAME)
+                () -> grepApp.grepFromFiles(STRING_SINGLE_WORD, false, false, null, TEST_FILENAME)
         );
     }
 
@@ -348,7 +349,7 @@ class GrepApplicationTest {
     void grepFromFiles_OneFileFindPhrase_ReturnsLines() {
         String output = assertDoesNotThrow(
                 () -> grepApp.grepFromFiles(
-                        "the above copyright notice, this list of conditions and the following disclaimer",//NOPMD
+                        TEST_LINE_7,
                         false,
                         false,
                         false,
@@ -380,7 +381,7 @@ class GrepApplicationTest {
 
     @Test
     void grepFromFiles_MultipleFilesFindPhraseWithFilenameFlag_ReturnsFilenamesAndLines() {
-        String output = assertDoesNotThrow(() -> grepApp.grepFromFiles("the above copyright notice, this list of conditions and the following disclaimer", false, false, true, TEST_FILENAME, TEST_FILENAME_2));
+        String output = assertDoesNotThrow(() -> grepApp.grepFromFiles(TEST_LINE_7, false, false, true, TEST_FILENAME, TEST_FILENAME_2));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(4, result.size());
         assertEquals(TEST_FILENAME + ": " + TEST_LINE_4, result.get(0));
@@ -393,7 +394,7 @@ class GrepApplicationTest {
     void grepFromFileAndStdin_NullStdin_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFileAndStdin("test", false, false, false, null, TEST_FILENAME)
+                () -> grepApp.grepFromFileAndStdin(STRING_SINGLE_WORD, false, false, false, null, TEST_FILENAME)
         );
     }
 
@@ -401,7 +402,7 @@ class GrepApplicationTest {
     void grepFromFileAndStdin_EmptyFileNames_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFileAndStdin("test", false, false, false, testInputStream)
+                () -> grepApp.grepFromFileAndStdin(STRING_SINGLE_WORD, false, false, false, testInputStream)
         );
     }
 
@@ -409,7 +410,7 @@ class GrepApplicationTest {
     void grepFromFileAndStdin_NullFileNames_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFileAndStdin("test", false, false, false, testInputStream, (String[]) null)
+                () -> grepApp.grepFromFileAndStdin(STRING_SINGLE_WORD, false, false, false, testInputStream, (String[]) null)
         );
     }
 
@@ -417,7 +418,7 @@ class GrepApplicationTest {
     void grepFromFileAndStdin_FileNamesContainNull_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFileAndStdin("test", false, false, false, testInputStream, TEST_FILENAME, null)
+                () -> grepApp.grepFromFileAndStdin(STRING_SINGLE_WORD, false, false, false, testInputStream, TEST_FILENAME, null)
         );
     }
 
@@ -433,15 +434,15 @@ class GrepApplicationTest {
     void grepFromFileAndStdin_NullFlags_ThrowsException() {
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFileAndStdin("test", null, false, false, testInputStream, TEST_FILENAME)
+                () -> grepApp.grepFromFileAndStdin(STRING_SINGLE_WORD, null, false, false, testInputStream, TEST_FILENAME)
         );
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFileAndStdin("test", false, null, false, testInputStream, TEST_FILENAME)
+                () -> grepApp.grepFromFileAndStdin(STRING_SINGLE_WORD, false, null, false, testInputStream, TEST_FILENAME)
         );
         assertThrows(
                 GrepException.class,
-                () -> grepApp.grepFromFileAndStdin("test", false, false, null, testInputStream, TEST_FILENAME)
+                () -> grepApp.grepFromFileAndStdin(STRING_SINGLE_WORD, false, false, null, testInputStream, TEST_FILENAME)
         );
     }
 

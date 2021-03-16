@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
@@ -28,7 +29,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 
 class WcApplicationTest {
@@ -41,8 +42,8 @@ class WcApplicationTest {
     private static final String WORDS_FLAG = CHAR_FLAG_PREFIX + WORDS_LETTER;
     private static final String REGEX = "\\s+";
 
-    private static final String DEFAULT_DIRNAME = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "WcApplicationTest";
+    private static final String DEFAULT_DIRNAME = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "WcApplicationTest";
     private static final String TEST_FILENAME_1 = "test1.txt";
     private static final String TEST_FILENAME_2 = "test2.txt";
     private static final String TEST_FILENAME_3 = "test3.txt";
@@ -61,13 +62,13 @@ class WcApplicationTest {
     static void setUpBeforeAll() {
         testDir = new File(TEST_DIR);
         testDir.mkdir();
-        Environment.currentDirectory = TEST_DIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
         testDir.delete();
-        Environment.currentDirectory = DEFAULT_DIRNAME;
+        EnvironmentHelper.currentDirectory = DEFAULT_DIRNAME;
     }
 
     private void captureErr() {
@@ -212,17 +213,17 @@ class WcApplicationTest {
     @Test
     void run_MultipleFilesWordsFlag_CountsWords() throws Exception {
         int testLines1 = 2;
-        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
+        File testFile1 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_1);
         testFile1.createNewFile();
         Files.writeString(testFile1.toPath(), generateString(testLines1));
 
         int testLines2 = 4;
-        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
+        File testFile2 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), generateString(testLines2));
 
         int testLines3 = 6;
-        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
+        File testFile3 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_3);
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
@@ -294,7 +295,7 @@ class WcApplicationTest {
     @Test
     void countFromFiles_OneFileLinesWords_CountsLinesWords() throws Exception {
         int testLines = 10;
-        File testFile = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
+        File testFile = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_1);
         testFile.createNewFile();
         Files.writeString(testFile.toPath(), generateString(testLines));
 
@@ -310,17 +311,17 @@ class WcApplicationTest {
     @Test
     void countFromFiles_MultipleFiles_CountsLinesWordsBytes() throws Exception {
         int testLines1 = 2;
-        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
+        File testFile1 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_1);
         testFile1.createNewFile();
         Files.writeString(testFile1.toPath(), generateString(testLines1));
 
         int testLines2 = 4;
-        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
+        File testFile2 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), generateString(testLines2));
 
         int testLines3 = 6;
-        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
+        File testFile3 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_3);
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
@@ -359,17 +360,17 @@ class WcApplicationTest {
     @Test
     void countFromFiles_MultipleFilesWordsFlag_CountsWords() throws Exception {
         int testLines1 = 2;
-        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
+        File testFile1 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_1);
         testFile1.createNewFile();
         Files.writeString(testFile1.toPath(), generateString(testLines1));
 
         int testLines2 = 4;
-        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
+        File testFile2 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), generateString(testLines2));
 
         int testLines3 = 6;
-        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
+        File testFile3 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_3);
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 
@@ -447,17 +448,17 @@ class WcApplicationTest {
     @Test
     void countFromFileAndStdin_MultipleFiles_CountsLinesWordsBytes() throws Exception {
         int testLines1 = 2;
-        File testFile1 = new File(TEST_DIR + File.separator + TEST_FILENAME_1);
+        File testFile1 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_1);
         testFile1.createNewFile();
         Files.writeString(testFile1.toPath(), generateString(testLines1));
 
         int testLines2 = 4;
-        File testFile2 = new File(TEST_DIR + File.separator + TEST_FILENAME_2);
+        File testFile2 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), generateString(testLines2));
 
         int testLines3 = 6;
-        File testFile3 = new File(TEST_DIR + File.separator + TEST_FILENAME_3);
+        File testFile3 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_3);
         testFile3.createNewFile();
         Files.writeString(testFile3.toPath(), generateString(testLines3));
 

@@ -2,9 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.result;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE;
 
@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 class CatResultTest {
     private OutputStream stderr;
@@ -46,7 +48,7 @@ class CatResultTest {
     void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
-        new CatResult("").outputError();
+        new CatResult(STRING_EMPTY).outputError();
 
         assertEquals(STRING_EMPTY, getErrOutput());
     }

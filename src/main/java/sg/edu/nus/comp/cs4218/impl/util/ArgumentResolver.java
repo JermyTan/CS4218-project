@@ -10,7 +10,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -20,7 +20,6 @@ import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
-@SuppressWarnings("PMD.ExcessiveMethodLength")
 public class ArgumentResolver {
 
     private final ApplicationRunner applicationRunner;
@@ -41,7 +40,7 @@ public class ArgumentResolver {
      * @throws ShellException If any of the arguments have an invalid syntax.
      */
     public List<String> parseArguments(List<String> argsList) throws AbstractApplicationException, ShellException {
-        List<String> parsedArgsList = new LinkedList<>();
+        List<String> parsedArgsList = new ArrayList<>();
         for (String arg : argsList) {
             parsedArgsList.addAll(resolveOneArgument(arg));
         }
@@ -59,9 +58,9 @@ public class ArgumentResolver {
      * @param arg String containing one argument.
      * @return A list containing one or more parsed args, depending on the outcome of the parsing.
      */
-    public List<String> resolveOneArgument(String arg) throws AbstractApplicationException, ShellException {
+    public List<String> resolveOneArgument(String arg) throws AbstractApplicationException, ShellException { //NOPMD
         Stack<Character> unmatchedQuotes = new Stack<>();
-        LinkedList<RegexArgument> parsedArgsSegment = new LinkedList<>();
+        ArrayList<RegexArgument> parsedArgsSegment = new ArrayList<>();
         RegexArgument parsedArg = makeRegexArgument();
         StringBuilder subCommand = new StringBuilder();
 
@@ -176,7 +175,7 @@ public class ArgumentResolver {
         }
 
         OutputStream outputStream = new ByteArrayOutputStream();
-        Command command = CommandBuilder.parseCommand(commandString, getAppRunner());
+        Command command = CommandBuilderHelper.parseCommand(commandString, getAppRunner());
         command.evaluate(System.in, outputStream);
 
         // replace newlines with spaces
@@ -187,12 +186,12 @@ public class ArgumentResolver {
      * Append current parsedArg to the last parsedArg in parsedArgsSegment.
      * If parsedArgsSegment is empty, then just add current parsedArg.
      */
-    private void appendParsedArgIntoSegment(LinkedList<RegexArgument> parsedArgsSegment,
+    private void appendParsedArgIntoSegment(List<RegexArgument> parsedArgsSegment,
                                             RegexArgument parsedArg) {
         if (parsedArgsSegment.isEmpty()) {
             parsedArgsSegment.add(parsedArg);
         } else {
-            RegexArgument lastParsedArg = parsedArgsSegment.removeLast();
+            RegexArgument lastParsedArg = parsedArgsSegment.remove(parsedArgsSegment.size()-1);
             parsedArgsSegment.add(lastParsedArg);
             lastParsedArg.merge(parsedArg);
         }

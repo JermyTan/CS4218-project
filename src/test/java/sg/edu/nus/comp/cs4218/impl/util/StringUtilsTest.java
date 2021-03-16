@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_CUSTOM_EXT_FILE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_JPG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_MD;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_TXT;
@@ -29,8 +29,12 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class StringUtilsTest {
+    private final static String TXT_EXT = "txt";
+    private final static String JPG_EXT = "jpg";
+    private final static String MD_EXT = "md";
+    private final static String CUSTOM_EXT = "CusTom";
+    private final static String UNICODE_EXT = "😈🌚";
 
     @Test
     void getFileExtension_NullString_ReturnsEmptyString() {
@@ -59,15 +63,15 @@ class StringUtilsTest {
         );
 
         List<String> expectedExts = List.of(
-                "txt",
-                "txt",
-                "txt",
-                "jpg",
-                "md",
-                "CusTom",
-                "txt",
-                "txt",
-                "😈🌚"
+                TXT_EXT,
+                TXT_EXT,
+                TXT_EXT,
+                JPG_EXT,
+                MD_EXT,
+                CUSTOM_EXT,
+                TXT_EXT,
+                TXT_EXT,
+                UNICODE_EXT
         );
 
         IntStream.range(0, stringsWithExt.size())

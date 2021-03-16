@@ -8,6 +8,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.IOUtils.getLinesFromInputStream;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
@@ -35,13 +37,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.exception.TeeException;
 
 class TeeApplicationTest {
 
-    private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TEST_DIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "TeeApplicationTest";
+    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "TeeApplicationTest";
 
     private static final String INPUT_1 = "hello world";
     private static final String INPUT_2 = "hello world" + STRING_NEWLINE + "How are you";
@@ -72,12 +74,12 @@ class TeeApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TEST_DIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        Environment.currentDirectory = ORIGINAL_DIR;
+        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
     }
 
     private void createFileWithContent(Path path, String content) throws IOException {
@@ -87,15 +89,13 @@ class TeeApplicationTest {
         outputStream.close();
     }
 
-    private String readFromFile(Path path) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(path.toString())); //NOPMD
-        List<String> result = new ArrayList<>();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            result.add(line);
+    private String readFromFile(Path path) {
+        try {
+            List<String> result = getLinesFromInputStream(Files.newInputStream(path));
+            return String.join(STRING_NEWLINE, result);
+        } catch (Exception e) {
+            return e.getMessage();
         }
-        reader.close();
-        return String.join(STRING_NEWLINE, result);
     }
 
     @BeforeEach

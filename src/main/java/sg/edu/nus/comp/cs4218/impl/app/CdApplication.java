@@ -11,7 +11,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.app.CdInterface;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
@@ -70,6 +70,6 @@ public class CdApplication implements CdInterface {
 
     @Override
     public void changeToDirectory(String path) throws CdException {
-        Environment.currentDirectory = getNormalizedAbsolutePath(path);
+        EnvironmentHelper.currentDirectory = getNormalizedAbsolutePath(path);
     }
 }

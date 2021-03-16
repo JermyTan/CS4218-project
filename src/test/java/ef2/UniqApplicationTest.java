@@ -1,19 +1,24 @@
 package ef2;
 
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.spy;
+import static sg.edu.nus.comp.cs4218.impl.util.IOUtils.getLinesFromInputStream;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +26,6 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,25 +36,36 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 @Disabled
 public class UniqApplicationTest {
+    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
+    private static final String TEST_DIR = String.join(STRING_FILE_SEP,
+            EnvironmentHelper.currentDirectory,
+            RESOURCES_PATH,
+            "UniqApplicationTest");
 
-    private static final String ORIGINAL_DIR = Environment.currentDirectory;
-    private static final String TESTDIR = Environment.currentDirectory + File.separator + RESOURCES_PATH + File.separator + "UniqApplicationTest";
-
-    private static final String INPUT_1 = "Hello World" + STRING_NEWLINE + "Hello World"
-            + "Alice" + STRING_NEWLINE + "Alice" + STRING_NEWLINE
-            + "Bob" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob";
-    private static final String INPUT_2 = "AAA" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "CCC";
-    private static final String INPUT_3 = "AAA" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "BBB"
-            + STRING_NEWLINE + "AAA" + STRING_NEWLINE + "AAA";
-
-    private static final String INPUT_EMPTY = "";
+    private static final String INPUT_1 = String.join(STRING_NEWLINE,
+            STRING_MULTI_WORDS,
+            STRING_MULTI_WORDS,
+            STRING_SINGLE_WORD,
+            STRING_SINGLE_WORD,
+            STRING_UNICODE,
+            STRING_SINGLE_WORD,
+            STRING_UNICODE);
+    private static final String INPUT_2 = String.join(STRING_NEWLINE,
+            STRING_SINGLE_WORD,
+            STRING_MULTI_WORDS,
+            STRING_UNICODE);
+    private static final String INPUT_3 = String.join(STRING_NEWLINE,
+            STRING_SINGLE_WORD,
+            STRING_MULTI_WORDS,
+            STRING_MULTI_WORDS,
+            STRING_SINGLE_WORD,
+            STRING_SINGLE_WORD);
 
     private static final String INPUT_FILE_1 = "in1.txt";
     private static final String INPUT_FILE_2 = "in2.txt";
@@ -61,14 +76,14 @@ public class UniqApplicationTest {
     private static final String OUTPUT_FILE_2 = "out2.txt";
     private static final String OUTPUT_FILE_3 = "out3.txt"; // does not exist
 
-    private final Path in1 = Paths.get(TESTDIR, INPUT_FILE_1);
-    private final Path in2 = Paths.get(TESTDIR, INPUT_FILE_2);
-    private final Path in3 = Paths.get(TESTDIR, INPUT_FILE_3);
-    private final Path in4 = Paths.get(TESTDIR, INPUT_FILE_4);
+    private final Path in1 = Paths.get(TEST_DIR, INPUT_FILE_1);
+    private final Path in2 = Paths.get(TEST_DIR, INPUT_FILE_2);
+    private final Path in3 = Paths.get(TEST_DIR, INPUT_FILE_3);
+    private final Path in4 = Paths.get(TEST_DIR, INPUT_FILE_4);
 
-    private final Path out1 = Paths.get(TESTDIR, OUTPUT_FILE_1);
-    private final Path out2 = Paths.get(TESTDIR, OUTPUT_FILE_2);
-    private final Path out3 = Paths.get(TESTDIR, OUTPUT_FILE_3);
+    private final Path out1 = Paths.get(TEST_DIR, OUTPUT_FILE_1);
+    private final Path out2 = Paths.get(TEST_DIR, OUTPUT_FILE_2);
+    private final Path out3 = Paths.get(TEST_DIR, OUTPUT_FILE_3);
 
 
     private final List<Path> paths = List.of(in1, in2, in3, in4, out1, out2, out3);
@@ -78,12 +93,12 @@ public class UniqApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        Environment.currentDirectory = TESTDIR;
+        EnvironmentHelper.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        Environment.currentDirectory = ORIGINAL_DIR;
+        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
     }
 
     private void createFileWithContent(Path path, String content) throws IOException {
@@ -93,15 +108,9 @@ public class UniqApplicationTest {
         outputStream.close();
     }
 
-    private String readFromFile(String path) {
+    private String readFromFile(Path path) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(path));//NOPMD
-            String line;
-            List<String> result = new ArrayList<>();
-            while ((line = reader.readLine()) != null) {
-                result.add(line);
-            }
-            reader.close();
+            List<String> result = getLinesFromInputStream(Files.newInputStream(path));
             return String.join(STRING_NEWLINE, result);
         } catch (Exception e) {
             return e.getMessage();
@@ -150,131 +159,194 @@ public class UniqApplicationTest {
     }
 
     @Test
-    public void uniqFromFile_NoFlag_RemovesAdjacentDup() throws AbstractApplicationException {
-        String result1 = app.uniqFromFile(false, false, false, INPUT_FILE_1, OUTPUT_FILE_1);
-        String expected1 = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob" + STRING_NEWLINE + "Alice"
-                + STRING_NEWLINE + "Bob" + STRING_NEWLINE;
+    public void uniqFromFile_NoFlag_RemovesAdjacentDup() {
+        assertDoesNotThrow(() -> {
+            String result1 = app.uniqFromFile(false, false, false, INPUT_FILE_1, OUTPUT_FILE_1);
+            String expected1 = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE);
 
-        String result2 = app.uniqFromFile(false, false, false, INPUT_FILE_2, OUTPUT_FILE_2);
-        String expected2 = "AAA" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "CCC" + STRING_NEWLINE;
+            String result2 = app.uniqFromFile(false, false, false, INPUT_FILE_2, OUTPUT_FILE_2);
+            String expected2 = String.join(STRING_NEWLINE,
+                    STRING_SINGLE_WORD,
+                    STRING_MULTI_WORDS,
+                    STRING_UNICODE);
 
-        String result3 = app.uniqFromFile(false, false, false, INPUT_FILE_3, OUTPUT_FILE_3);
-        String expected3 = "AAA" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "AAA" + STRING_NEWLINE;
+            String result3 = app.uniqFromFile(false, false, false, INPUT_FILE_3, OUTPUT_FILE_3);
+            String expected3 = String.join(STRING_NEWLINE,
+                    STRING_SINGLE_WORD,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD);
 
-        assertEquals(expected1, result1);
-        assertEquals(expected2, result2);
-        assertEquals(expected3, result3);
+            assertEquals(expected1, result1);
+            assertEquals(expected2, result2);
+            assertEquals(expected3, result3);
 
-        assertEquals(expected1, readFromFile(OUTPUT_FILE_1));
-        assertEquals(expected2, readFromFile(OUTPUT_FILE_2));
-        assertEquals(expected3, readFromFile(OUTPUT_FILE_3));
+            assertEquals(expected1, readFromFile(out1));
+            assertEquals(expected2, readFromFile(out2));
+            assertEquals(expected3, readFromFile(out3));
+        });
     }
 
     @Test
-    public void uniqFromFile_NoFlagNoOutputFile_WriteToStdout() throws AbstractApplicationException {
-        String result1 = app.uniqFromFile(false, false, false, INPUT_FILE_1, null);
-        String expected1 = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob" + STRING_NEWLINE + "Alice"
-                + STRING_NEWLINE + "Bob" + STRING_NEWLINE;
+    public void uniqFromFile_NoFlagNoOutputFile_WriteToStdout() {
+        assertDoesNotThrow(() -> {
+            String result = app.uniqFromFile(false, false, false, INPUT_FILE_1, null);
+            String expected = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE);
 
-        assertEquals(expected1, result1);
-        assertEquals(expected1, STD_OUTPUT.toString());
-
+            assertEquals(expected, result);
+            assertEquals(expected, STD_OUTPUT.toString());
+        });
     }
 
     @Test
-    public void uniqFromFile_IsCount_RemovesAdjacentDupWithPrefix() throws AbstractApplicationException {
-        String result1 = app.uniqFromFile(true, false, false, INPUT_FILE_1, OUTPUT_FILE_1);
-        String expected1 = "2 Hello World" + STRING_NEWLINE + "2 Alice" + STRING_NEWLINE + "1 Bob" + STRING_NEWLINE + "1 Alice"
-                + STRING_NEWLINE + "1 Bob" + STRING_NEWLINE;
+    public void uniqFromFile_IsCount_RemovesAdjacentDupWithPrefix() {
+        assertDoesNotThrow(() -> {
+            String result1 = app.uniqFromFile(true, false, false, INPUT_FILE_1, OUTPUT_FILE_1);
+            String expected1 = String.join(STRING_NEWLINE,
+                    "2 " + STRING_MULTI_WORDS,
+                    "2 " + STRING_SINGLE_WORD,
+                    "1 " + STRING_UNICODE,
+                    "1 " + STRING_SINGLE_WORD,
+                    "1 " + STRING_UNICODE);
 
-        String result2 = app.uniqFromFile(true, false, false, INPUT_FILE_2, OUTPUT_FILE_2);
-        String expected2 = "1 AAA" + STRING_NEWLINE + "1 BBB" + STRING_NEWLINE + "1 CCC" + STRING_NEWLINE;
+            String result2 = app.uniqFromFile(true, false, false, INPUT_FILE_2, OUTPUT_FILE_2);
+            String expected2 = String.join(STRING_NEWLINE,
+                    "1 " + STRING_SINGLE_WORD,
+                    "1 " + STRING_MULTI_WORDS,
+                    "1 " + STRING_UNICODE);
 
-        String result3 = app.uniqFromFile(true, false, false, INPUT_FILE_3, OUTPUT_FILE_3);
-        String expected3 = "1 AAA" + STRING_NEWLINE + "2 BBB" + STRING_NEWLINE + "2 AAA" + STRING_NEWLINE;
+            String result3 = app.uniqFromFile(true, false, false, INPUT_FILE_3, OUTPUT_FILE_3);
+            String expected3 = String.join(STRING_NEWLINE,
+                    "1 " + STRING_SINGLE_WORD,
+                    "2 " + STRING_MULTI_WORDS,
+                    "2 " + STRING_SINGLE_WORD);
 
-        assertEquals(expected1, result1);
-        assertEquals(expected2, result2);
-        assertEquals(expected3, result3);
+            assertEquals(expected1, result1);
+            assertEquals(expected2, result2);
+            assertEquals(expected3, result3);
 
-        assertEquals(expected1, readFromFile(OUTPUT_FILE_1));
-        assertEquals(expected2, readFromFile(OUTPUT_FILE_2));
-        assertEquals(expected3, readFromFile(OUTPUT_FILE_3));
+            assertEquals(expected1, readFromFile(out1));
+            assertEquals(expected2, readFromFile(out2));
+            assertEquals(expected3, readFromFile(out3));
+        });
     }
 
     @Test
-    public void uniqFromFile_IsRepeated_DisplaysOnlyDup() throws AbstractApplicationException {
-        String result1 = app.uniqFromFile(false, true, false, INPUT_FILE_1, OUTPUT_FILE_1);
-        String expected1 = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE;
+    public void uniqFromFile_IsRepeated_DisplaysOnlyDup() {
+        assertDoesNotThrow(() -> {
+            String result1 = app.uniqFromFile(false, true, false, INPUT_FILE_1, OUTPUT_FILE_1);
+            String expected1 = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD);
 
-        String result2 = app.uniqFromFile(false, true, false, INPUT_FILE_2, OUTPUT_FILE_2);
+            String result2 = app.uniqFromFile(false, true, false, INPUT_FILE_2, OUTPUT_FILE_2);
+            String expected2 = STRING_EMPTY;
 
-        String result3 = app.uniqFromFile(false, true, false, INPUT_FILE_3, OUTPUT_FILE_3);
-        String expected3 = "BBB" + STRING_NEWLINE + "AAA" + STRING_NEWLINE;
+            String result3 = app.uniqFromFile(false, true, false, INPUT_FILE_3, OUTPUT_FILE_3);
+            String expected3 = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD);
 
-        assertEquals(expected1, result1);
-        assertEquals(STRING_NEWLINE, result2);
-        assertEquals(expected3, result3);
+            assertEquals(expected1, result1);
+            assertEquals(expected2, result2);
+            assertEquals(expected3, result3);
 
-        assertEquals(expected1, readFromFile(OUTPUT_FILE_1));
-        assertEquals(STRING_NEWLINE, readFromFile(OUTPUT_FILE_2));
-        assertEquals(expected3, readFromFile(OUTPUT_FILE_3));
+            assertEquals(expected1, readFromFile(out1));
+            assertEquals(expected2, readFromFile(out2));
+            assertEquals(expected3, readFromFile(out3));
+        });
     }
 
     @Test
-    public void uniqFromFile_IsRepeatedAndIsAllRepeated_DisplaysAllDup() throws AbstractApplicationException {
-        String result1 = app.uniqFromFile(false, true, true, INPUT_FILE_1, OUTPUT_FILE_1);
-        String expected1 = "Hello World" + STRING_NEWLINE + "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE
-                + "Alice" + STRING_NEWLINE;
-        String result2 = app.uniqFromFile(false, true, true, INPUT_FILE_2, OUTPUT_FILE_2);
-        String result3 = app.uniqFromFile(false, true, true, INPUT_FILE_3, OUTPUT_FILE_3);
-        String expected3 = "BBB" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "AAA" + STRING_NEWLINE
-                + "AAA" + STRING_NEWLINE;
+    public void uniqFromFile_IsRepeatedAndIsAllRepeated_DisplaysAllDup() {
+        assertDoesNotThrow(() -> {
+            String result1 = app.uniqFromFile(false, true, true, INPUT_FILE_1, OUTPUT_FILE_1);
+            String expected1 = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_SINGLE_WORD);
 
-        assertEquals(expected1, result1);
-        assertEquals(STRING_NEWLINE, result2);
-        assertEquals(expected3, result3);
+            String result2 = app.uniqFromFile(false, true, true, INPUT_FILE_2, OUTPUT_FILE_2);
+            String expected2 = STRING_EMPTY;
 
-        assertEquals(expected1, readFromFile(OUTPUT_FILE_1));
-        assertEquals(STRING_NEWLINE, readFromFile(OUTPUT_FILE_2));
-        assertEquals(expected3, readFromFile(OUTPUT_FILE_3));
+            String result3 = app.uniqFromFile(false, true, true, INPUT_FILE_3, OUTPUT_FILE_3);
+            String expected3 = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_SINGLE_WORD);
 
+            assertEquals(expected1, result1);
+            assertEquals(expected2, result2);
+            assertEquals(expected3, result3);
+
+            assertEquals(expected1, readFromFile(out1));
+            assertEquals(expected2, readFromFile(out2));
+            assertEquals(expected3, readFromFile(out3));
+        });
     }
 
     @Test
-    public void uniqFromFile_IsAllRepeated_DisplaysAllDup() throws AbstractApplicationException {
+    public void uniqFromFile_IsAllRepeated_DisplaysAllDup() {
+        assertDoesNotThrow(() -> {
+            String result1 = app.uniqFromFile(false, false, true, INPUT_FILE_1, OUTPUT_FILE_1);
+            String expected1 = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_SINGLE_WORD);
 
-        String expected1 = "Hello World" + STRING_NEWLINE + "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE
-                + "Alice" + STRING_NEWLINE;
-        String expected3 = "BBB" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "AAA" + STRING_NEWLINE
-                + "AAA" + STRING_NEWLINE;
+            String result2 = app.uniqFromFile(false, false, true, INPUT_FILE_2, OUTPUT_FILE_2);
+            String expected2 = STRING_EMPTY;
 
-        String result1 = app.uniqFromFile(false, false, true, INPUT_FILE_1, OUTPUT_FILE_1);
-        String result2 = app.uniqFromFile(false, false, true, INPUT_FILE_2, OUTPUT_FILE_2);
-        String result3 = app.uniqFromFile(false, false, true, INPUT_FILE_3, OUTPUT_FILE_3);
+            String result3 = app.uniqFromFile(false, false, true, INPUT_FILE_3, OUTPUT_FILE_3);
+            String expected3 = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_SINGLE_WORD);
 
-        assertEquals(expected1, result1);
-        assertEquals(STRING_NEWLINE, result2);
-        assertEquals(expected3, result3);
 
-        assertEquals(expected1, readFromFile(OUTPUT_FILE_1));
-        assertEquals(STRING_NEWLINE, readFromFile(OUTPUT_FILE_2));
-        assertEquals(expected3, readFromFile(OUTPUT_FILE_3));
+            assertEquals(expected1, result1);
+            assertEquals(expected2, result2);
+            assertEquals(expected3, result3);
+
+            assertEquals(expected1, readFromFile(out1));
+            assertEquals(expected2, readFromFile(out2));
+            assertEquals(expected3, readFromFile(out3));
+        });
     }
 
     @Test
-    public void uniqFromFile_IsCountAndIsRepeated_DisplaysOnlyDupWithPrefix() throws AbstractApplicationException {
-        String result1 = app.uniqFromFile(true, true, false, INPUT_FILE_1, OUTPUT_FILE_1);
-        String expected1 = "2 Hello World" + STRING_NEWLINE + "2 Alice" + STRING_NEWLINE;
+    public void uniqFromFile_IsCountAndIsRepeated_DisplaysOnlyDupWithPrefix() {
+        assertDoesNotThrow(() -> {
+            String result1 = app.uniqFromFile(true, true, false, INPUT_FILE_1, OUTPUT_FILE_1);
+            String expected1 = String.join(STRING_NEWLINE,
+                    "2 " + STRING_MULTI_WORDS,
+                    "2 " + STRING_SINGLE_WORD);
 
-        String result2 = app.uniqFromFile(true, true, false, INPUT_FILE_2, OUTPUT_FILE_1);
+            String result2 = app.uniqFromFile(true, true, false, INPUT_FILE_2, OUTPUT_FILE_1);
+            String expected2 = STRING_EMPTY;
 
-        String result3 = app.uniqFromFile(true, true, false, INPUT_FILE_3, OUTPUT_FILE_1);
-        String expected3 = "2 BBB" + STRING_NEWLINE + "2 AAA" + STRING_NEWLINE;
+            String result3 = app.uniqFromFile(true, true, false, INPUT_FILE_3, OUTPUT_FILE_1);
+            String expected3 = String.join(STRING_NEWLINE,
+                    "2 " + STRING_MULTI_WORDS,
+                    "2 " + STRING_SINGLE_WORD);
 
-        assertEquals(expected1, result1);
-        assertEquals(STRING_NEWLINE, result2);
-        assertEquals(expected3, result3);
+            assertEquals(expected1, result1);
+            assertEquals(expected2, result2);
+            assertEquals(expected3, result3);
+        });
     }
 
     @Test
@@ -295,37 +367,56 @@ public class UniqApplicationTest {
     }
 
     @Test
-    public void uniqFromStdin_NoFlag_RemovesAdjacentDup() throws AbstractApplicationException {
-        inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
-        String result1 = app.uniqFromStdin(false, false, false, inputStream, OUTPUT_FILE_1);
-        String expected1 = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob" + STRING_NEWLINE + "Alice"
-                + STRING_NEWLINE + "Bob" + STRING_NEWLINE;
+    public void uniqFromStdin_NoFlag_RemovesAdjacentDup() {
+        assertDoesNotThrow(() -> {
+            inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
+            String result1 = app.uniqFromStdin(false, false, false, inputStream, OUTPUT_FILE_1);
+            String expected1 = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE);
 
-        inputStream = new ByteArrayInputStream(INPUT_2.getBytes());
-        String result2 = app.uniqFromStdin(false, false, false, inputStream, OUTPUT_FILE_2);
-        String expected2 = "AAA" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "CCC" + STRING_NEWLINE;
+            inputStream = new ByteArrayInputStream(INPUT_2.getBytes());
+            String result2 = app.uniqFromStdin(false, false, false, inputStream, OUTPUT_FILE_2);
+            String expected2 = String.join(STRING_NEWLINE,
+                    STRING_SINGLE_WORD,
+                    STRING_MULTI_WORDS,
+                    STRING_UNICODE);
 
-        inputStream = new ByteArrayInputStream(INPUT_3.getBytes());
-        String result3 = app.uniqFromStdin(false, false, false, inputStream, OUTPUT_FILE_3);
-        String expected3 = "AAA" + STRING_NEWLINE + "BBB" + STRING_NEWLINE + "AAA" + STRING_NEWLINE;
+            inputStream = new ByteArrayInputStream(INPUT_3.getBytes());
+            String result3 = app.uniqFromStdin(false, false, false, inputStream, OUTPUT_FILE_3);
+            String expected3 = String.join(STRING_NEWLINE,
+                    STRING_SINGLE_WORD,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD);
 
-        assertEquals(expected1, result1);
-        assertEquals(expected2, result2);
-        assertEquals(expected3, result3);
+            assertEquals(expected1, result1);
+            assertEquals(expected2, result2);
+            assertEquals(expected3, result3);
 
-        assertEquals(expected1, readFromFile(OUTPUT_FILE_1));
-        assertEquals(expected2, readFromFile(OUTPUT_FILE_2));
-        assertEquals(expected3, readFromFile(OUTPUT_FILE_3));
+            assertEquals(expected1, readFromFile(out1));
+            assertEquals(expected2, readFromFile(out2));
+            assertEquals(expected3, readFromFile(out3));
+        });
     }
 
     @Test
-    public void uniqFromStdin_NoOutputFile_ShouldWriteToStdout() throws AbstractApplicationException {
-        inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
-        String result = app.uniqFromStdin(true, false, true, inputStream, null);
-        String expected1 = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob" + STRING_NEWLINE + "Alice"
-                + STRING_NEWLINE + "Bob" + STRING_NEWLINE;
+    public void uniqFromStdin_NoFlagNoOutputFile_ShouldWriteToStdout() {
+        assertDoesNotThrow(() -> {
+            inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
+            String result = app.uniqFromStdin(false, false, false, inputStream, null);
+            String expected = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE);
 
-        assertEquals(expected1, STD_OUTPUT.toString());
+            assertEquals(expected, result);
+            assertEquals(expected, STD_OUTPUT.toString());
+        });
     }
 
     @Test
@@ -344,82 +435,126 @@ public class UniqApplicationTest {
     }
 
     @Test
-    public void run_NoFlagReadAndWriteToFile_RemovesAdjacentDup() throws AbstractApplicationException {
-        app.run(new String[]{INPUT_FILE_1, OUTPUT_FILE_1}, System.in, System.out);
-        String expected = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob" + STRING_NEWLINE + "Alice"
-                + STRING_NEWLINE + "Bob" + STRING_NEWLINE;
+    public void run_NoFlagReadAndWriteToFile_RemovesAdjacentDup() {
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{INPUT_FILE_1, OUTPUT_FILE_1}, System.in, System.out);
+            String expected = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE);
 
-        assertNotEquals(expected, STD_OUTPUT.toString());
-        assertEquals(expected, readFromFile(OUTPUT_FILE_1));
+            assertNotEquals(expected, STD_OUTPUT.toString());
+            assertEquals(expected, readFromFile(out1));
+        });
     }
 
     @Test
-    public void run_NoFlagWriteToStdout_RemovesAdjacentDup() throws AbstractApplicationException {
-        app.run(new String[]{INPUT_FILE_1}, System.in, System.out);
-        String expected = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob" + STRING_NEWLINE + "Alice"
-                + STRING_NEWLINE + "Bob" + STRING_NEWLINE;
+    public void run_NoFlagWriteToStdout_RemovesAdjacentDup() {
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{INPUT_FILE_1}, System.in, System.out);
+            String expected = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE);
 
-        assertEquals(expected, STD_OUTPUT.toString());
+            assertEquals(expected, STD_OUTPUT.toString());
+        });
     }
 
     @Test
-    public void run_NoFlagAndOutputFilenameIsDash_RemovesAdjacentDup() throws AbstractApplicationException {
-        app.run(new String[]{INPUT_FILE_1, "-"}, System.in, System.out);
-        String expected = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE + "Bob" + STRING_NEWLINE + "Alice"
-                + STRING_NEWLINE + "Bob" + STRING_NEWLINE;
+    public void run_NoFlagAndOutputFilenameIsDash_RemovesAdjacentDup() {
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{INPUT_FILE_1, "-"}, System.in, System.out);
+            String expected = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE,
+                    STRING_SINGLE_WORD,
+                    STRING_UNICODE);
 
-        assertEquals(expected, STD_OUTPUT.toString());
+            assertEquals(expected, STD_OUTPUT.toString());
+        });
     }
 
     @Test
-    public void run_IsCountWriteToStdout_RemovesAdjacentDupWithPrefix() throws AbstractApplicationException {
-        app.run(new String[]{INPUT_FILE_1, "-c"}, System.in, System.out);
-        String expected = "2 Hello World" + STRING_NEWLINE + "2 Alice" + STRING_NEWLINE + "1 Bob" + STRING_NEWLINE + "1 Alice"
-                + STRING_NEWLINE + "1 Bob" + STRING_NEWLINE;
+    public void run_IsCountWriteToStdout_RemovesAdjacentDupWithPrefix() {
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{INPUT_FILE_1, "-c"}, System.in, System.out);
+            String expected = String.join(STRING_NEWLINE,
+                    "2 " + STRING_MULTI_WORDS,
+                    "2 " + STRING_SINGLE_WORD,
+                    "1 " + STRING_UNICODE,
+                    "1 " + STRING_SINGLE_WORD,
+                    "1 " + STRING_UNICODE);
 
-        assertEquals(expected, STD_OUTPUT.toString());
+            assertEquals(expected, STD_OUTPUT.toString());
+        });
     }
 
     @Test
-    public void run_IsRepeatedWriteToStdout_DisplaysOnlyDup() throws AbstractApplicationException {
-        app.run(new String[]{INPUT_FILE_1, "-d"}, System.in, System.out);
-        String expected = "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE;
+    public void run_IsRepeatedWriteToStdout_DisplaysOnlyDup() {
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{INPUT_FILE_1, "-d"}, System.in, System.out);
+            String expected = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD);
 
-        assertEquals(expected, STD_OUTPUT.toString());
+            assertEquals(expected, STD_OUTPUT.toString());
+        });
     }
 
     @Test
-    public void run_IsAllRepeatedWriteToStdout_DisplaysAllDup() throws AbstractApplicationException {
-        app.run(new String[]{INPUT_FILE_1, "-D"}, System.in, System.out);
-        String expected = "Hello World" + STRING_NEWLINE + "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE
-                + "Alice" + STRING_NEWLINE;
+    public void run_IsAllRepeatedWriteToStdout_DisplaysAllDup() {
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{INPUT_FILE_1, "-D"}, System.in, System.out);
+            String expected = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_SINGLE_WORD);
 
-        assertEquals(expected, STD_OUTPUT.toString());
+            assertEquals(expected, STD_OUTPUT.toString());
+        });
     }
 
     @Test
-    public void run_IsRepeatedAndIsCountWriteToStdout_DisplaysOnlyDupWithPrefix() throws AbstractApplicationException {
-        app.run(new String[]{INPUT_FILE_1, "-d", "-c"}, System.in, System.out);
-        String expected = "2 Hello World" + STRING_NEWLINE + "2 Alice" + STRING_NEWLINE;
+    public void run_IsRepeatedAndIsCountWriteToStdout_DisplaysOnlyDupWithPrefix() {
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{INPUT_FILE_1, "-d", "-c"}, System.in, System.out);
+            String expected = String.join(STRING_NEWLINE,
+                    "2 " + STRING_MULTI_WORDS,
+                    "2 " + STRING_SINGLE_WORD);
 
-        assertEquals(expected, STD_OUTPUT.toString());
+            assertEquals(expected, STD_OUTPUT.toString());
+        });
     }
 
     @Test
-    public void run_IsRepeatedAndIsAllRepeatedWriteToStdout_DisplaysOnlyDupWithPrefix() throws AbstractApplicationException {
-        app.run(new String[]{INPUT_FILE_1, "-d", "-D"}, System.in, System.out);
-        String expected = "Hello World" + STRING_NEWLINE + "Hello World" + STRING_NEWLINE + "Alice" + STRING_NEWLINE
-                + "Alice" + STRING_NEWLINE;
+    public void run_IsRepeatedAndIsAllRepeatedWriteToStdout_DisplaysOnlyDupWithPrefix() {
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{INPUT_FILE_1, "-d", "-D"}, System.in, System.out);
+            String expected = String.join(STRING_NEWLINE,
+                    STRING_MULTI_WORDS,
+                    STRING_MULTI_WORDS,
+                    STRING_SINGLE_WORD,
+                    STRING_SINGLE_WORD);
 
-        assertEquals(expected, STD_OUTPUT.toString());
+            assertEquals(expected, STD_OUTPUT.toString());
+        });
     }
 
     @Test
-    public void run_ReadFromStdinBlank_DisplaysBlank() throws AbstractApplicationException {
-        inputStream = new ByteArrayInputStream(INPUT_EMPTY.getBytes());
-        app.run(new String[]{}, inputStream, System.out);
+    public void run_ReadFromStdinBlank_DisplaysBlank() {
+        assertDoesNotThrow(() -> {
+            inputStream = new ByteArrayInputStream(STRING_EMPTY.getBytes());
+            app.run(new String[]{}, inputStream, System.out);
 
-        assertEquals(STRING_NEWLINE, STD_OUTPUT.toString());
+            assertEquals(STRING_EMPTY, STD_OUTPUT.toString());
+        });
     }
 
 }

@@ -1,11 +1,12 @@
 package sg.edu.nus.comp.cs4218.testutil;
 
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+
 import java.util.List;
 
 public final class TestConstants {
     public static final String STRING_SINGLE_WORD = "Test";
     public static final String STRING_MULTI_WORDS = "This is a   test string";
-    public static final String STRING_EMPTY = "";
     public static final String STRING_BLANK = "     ";
     public static final String STRING_LEADING_TRAILING_SPACES = "   Test  string  ";
     public static final String STRING_UNICODE = " Test 💩🌚😊👍🏻风和日丽 ";

@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.Command;
@@ -30,7 +30,7 @@ public class SequenceCommand implements Command {
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException {
         ExitException exitException = null;
-        List<String> outputLines = new LinkedList<>();
+        List<String> outputLines = new ArrayList<>();
 
         for (Command command : commands) {
             try {

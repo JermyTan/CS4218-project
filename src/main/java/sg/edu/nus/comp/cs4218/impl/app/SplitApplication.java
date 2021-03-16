@@ -8,6 +8,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.BufferedReader;
@@ -25,7 +26,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 import sg.edu.nus.comp.cs4218.app.SplitInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
@@ -178,7 +179,7 @@ public class SplitApplication implements SplitInterface {
                     if (writer != null) {
                         writer.close();
                     }
-                    String fileName = Environment.currentDirectory + File.separator + validPrefix + generateSuffix(linesRead / linesPerFile + 1);
+                    String fileName = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + validPrefix + generateSuffix(linesRead / linesPerFile + 1);
                     writer = new PrintWriter(fileName, StandardCharsets.UTF_8);
                 }
                 writer.println(line);
@@ -216,7 +217,7 @@ public class SplitApplication implements SplitInterface {
             int pieceNo = 1;
             int bytesRead;
             while ((bytesRead = stdin.read(buffer, 0, numOfBytesPerFile)) != -1) {
-                String fileName = Environment.currentDirectory + File.separator + validPrefix + generateSuffix(pieceNo);
+                String fileName = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + validPrefix + generateSuffix(pieceNo);
                 FileOutputStream outputStream = new FileOutputStream(fileName);//NOPMD
                 outputStream.write(buffer, 0, bytesRead);
                 outputStream.close();

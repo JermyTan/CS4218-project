@@ -2,16 +2,17 @@ package sg.edu.nus.comp.cs4218.impl.util;
 
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.EnvironmentHelper;
 
 @SuppressWarnings("PMD.AvoidStringBufferField")
 public final class RegexArgument {
@@ -37,7 +38,7 @@ public final class RegexArgument {
 
     public void appendAsterisk() {
         plaintext.append(CHAR_ASTERISK);
-        regex.append(String.format("%s%s%s", "[^", File.separator, "]*"));
+        regex.append(String.format("%s%s%s", "[^", STRING_FILE_SEP, "]*"));
         isRegex = true;
     }
 
@@ -53,7 +54,7 @@ public final class RegexArgument {
     }
 
     public List<String> globFiles() {
-        List<String> globbedFiles = new LinkedList<>();
+        List<String> globbedFiles = new ArrayList<>();
 
         if (isRegex) {
             Pattern regexPattern = Pattern.compile(regex.toString());
@@ -63,7 +64,7 @@ public final class RegexArgument {
 
             String dir = STRING_EMPTY;
             for (int i = 0; i < tokens.length - 1; i++) {
-                dir += tokens[i] + File.separator;
+                dir += tokens[i] + STRING_FILE_SEP;
             }
 
             boolean isAbsolute = Paths.get(dir).isAbsolute();
@@ -71,7 +72,7 @@ public final class RegexArgument {
 
             File currentDir = Paths.get(dir).toFile();
             if (!isAbsolute) {
-                currentDir = Paths.get(Environment.currentDirectory, dir).normalize().toFile();
+                currentDir = Paths.get(EnvironmentHelper.currentDirectory, dir).normalize().toFile();
             }
 
             globbedFiles = traverseAndFilter(regexPattern, currentDir, isAbsolute, onlyDirectories);
@@ -108,10 +109,10 @@ public final class RegexArgument {
             File nextNode = new File(node, current);
             String match = isAbsolute
                     ? nextNode.getAbsolutePath()
-                    : nextNode.getAbsolutePath().substring(Environment.currentDirectory.length() + 1);
+                    : nextNode.getAbsolutePath().substring(EnvironmentHelper.currentDirectory.length() + 1);
             // TODO: Find a better way to handle this.
             if (onlyDirectories && nextNode.isDirectory()) {
-                match += File.separator;
+                match += STRING_FILE_SEP;
             }
             if (!nextNode.isHidden() && regexPattern.matcher(match).matches()) {
                 matches.add(nextNode.getAbsolutePath());
