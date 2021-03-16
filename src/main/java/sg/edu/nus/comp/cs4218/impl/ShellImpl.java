@@ -30,6 +30,14 @@ public class ShellImpl implements Shell {
                 String commandString;
 
                 try {
+                    try {
+                        // small delay to let system.err finish output to console
+                        Thread.sleep(200);
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                    }
+
+                    System.out.print("$ ");
                     commandString = reader.readLine();
                 } catch (IOException e) {
                     reader.close();
