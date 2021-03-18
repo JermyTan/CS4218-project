@@ -16,7 +16,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
@@ -135,7 +136,7 @@ class MvApplicationTest {
 
         assertDoesNotThrow(() -> app.run(new String[]{FILE_1, FILE_2}, stdin, stdout));
 
-        assertDoesNotThrow(() -> verify(app).mvSrcFileToDestFile(FILE_1, FILE_2));
+        assertDoesNotThrow(() -> verify(app).mvSrcFileToDestFile(true, FILE_1, FILE_2));
         verifyNoInteractions(stdin);
         verifyNoInteractions(stdout);
 
@@ -154,7 +155,7 @@ class MvApplicationTest {
 
         assertDoesNotThrow(() -> app.run(new String[]{FILE_1, FILE_3, FOLDER_3}, stdin, stdout));
 
-        assertDoesNotThrow(() -> verify(app).mvFilesToFolder(FOLDER_3, FILE_1, FILE_3));
+        assertDoesNotThrow(() -> verify(app).mvFilesToFolder(true, FOLDER_3, FILE_1, FILE_3));
         verifyNoInteractions(stdin);
         verifyNoInteractions(stdout);
 
@@ -170,6 +171,8 @@ class MvApplicationTest {
         assertDoesNotThrow(() -> app.run(new String[]{"-n", FILE_1, FILE_3}, stdin, stdout));
 
         assertDoesNotThrow(() -> {
+            verify(app).mvSrcFileToDestFile(false, FILE_1, FILE_3);
+
             String fileContent = new String(Files.readAllBytes(file3));
             assertEquals(FILE_3, fileContent);
         });
@@ -184,6 +187,8 @@ class MvApplicationTest {
         assertDoesNotThrow(() -> app.run(new String[]{"-n", FILE_1, FOLDER_1}, stdin, stdout));
 
         assertDoesNotThrow(() -> {
+            verify(app).mvFilesToFolder(false, FOLDER_1, FILE_1);
+
             String fileContent = new String(Files.readAllBytes(destPath));
             assertEquals(originalFileContent, fileContent);
         });
@@ -197,7 +202,10 @@ class MvApplicationTest {
         assertDoesNotThrow(() -> createFileWithContent(destPath, originalFileContent));
 
         // Move file1.txt and file3.txt to folder1
-        assertDoesNotThrow(() -> app.run(new String[]{"-n", FILE_1, FILE_3, FOLDER_1}, stdin, stdout));
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{"-n", FILE_1, FILE_3, FOLDER_1}, stdin, stdout);
+            verify(app).mvFilesToFolder(false, FOLDER_1, FILE_1, FILE_3);
+        });
 
         // Only file3.txt moved
         assertTrue(Files.exists(Paths.get(TEST_DIR, FOLDER_1, FILE_3)));
@@ -222,7 +230,7 @@ class MvApplicationTest {
         assertTrue(Files.exists(file1));
         assertTrue(Files.notExists(file2));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, FILE_2));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(true, FILE_1, FILE_2));
 
         assertTrue(Files.notExists(file1));
         assertTrue(Files.exists(file2));
@@ -235,7 +243,7 @@ class MvApplicationTest {
         assertTrue(Files.exists(file1));
         assertTrue(Files.notExists(destPath));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, Paths.get(FOLDER_1, FILE_1).toString()));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(true, FILE_1, Paths.get(FOLDER_1, FILE_1).toString()));
 
         assertTrue(Files.notExists(file1));
         assertTrue(Files.exists(destPath));
@@ -248,7 +256,7 @@ class MvApplicationTest {
         assertTrue(Files.exists(file1));
         assertTrue(Files.notExists(destPath));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, Paths.get(FOLDER_1, FILE_2).toString()));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(true, FILE_1, Paths.get(FOLDER_1, FILE_2).toString()));
 
         assertTrue(Files.notExists(file1));
         assertTrue(Files.exists(destPath));
@@ -259,7 +267,7 @@ class MvApplicationTest {
         assertTrue(Files.exists(file1));
         assertTrue(Files.exists(file3));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FILE_1, FILE_3));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(true, FILE_1, FILE_3));
 
         assertTrue(Files.notExists(file1));
         assertTrue(Files.exists(file3));
@@ -275,7 +283,7 @@ class MvApplicationTest {
         assertTrue(Files.exists(folder1));
         assertTrue(Files.notExists(folder2));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FOLDER_1, FOLDER_2));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(true, FOLDER_1, FOLDER_2));
 
         assertTrue(Files.notExists(folder1));
         assertTrue(Files.exists(folder2));
@@ -288,7 +296,7 @@ class MvApplicationTest {
         assertTrue(Files.exists(folder1));
         assertTrue(Files.notExists(destPath));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FOLDER_1, Paths.get(FOLDER_3, FOLDER_1).toString()));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(true, FOLDER_1, Paths.get(FOLDER_3, FOLDER_1).toString()));
 
         assertTrue(Files.notExists(folder1));
         assertTrue(Files.exists(destPath));
@@ -301,10 +309,16 @@ class MvApplicationTest {
         assertTrue(Files.exists(folder1));
         assertTrue(Files.notExists(destPath));
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(FOLDER_1, Paths.get(FOLDER_3, FOLDER_2).toString()));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(true, FOLDER_1, Paths.get(FOLDER_3, FOLDER_2).toString()));
 
         assertTrue(Files.notExists(folder1));
         assertTrue(Files.exists(destPath));
+    }
+
+    @Test
+    public void mvSrcFileToDestFile_NullIsOverwrite_ThrowsException() {
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(null, FILE_1, FILE_2));
+        assertEquals(ERR_NULL_ARGS, exception.getMessage());
     }
 
     @Test
@@ -313,7 +327,7 @@ class MvApplicationTest {
         String srcFile = FILE_2;
         String destFile = FILE_1;
 
-        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(true, srcFile, destFile));
         assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), exception.getMessage());
     }
 
@@ -323,7 +337,7 @@ class MvApplicationTest {
         String srcFile = FOLDER_2;
         String destFile = FOLDER_1;
 
-        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(true, srcFile, destFile));
         assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), exception.getMessage());
     }
 
@@ -332,7 +346,7 @@ class MvApplicationTest {
         String srcFile = FILE_1;
         String destFile = Paths.get(FOLDER_2, FILE_1).toString();
 
-        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(true, srcFile, destFile));
         assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), exception.getMessage());
     }
 
@@ -342,7 +356,7 @@ class MvApplicationTest {
         String srcFile = FOLDER_1;
         String destFile = FOLDER_3;
 
-        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(true, srcFile, destFile));
         assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_IS_DIR), exception.getMessage());
     }
 
@@ -352,7 +366,7 @@ class MvApplicationTest {
         String srcFile = FOLDER_1;
         String destFile = FILE_1;
 
-        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(true, srcFile, destFile));
         assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_IS_NOT_DIR), exception.getMessage());
     }
 
@@ -361,7 +375,7 @@ class MvApplicationTest {
         String srcFile = FOLDER_1;
         String destFile = Paths.get(FOLDER_1, FOLDER_2).toString();
 
-        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(true, srcFile, destFile));
         assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARGS), exception.getMessage());
     }
 
@@ -371,15 +385,39 @@ class MvApplicationTest {
         String destFile = Paths.get(FOLDER_1, FILE_1).toString();
         folder1.toFile().setWritable(false);
 
-        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(srcFile, destFile));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(true, srcFile, destFile));
         assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_CANNOT_RENAME), exception.getMessage());
+    }
+
+    @Test
+    public void mvFilesToFolder_NullIsOverwrite_ThrowsException() {
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(null, FOLDER_1, FILE_1));
+        assertEquals(ERR_NULL_ARGS, exception.getMessage());
+    }
+
+    @Test
+    public void mvFilesToFolder_NullFilenames_ThrowsException() {
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(true, FOLDER_1, (String[]) null));
+        assertEquals(ERR_NO_FILE_ARGS, exception.getMessage());
+    }
+
+    @Test
+    public void mvFilesToFolder_EmptyFilenames_ThrowsException() {
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(false, FOLDER_1));
+        assertEquals(ERR_NO_FILE_ARGS, exception.getMessage());
+    }
+
+    @Test
+    public void mvFilesToFolder_FilenamesContainNull_ThrowsException() {
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(false, FOLDER_1, FILE_1, null));
+        assertEquals(ERR_INVALID_FILES, exception.getMessage());
     }
 
     @Test
     public void mvFilesToFolder_DestFolderDoesNotExist_ThrowsException() {
         assertTrue(Files.notExists(folder2));
 
-        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_2, FILE_1));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(true, FOLDER_2, FILE_1));
         assertEquals(ERR_FILE_NOT_FOUND, exception.getMessage());
     }
 
@@ -387,19 +425,13 @@ class MvApplicationTest {
     public void mvFilesToFolder_DestFolderIsNotDirectory_ThrowsException() {
         assertFalse(Files.isDirectory(file1));
 
-        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(FILE_1, FILE_3));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(true, FILE_1, FILE_3));
         assertEquals(ERR_IS_NOT_DIR, exception.getMessage());
     }
 
     @Test
-    public void mvFilesToFolder_NoFileName_ThrowsException() {
-        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_1));
-        assertEquals(ERR_MISSING_ARG, exception.getMessage());
-    }
-
-    @Test
     public void mvFilesToFolder_FileDoesNotExist_ThrowsException() {
-        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(FOLDER_1, FILE_2));
+        Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(true, FOLDER_1, FILE_2));
         assertEquals(constructRenameErrorMsg(FILE_2, Paths.get(FOLDER_1, FILE_2).toString(), ERR_FILE_NOT_FOUND),
                 exception.getMessage());
     }
@@ -418,7 +450,7 @@ class MvApplicationTest {
         String destFile = Paths.get(FOLDER_1, FOLDER_2).toString();
 
         // Move folder1 to folder1/folder2
-        assertThrows(Exception.class, () -> app.mvFilesToFolder(destFile, srcFile));
+        assertThrows(Exception.class, () -> app.mvFilesToFolder(true, destFile, srcFile));
     }
 
     @Test
@@ -426,7 +458,7 @@ class MvApplicationTest {
         Path destPath = Paths.get(TEST_DIR, FOLDER_1, FILE_1);
         assertTrue(Files.notExists(destPath));
 
-        assertDoesNotThrow(() -> app.mvFilesToFolder(FOLDER_1, FILE_1));
+        assertDoesNotThrow(() -> app.mvFilesToFolder(true, FOLDER_1, FILE_1));
 
         assertTrue(Files.notExists(file1));
         assertTrue(Files.exists(destPath));
@@ -440,7 +472,7 @@ class MvApplicationTest {
         Path destPath2 = Paths.get(TEST_DIR, FOLDER_1, FILE_3);
         assertTrue(Files.notExists(destPath2));
 
-        assertDoesNotThrow(() -> app.mvFilesToFolder(FOLDER_1, FILE_1, FILE_3));
+        assertDoesNotThrow(() -> app.mvFilesToFolder(true, FOLDER_1, FILE_1, FILE_3));
 
         assertTrue(Files.notExists(file1));
         assertTrue(Files.notExists(file3));

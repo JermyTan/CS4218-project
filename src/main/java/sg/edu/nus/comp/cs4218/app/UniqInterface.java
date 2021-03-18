@@ -1,8 +1,8 @@
 package sg.edu.nus.comp.cs4218.app;
 
-import java.io.InputStream;
-
 import sg.edu.nus.comp.cs4218.Application;
+
+import java.io.InputStream;
 
 public interface UniqInterface extends Application {
 
@@ -27,6 +27,7 @@ public interface UniqInterface extends Application {
      * @param isRepeated    Boolean option to print only duplicate lines, one for each group
      * @param isAllRepeated Boolean option to print all duplicate lines (takes precedence if isRepeated is set to true)
      * @param stdin         InputStream containing arguments from Stdin
+     * @param outputFileName of path to output file (if any)
      * @return
      * @throws Exception
      */

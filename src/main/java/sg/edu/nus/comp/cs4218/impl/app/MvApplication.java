@@ -6,8 +6,10 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 
 import java.io.File;
@@ -23,6 +25,7 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public class MvApplication implements MvInterface {
@@ -37,7 +40,7 @@ public class MvApplication implements MvInterface {
             throw new MvException(e.getMessage(), e);
         }
 
-        boolean isNotOverwrite = parser.isNotOverwrite();
+        boolean isOverwrite = !parser.isNotOverwrite();
         String destFile = parser.getDestFile();
         String[] srcFiles = parser.getSrcFiles().toArray(String[]::new);
 
@@ -48,25 +51,10 @@ public class MvApplication implements MvInterface {
                 }
 
                 String srcFile = srcFiles[0];
-
-                Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
-                if (isNotOverwrite && Files.exists(destPath)) {
-                    return;
-                }
-
-                mvSrcFileToDestFile(srcFile, destFile);
+                mvSrcFileToDestFile(isOverwrite, srcFile, destFile);
 
             } else {
-                if (isNotOverwrite) {
-                    srcFiles = filterSrcFiles(destFile, srcFiles);
-
-                    // Return if srcFiles becomes empty after filtering
-                    if (srcFiles.length == 0) {
-                        return;
-                    }
-                }
-
-                mvFilesToFolder(destFile, srcFiles);
+                mvFilesToFolder(isOverwrite, destFile, srcFiles);
             }
 
         } catch (Exception e) {
@@ -75,7 +63,11 @@ public class MvApplication implements MvInterface {
     }
 
     @Override
-    public String mvSrcFileToDestFile(String srcFile, String destFile) throws Exception {
+    public String mvSrcFileToDestFile(Boolean isOverwrite, String srcFile, String destFile) throws Exception {
+        if (CollectionUtils.isAnyNull(isOverwrite, srcFile, destFile)) {
+            throw new Exception(ERR_NULL_ARGS);
+        }
+
         Path srcPath = IOUtils.resolveAbsoluteFilePath(srcFile);
         Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
 
@@ -107,6 +99,10 @@ public class MvApplication implements MvInterface {
             }
         }
 
+        if (!isOverwrite && Files.exists(destPath)) {
+            return null;
+        }
+
         try {
             Files.move(srcPath, destPath, REPLACE_EXISTING);
         } catch (IOException e) {
@@ -117,7 +113,28 @@ public class MvApplication implements MvInterface {
     }
 
     @Override
-    public String mvFilesToFolder(String destFolder, String... fileNames) throws Exception {
+    public String mvFilesToFolder(Boolean isOverwrite, String destFolder, String... fileNames) throws Exception {
+        if (isOverwrite == null || destFolder == null) {
+            throw new Exception(ERR_NULL_ARGS);
+        }
+
+        if (fileNames == null || fileNames.length == 0) {
+            throw new Exception(ERR_NO_FILE_ARGS);
+        }
+
+        if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
+            throw new Exception(ERR_INVALID_FILES);
+        }
+
+        if (!isOverwrite) {
+            fileNames = filterSrcFiles(destFolder, fileNames);
+
+            // Return if fileNames becomes empty after filtering
+            if (fileNames.length == 0) {
+                return null;
+            }
+        }
+
         Path destPath = IOUtils.resolveAbsoluteFilePath(destFolder);
 
         // `destFolder` must exist
@@ -130,14 +147,9 @@ public class MvApplication implements MvInterface {
             throw new Exception(ERR_IS_NOT_DIR);
         }
 
-        // There has to be at least one file
-        if (fileNames.length == 0) {
-            throw new Exception(ERR_MISSING_ARG);
-        }
-
         for (String fileName : fileNames) {
             String destFile = destFolder + STRING_FILE_SEP + new File(fileName).getName();
-            mvSrcFileToDestFile(fileName, destFile);
+            mvSrcFileToDestFile(isOverwrite, fileName, destFile);
         }
 
         return null;
