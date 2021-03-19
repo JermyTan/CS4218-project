@@ -11,6 +11,10 @@ public class ExitApplication implements ExitInterface {
 
     private final SystemExit systemExit;
 
+    public ExitApplication() {
+        this(new SystemExit());
+    }
+
     public ExitApplication(SystemExit systemExit) {
         this.systemExit = systemExit;
     }

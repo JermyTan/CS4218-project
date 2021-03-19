@@ -20,7 +20,6 @@ import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -30,13 +29,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 
 class CatApplicationTest {
-    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
+    private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = String.join(STRING_FILE_SEP,
-            EnvironmentHelper.currentDirectory,
+            EnvironmentUtil.currentDirectory,
             RESOURCES_PATH,
             "CatApplicationTest");
 
@@ -57,12 +56,12 @@ class CatApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
+        EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
     }
 
     private void captureErr() {

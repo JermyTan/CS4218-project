@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 public final class IOUtils {
@@ -107,7 +107,7 @@ public final class IOUtils {
         }
 
         try {
-            return Paths.get(EnvironmentHelper.currentDirectory).resolve(fileName).normalize();
+            return Paths.get(EnvironmentUtil.currentDirectory).resolve(fileName).normalize();
 
         } catch (InvalidPathException e) {
             throw new ShellException(ERR_INVALID_FILES, e);

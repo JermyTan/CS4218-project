@@ -18,24 +18,24 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class IOUtilsTest {
 
-    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
-    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "IOUtilsTest";
+    private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
+    private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "IOUtilsTest";
     private final static String TEST_TXT = "test.txt";
     private final static String NON_EXISTENT_TEXT = "test" + STRING_FILE_SEP + "test1.txt";
 
     @BeforeAll
     static void setupBeforeAll() {
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
+        EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
     }
 
     @Test

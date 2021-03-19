@@ -11,7 +11,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,14 +26,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class IORedirectionHandlerTest {
 
-    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
-    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "IORedirectionHandlerTest";
+    private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
+    private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "IORedirectionHandlerTest";
     private static final String FILE_1 = "file1.txt"; // exists
     private static final String FILE_2 = "file2.txt"; // exists
     private static final String FILE_3 = "file3.txt"; // does not exist
@@ -49,12 +48,12 @@ class IORedirectionHandlerTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
+        EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
     }
 
     private void buildRedirHandler(List<String> argsList) {

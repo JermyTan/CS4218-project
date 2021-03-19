@@ -19,12 +19,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 
 class RegexArgumentTest {
 
-    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
-    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "RegexArgumentTest";
+    private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
+    private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "RegexArgumentTest";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -38,12 +38,12 @@ class RegexArgumentTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
+        EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
     }
 
     private String resolveArg(String arg) {
@@ -155,7 +155,7 @@ class RegexArgumentTest {
 
     @Test
     public void globFiles_AbsolutePath_ReturnsGlobbedFilesSorted() {
-        regexArgument.merge(EnvironmentHelper.currentDirectory);
+        regexArgument.merge(EnvironmentUtil.currentDirectory);
         regexArgument.merge(STRING_FILE_SEP);
         regexArgument.merge("file");
         regexArgument.appendAsterisk();

@@ -34,6 +34,8 @@ public class ApplicationRunner {
     public final static String APP_MV = "mv";
     public final static String APP_TEE = "tee";
     public final static String APP_RM = "rm";
+    public final static String APP_UNIQ = "uniq";
+    public final static String APP_CP = "cp";
     public final static String SHELL = "shell";
 
     /**

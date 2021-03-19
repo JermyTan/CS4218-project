@@ -9,6 +9,9 @@
   Last updated 9 January 2021 (Replaced deprecated rulesets with its equivalent)
   </description>
 
+  <!-- Ignore provided tdd files -->
+  <exclude-pattern>.*/src/test/java/tdd/.*</exclude-pattern>
+
   <!-- Replacement for deprecated rulesets/java/basic.xml -->
   <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" />
   <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />

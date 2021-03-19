@@ -39,7 +39,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.SplitException;
 
 class SplitApplicationTest {
@@ -48,8 +48,8 @@ class SplitApplicationTest {
     private static final String BYTES_OPTION = CHAR_FLAG_PREFIX + "b";
     private static final String DEFAULT_OPTION_ARG = String.valueOf(DEFAULT_LINES);
 
-    private static final String DEFAULT_DIRNAME = EnvironmentHelper.currentDirectory;
-    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "SplitApplicationTest";
+    private static final String DEFAULT_DIRNAME = EnvironmentUtil.currentDirectory;
+    private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "SplitApplicationTest";
     private static final String TEST_FILENAME = "test.txt";
     private static final String NON_EXISTENT_FILE = "non-existent.txt";
     private static final String TEST_FOLDER = "folder";
@@ -73,13 +73,13 @@ class SplitApplicationTest {
     static void setUpBeforeAll() {
         testDir = new File(TEST_DIR);
         testDir.mkdir();
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
         testDir.delete();
-        EnvironmentHelper.currentDirectory = DEFAULT_DIRNAME;
+        EnvironmentUtil.currentDirectory = DEFAULT_DIRNAME;
     }
 
     private String generateString(int lines) {

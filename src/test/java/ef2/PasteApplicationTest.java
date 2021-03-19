@@ -9,7 +9,6 @@ import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -19,14 +18,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.impl.app.PasteApplication;
 
 @Disabled
 class PasteApplicationTest {
 
-    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
-    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "PasteApplicationTest";
+    private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
+    private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "PasteApplicationTest";
 
     private static final String FILE_1 = "file1.txt"; // exists
     private static final String FILE_2 = "file2.txt"; // exists
@@ -43,12 +42,12 @@ class PasteApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
+        EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
     }
 
     private void provideInput(String input) {

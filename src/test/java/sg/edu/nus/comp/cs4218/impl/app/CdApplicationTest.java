@@ -13,21 +13,19 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.File;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 
 class CdApplicationTest {
 
-    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
-    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "CdApplicationTest";
+    private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
+    private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "CdApplicationTest";
 
     private static final String FOLDER_1 = "folder1"; // exists
     private static final String FOLDER_2 = "folder2"; // does not exist
@@ -42,12 +40,12 @@ class CdApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
+        EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
     }
 
     @BeforeEach
@@ -57,14 +55,14 @@ class CdApplicationTest {
 
     @AfterEach
     void tearDown() {
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @Test
     void run_ExistingFolder_ShouldReturn() {
-        String oldDir = EnvironmentHelper.currentDirectory;
+        String oldDir = EnvironmentUtil.currentDirectory;
         assertDoesNotThrow(() -> app.run(ARGS_1, System.in, System.out));
-        String newDir = EnvironmentHelper.currentDirectory;
+        String newDir = EnvironmentUtil.currentDirectory;
 
         assertEquals(oldDir + STRING_FILE_SEP + FOLDER_1, newDir);
     }
@@ -89,17 +87,17 @@ class CdApplicationTest {
 
     @Test
     void changeToDirectory_ExistingFolder_ShouldReturn() {
-        String oldDir = EnvironmentHelper.currentDirectory;
+        String oldDir = EnvironmentUtil.currentDirectory;
         assertDoesNotThrow(() -> app.changeToDirectory(FOLDER_1));
-        String newDir = EnvironmentHelper.currentDirectory;
+        String newDir = EnvironmentUtil.currentDirectory;
         assertEquals(oldDir + STRING_FILE_SEP + FOLDER_1, newDir);
     }
 
     @Test
     void changeToDirectory_MultiLevelFolder_ShouldReturn() {
-        String oldDir = EnvironmentHelper.currentDirectory;
+        String oldDir = EnvironmentUtil.currentDirectory;
         assertDoesNotThrow(() -> app.changeToDirectory(FOLDER_3));
-        String newDir = EnvironmentHelper.currentDirectory;
+        String newDir = EnvironmentUtil.currentDirectory;
         assertEquals(oldDir + STRING_FILE_SEP + FOLDER_3, newDir);
     }
 

@@ -36,15 +36,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 
 @Disabled
 public class UniqApplicationTest {
-    private static final String ORIGINAL_DIR = EnvironmentHelper.currentDirectory;
+    private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = String.join(STRING_FILE_SEP,
-            EnvironmentHelper.currentDirectory,
+            EnvironmentUtil.currentDirectory,
             RESOURCES_PATH,
             "UniqApplicationTest");
 
@@ -93,12 +92,12 @@ public class UniqApplicationTest {
 
     @BeforeAll
     static void setupBeforeAll() {
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        EnvironmentHelper.currentDirectory = ORIGINAL_DIR;
+        EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
     }
 
     private void createFileWithContent(Path path, String content) throws IOException {

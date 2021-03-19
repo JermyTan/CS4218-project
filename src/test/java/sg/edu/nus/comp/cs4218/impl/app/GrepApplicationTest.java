@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
 class GrepApplicationTest {
@@ -44,8 +44,8 @@ class GrepApplicationTest {
     private static final String COUNT_FLAG = CHAR_FLAG_PREFIX + COUNT_LETTER;
     private static final String FILENAME_FLAG = CHAR_FLAG_PREFIX + FILENAME_LETTER;
 
-    private static final String DEFAULT_DIRNAME = EnvironmentHelper.currentDirectory;
-    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "GrepApplicationTest";
+    private static final String DEFAULT_DIRNAME = EnvironmentUtil.currentDirectory;
+    private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "GrepApplicationTest";
     private static final String TEST_FILENAME = "bsd1.txt";
     private static final String TEST_FILENAME_2 = "bsd2.txt";
     private static final String NON_EXISTENT_FILE = "non-existent.txt";
@@ -96,7 +96,7 @@ class GrepApplicationTest {
     static void setUpBeforeAll() throws IOException {
         testDir = new File(TEST_DIR);
         testDir.mkdir();
-        EnvironmentHelper.currentDirectory = TEST_DIR;
+        EnvironmentUtil.currentDirectory = TEST_DIR;
 
         testFile = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME);
         testFile.createNewFile();
@@ -114,7 +114,7 @@ class GrepApplicationTest {
         testFile2.delete();
         Files.delete(testFolder);
 
-        EnvironmentHelper.currentDirectory = DEFAULT_DIRNAME;
+        EnvironmentUtil.currentDirectory = DEFAULT_DIRNAME;
         testDir.delete();
     }
 

@@ -19,10 +19,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.EnvironmentHelper;
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 
 class LsResultTest {
-    private static final String TEST_DIR = EnvironmentHelper.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "GrepResultTest";
+    private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "GrepResultTest";
     private static final String FILE_NAME_1 = "test.txt";
     private static final String FILE_NAME_2 = "readme.md";
     private static final String FILE_NAME_3 = "unknown";
