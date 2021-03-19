@@ -14,3 +14,6 @@
 - Use squash and merge
 - PR by issue/feature
 - Use github issues
+
+## Ssytem requirements
+JDK 14
