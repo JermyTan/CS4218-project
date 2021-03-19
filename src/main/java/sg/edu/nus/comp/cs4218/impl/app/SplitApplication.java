@@ -7,6 +7,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
@@ -19,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -28,7 +30,7 @@ import java.util.regex.Pattern;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.app.SplitInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.SplitException;
 import sg.edu.nus.comp.cs4218.impl.parser.SplitArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
@@ -125,14 +127,22 @@ public class SplitApplication implements SplitInterface {
         try {
             Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
             if (Files.notExists(filePath)) {
-                throw new SplitException(ERR_FILE_NOT_FOUND);
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
             }
             if (Files.isDirectory(filePath)) {
-                throw new SplitException(ERR_IS_DIR);
+                throw new InvalidDirectoryException(fileName, ERR_IS_DIR);
             }
-            splitStdinByLines(Files.newInputStream(filePath), prefix, linesPerFile);
-        } catch (IOException | ShellException e) {
-            throw new SplitException(ERR_IO_EXCEPTION, e);
+
+            try {
+                splitStdinByLines(Files.newInputStream(filePath), prefix, linesPerFile);
+            } catch (AccessDeniedException e) {
+                throw new InvalidDirectoryException(fileName, ERR_READING_FILE);
+            }
+        } catch (SplitException e) {
+            // allow exception to propagate
+            throw e;
+        } catch (Exception e) {
+            throw new SplitException(e.getMessage(), e);
         }
     }
 
@@ -141,14 +151,22 @@ public class SplitApplication implements SplitInterface {
         try {
             Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
             if (Files.notExists(filePath)) {
-                throw new SplitException(ERR_FILE_NOT_FOUND);
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
             }
             if (Files.isDirectory(filePath)) {
-                throw new SplitException(ERR_IS_DIR);
+                throw new InvalidDirectoryException(fileName, ERR_IS_DIR);
             }
-            splitStdinByBytes(Files.newInputStream(filePath), prefix, bytesPerFile);
-        } catch (IOException | ShellException e) {
-            throw new SplitException(ERR_IO_EXCEPTION, e);
+
+            try {
+                splitStdinByBytes(Files.newInputStream(filePath), prefix, bytesPerFile);
+            } catch (AccessDeniedException e) {
+                throw new InvalidDirectoryException(fileName, ERR_READING_FILE);
+            }
+        } catch (SplitException e) {
+            // allow exception to propagate
+            throw e;
+        } catch (Exception e) {
+            throw new SplitException(e.getMessage(), e);
         }
     }
 

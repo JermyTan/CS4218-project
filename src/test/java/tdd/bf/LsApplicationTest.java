@@ -1,12 +1,19 @@
 package tdd.bf;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.impl.app.LsApplication;
 
@@ -28,6 +36,17 @@ public class LsApplicationTest {
     public static final String TEMP = "temp-ls";
     public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
     public static Deque<Path> files = new ArrayDeque<>();
+    private OutputStream stderr;
+
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
+    }
 
     @BeforeEach
     void createTemp() throws IOException {
@@ -67,7 +86,7 @@ public class LsApplicationTest {
     private String[] toArgs(String flag, String... files) {
         List<String> args = new ArrayList<>();
         if (!flag.isEmpty()) {
-            args.add("-" + flag);
+            args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
             args.add(Paths.get(TEMP, file).toString());
@@ -82,7 +101,7 @@ public class LsApplicationTest {
         EnvironmentUtil.currentDirectory = TEMP_PATH.toString();
         createFile("fileA.txt");
         createDirectory("folderB");
-        new LsApplication().run(toArgs(""), System.in, output);
+        new LsApplication().run(toArgs(STRING_EMPTY), System.in, output);
         assertArrayEquals(("fileA.txt" + STRING_NEWLINE + "folderB" + STRING_NEWLINE).getBytes(), output.toByteArray());
         EnvironmentUtil.currentDirectory = currPathString;
     }
@@ -108,7 +127,7 @@ public class LsApplicationTest {
         Path folderBPath = createDirectory("folderB");
         createFile("file_in_folderB.txt", folderBPath);
         new LsApplication().run(toArgs("R"), System.in, output);
-        assertArrayEquals(("." + CHAR_FILE_SEP + ":" + STRING_NEWLINE + "fileA.txt"+ STRING_NEWLINE + "folderB" + STRING_NEWLINE + STRING_NEWLINE +
+        assertArrayEquals(("fileA.txt" + STRING_NEWLINE + "folderB" + STRING_NEWLINE + STRING_NEWLINE + STRING_CURR_DIR + STRING_FILE_SEP +
                 "folderB:" + STRING_NEWLINE + "file_in_folderB.txt" + STRING_NEWLINE).getBytes(), output.toByteArray());
         EnvironmentUtil.currentDirectory = currPathString;
     }
@@ -133,7 +152,7 @@ public class LsApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         createDirectory("empty_folder");
         new LsApplication().run(toArgs("", "empty_folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "empty_folder:" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(STRING_EMPTY.getBytes(), output.toByteArray());
     }
 
     @Test
@@ -141,7 +160,7 @@ public class LsApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         createDirectory("empty_folder");
         new LsApplication().run(toArgs("RdX", "empty_folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "empty_folder:" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(STRING_EMPTY.getBytes(), output.toByteArray());
     }
 
     @Test
@@ -152,8 +171,7 @@ public class LsApplicationTest {
         createFile("imageB.jpg", dir);
         createFile("documentC.doc", dir);
         new LsApplication().run(toArgs("", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE + "documentC.doc" + STRING_NEWLINE + "fileA.txt" +
-                STRING_NEWLINE + "imageB.jpg" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(("documentC.doc" + STRING_NEWLINE + "fileA.txt" + STRING_NEWLINE + "imageB.jpg" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -164,8 +182,7 @@ public class LsApplicationTest {
         createFile("imageB.jpg", dir);
         createFile("documentC.doc", dir);
         new LsApplication().run(toArgs("X", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE + "documentC.doc" + STRING_NEWLINE + "imageB.jpg" +
-                 STRING_NEWLINE + "fileA.txt" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(("documentC.doc" + STRING_NEWLINE + "imageB.jpg" + STRING_NEWLINE + "fileA.txt" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -176,16 +193,19 @@ public class LsApplicationTest {
         createFile("imageB.jpg", dir);
         createFile("documentC.doc", dir);
         new LsApplication().run(toArgs("RdX", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE).getBytes(), output.toByteArray());
+
+        String expected = STRING_EMPTY;
+        assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
     @Test
-    void run_SingleDirectoryWithEmptyDirectoryNoFlags_DisplaysDirectory() throws IOException, AbstractApplicationException {
+    void run_SingleDirectoryWithEmptyDirectoryNoFlags_DisplaysNestedDirectory() throws IOException, AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Path dir = createDirectory("folder");
         createDirectory("empty_folder", dir);
         new LsApplication().run(toArgs("", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE + "empty_folder" + STRING_NEWLINE).getBytes(), output.toByteArray());
+
+        assertArrayEquals(("empty_folder" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -194,8 +214,8 @@ public class LsApplicationTest {
         Path dir = createDirectory("folder");
         createDirectory("empty_folder", dir);
         new LsApplication().run(toArgs("RdX", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE + "empty_folder" + STRING_NEWLINE + STRING_NEWLINE +
-                TEMP + CHAR_FILE_SEP + "folder" + CHAR_FILE_SEP + "empty_folder:" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "folder:" + STRING_NEWLINE + "empty_folder" + STRING_NEWLINE + STRING_NEWLINE +
+                TEMP + STRING_FILE_SEP + "folder" + STRING_FILE_SEP + "empty_folder:" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -214,7 +234,7 @@ public class LsApplicationTest {
         createFile("image_in_subfolderB.jpg", dirB);
         createFile("document_in_subfolderB.doc", dirB);
         new LsApplication().run(toArgs("", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE + "document_in_folder.doc" + STRING_NEWLINE +
+        assertArrayEquals(("document_in_folder.doc" + STRING_NEWLINE +
                 "file_in_folder.txt" + STRING_NEWLINE + "image_in_folder.jpg" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
                 "subfolderB" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
@@ -235,8 +255,7 @@ public class LsApplicationTest {
         createFile("image_in_subfolderB.jpg", dirB);
         createFile("document_in_subfolderB.doc", dirB);
         new LsApplication().run(toArgs("d", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
-                "subfolderB" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(("subfolderA" + STRING_NEWLINE + "subfolderB" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -255,12 +274,15 @@ public class LsApplicationTest {
         createFile("image_in_subfolderB.jpg", dirB);
         createFile("document_in_subfolderB.doc", dirB);
         new LsApplication().run(toArgs("R", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE + "document_in_folder.doc" + STRING_NEWLINE + "file_in_folder.txt" +
+
+        String expected = TEMP + STRING_FILE_SEP + "folder:" + STRING_NEWLINE + "document_in_folder.doc" + STRING_NEWLINE + "file_in_folder.txt" +
                 STRING_NEWLINE + "image_in_folder.jpg" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE + "subfolderB" + STRING_NEWLINE +
-                STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "folder" + CHAR_FILE_SEP + "subfolderA:" + STRING_NEWLINE + "document_in_subfolderA.doc" +
+                STRING_NEWLINE + TEMP + STRING_FILE_SEP + "folder" + STRING_FILE_SEP + "subfolderA:" + STRING_NEWLINE + "document_in_subfolderA.doc" +
                 STRING_NEWLINE + "file_in_subfolderA.txt" + STRING_NEWLINE + "image_in_subfolderA.jpg" + STRING_NEWLINE + STRING_NEWLINE +
-                TEMP + CHAR_FILE_SEP + "folder" + CHAR_FILE_SEP + "subfolderB:" + STRING_NEWLINE + "document_in_subfolderB.doc" + STRING_NEWLINE +
-                "file_in_subfolderB.txt" + STRING_NEWLINE + "image_in_subfolderB.jpg" + STRING_NEWLINE).getBytes(), output.toByteArray());
+                TEMP + STRING_FILE_SEP + "folder" + STRING_FILE_SEP + "subfolderB:" + STRING_NEWLINE + "document_in_subfolderB.doc" + STRING_NEWLINE +
+                "file_in_subfolderB.txt" + STRING_NEWLINE + "image_in_subfolderB.jpg" + STRING_NEWLINE;
+
+        assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
     @Test
@@ -279,9 +301,9 @@ public class LsApplicationTest {
         createFile("image_in_subfolderB.jpg", dirB);
         createFile("document_in_subfolderB.doc", dirB);
         new LsApplication().run(toArgs("Rd", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE + "subfolderB" + STRING_NEWLINE +
-                STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "folder" + CHAR_FILE_SEP + "subfolderA:" + STRING_NEWLINE + STRING_NEWLINE +
-                TEMP + CHAR_FILE_SEP + "folder" + CHAR_FILE_SEP + "subfolderB:" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE + "subfolderB" + STRING_NEWLINE +
+                STRING_NEWLINE + TEMP + STRING_FILE_SEP + "folder" + STRING_FILE_SEP + "subfolderA:" + STRING_NEWLINE + STRING_NEWLINE +
+                TEMP + STRING_FILE_SEP + "folder" + STRING_FILE_SEP + "subfolderB:" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -300,9 +322,12 @@ public class LsApplicationTest {
         createFile("image_in_subfolderB.jpg", dirB);
         createFile("document_in_subfolderB.doc", dirB);
         new LsApplication().run(toArgs("RdX", "folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE + "subfolderB" + STRING_NEWLINE +
-                STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "folder" + CHAR_FILE_SEP + "subfolderA:" + STRING_NEWLINE + STRING_NEWLINE +
-                TEMP + CHAR_FILE_SEP + "folder" + CHAR_FILE_SEP + "subfolderB:" + STRING_NEWLINE).getBytes(), output.toByteArray());
+
+        String expected = TEMP + STRING_FILE_SEP + "folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE + "subfolderB" + STRING_NEWLINE +
+                STRING_NEWLINE + TEMP + STRING_FILE_SEP + "folder" + STRING_FILE_SEP + "subfolderA:" + STRING_NEWLINE + STRING_NEWLINE +
+                TEMP + STRING_FILE_SEP + "folder" + STRING_FILE_SEP + "subfolderB:" + STRING_NEWLINE;
+
+        assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
     @Test
@@ -311,8 +336,8 @@ public class LsApplicationTest {
         createDirectory("empty_folderA");
         createDirectory("empty_folderB");
         new LsApplication().run(toArgs("", "empty_folderA", "empty_folderB"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "empty_folderA:" + STRING_NEWLINE + STRING_NEWLINE +
-                TEMP + CHAR_FILE_SEP + "empty_folderB:" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "empty_folderA:" + STRING_NEWLINE + STRING_NEWLINE +
+                TEMP + STRING_FILE_SEP + "empty_folderB:" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -321,8 +346,8 @@ public class LsApplicationTest {
         createDirectory("empty_folderA");
         createDirectory("empty_folderB");
         new LsApplication().run(toArgs("RdX", "empty_folderA", "empty_folderB"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "empty_folderA:" + STRING_NEWLINE + STRING_NEWLINE +
-                TEMP + CHAR_FILE_SEP + "empty_folderB:" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "empty_folderA:" + STRING_NEWLINE + STRING_NEWLINE +
+                TEMP + STRING_FILE_SEP + "empty_folderB:" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -349,9 +374,9 @@ public class LsApplicationTest {
         createFile("document_in_subfolderB.doc", dirB);
 
         new LsApplication().run(toArgs("", "first_folder", "second_folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "first_folder:" + STRING_NEWLINE + "document_in_first_folder.doc" + STRING_NEWLINE +
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "first_folder:" + STRING_NEWLINE + "document_in_first_folder.doc" + STRING_NEWLINE +
                 "file_in_first_folder.txt" + STRING_NEWLINE + "image_in_first_folder.jpg" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
-                STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder:" + STRING_NEWLINE + "document_in_second_folder.doc" + STRING_NEWLINE +
+                STRING_NEWLINE + TEMP + STRING_FILE_SEP + "second_folder:" + STRING_NEWLINE + "document_in_second_folder.doc" + STRING_NEWLINE +
                 "file_in_second_folder.txt" + STRING_NEWLINE + "image_in_second_folder.jpg" + STRING_NEWLINE + "subfolderB" +
                 STRING_NEWLINE).getBytes(), output.toByteArray());
     }
@@ -380,8 +405,8 @@ public class LsApplicationTest {
         createFile("document_in_subfolderB.doc", dirB);
 
         new LsApplication().run(toArgs("d", "first_folder", "second_folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
-                STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder:" + STRING_NEWLINE + "subfolderB" +
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
+                STRING_NEWLINE + TEMP + STRING_FILE_SEP + "second_folder:" + STRING_NEWLINE + "subfolderB" +
                 STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -409,13 +434,13 @@ public class LsApplicationTest {
         createFile("document_in_subfolderB.doc", dirB);
 
         new LsApplication().run(toArgs("R", "first_folder", "second_folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "first_folder:" + STRING_NEWLINE + "document_in_first_folder.doc" + STRING_NEWLINE +
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "first_folder:" + STRING_NEWLINE + "document_in_first_folder.doc" + STRING_NEWLINE +
                 "file_in_first_folder.txt" + STRING_NEWLINE + "image_in_first_folder.jpg" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
-                STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "first_folder" + CHAR_FILE_SEP + "subfolderA:" + STRING_NEWLINE +
+                STRING_NEWLINE + TEMP + STRING_FILE_SEP + "first_folder" + STRING_FILE_SEP + "subfolderA:" + STRING_NEWLINE +
                 "document_in_subfolderA.doc" + STRING_NEWLINE + "file_in_subfolderA.txt" + STRING_NEWLINE + "image_in_subfolderA.jpg" +
-                STRING_NEWLINE + STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder:" + STRING_NEWLINE + "document_in_second_folder.doc" +
+                STRING_NEWLINE + STRING_NEWLINE + TEMP + STRING_FILE_SEP + "second_folder:" + STRING_NEWLINE + "document_in_second_folder.doc" +
                 STRING_NEWLINE + "file_in_second_folder.txt" + STRING_NEWLINE + "image_in_second_folder.jpg" + STRING_NEWLINE + "subfolderB" +
-                STRING_NEWLINE + STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder" + CHAR_FILE_SEP + "subfolderB:" + STRING_NEWLINE +
+                STRING_NEWLINE + STRING_NEWLINE + TEMP + STRING_FILE_SEP + "second_folder" + STRING_FILE_SEP + "subfolderB:" + STRING_NEWLINE +
                 "document_in_subfolderB.doc" + STRING_NEWLINE + "file_in_subfolderB.txt" + STRING_NEWLINE + "image_in_subfolderB.jpg" +
                 STRING_NEWLINE).getBytes(), output.toByteArray());
     }
@@ -444,10 +469,10 @@ public class LsApplicationTest {
         createFile("document_in_subfolderB.doc", dirB);
 
         new LsApplication().run(toArgs("Rd", "first_folder", "second_folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
-                STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "first_folder" + CHAR_FILE_SEP + "subfolderA:" +
-                STRING_NEWLINE + STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder:" + STRING_NEWLINE + "subfolderB" +
-                STRING_NEWLINE + STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder" + CHAR_FILE_SEP + "subfolderB:" +
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
+                STRING_NEWLINE + TEMP + STRING_FILE_SEP + "first_folder" + STRING_FILE_SEP + "subfolderA:" +
+                STRING_NEWLINE + STRING_NEWLINE + TEMP + STRING_FILE_SEP + "second_folder:" + STRING_NEWLINE + "subfolderB" +
+                STRING_NEWLINE + STRING_NEWLINE + TEMP + STRING_FILE_SEP + "second_folder" + STRING_FILE_SEP + "subfolderB:" +
                 STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -475,9 +500,9 @@ public class LsApplicationTest {
         createFile("document_in_subfolderB.doc", dirB);
 
         new LsApplication().run(toArgs("X", "first_folder", "second_folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
                 "document_in_first_folder.doc" + STRING_NEWLINE + "image_in_first_folder.jpg" + STRING_NEWLINE +
-                "file_in_first_folder.txt" + STRING_NEWLINE + STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder:" +
+                "file_in_first_folder.txt" + STRING_NEWLINE + STRING_NEWLINE + TEMP + STRING_FILE_SEP + "second_folder:" +
                 STRING_NEWLINE + "subfolderB" + STRING_NEWLINE + "document_in_second_folder.doc" + STRING_NEWLINE +
                 "image_in_second_folder.jpg" + STRING_NEWLINE + "file_in_second_folder.txt" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
@@ -506,10 +531,10 @@ public class LsApplicationTest {
         createFile("document_in_subfolderB.doc", dirB);
 
         new LsApplication().run(toArgs("RdX", "first_folder", "second_folder"), System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
-                STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "first_folder" + CHAR_FILE_SEP + "subfolderA:" +
-                STRING_NEWLINE + STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder:" + STRING_NEWLINE + "subfolderB" +
-                STRING_NEWLINE + STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder" + CHAR_FILE_SEP + "subfolderB:" +
+        assertArrayEquals((TEMP + STRING_FILE_SEP + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
+                STRING_NEWLINE + TEMP + STRING_FILE_SEP + "first_folder" + STRING_FILE_SEP + "subfolderA:" +
+                STRING_NEWLINE + STRING_NEWLINE + TEMP + STRING_FILE_SEP + "second_folder:" + STRING_NEWLINE + "subfolderB" +
+                STRING_NEWLINE + STRING_NEWLINE + TEMP + STRING_FILE_SEP + "second_folder" + STRING_FILE_SEP + "subfolderB:" +
                 STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -536,25 +561,34 @@ public class LsApplicationTest {
         createFile("image_in_subfolderB.jpg", dirB);
         createFile("document_in_subfolderB.doc", dirB);
 
-        String prefix = TEMP_PATH.toString() + CHAR_FILE_SEP;
-        new LsApplication().run(new String[]{"-RdX", prefix + "first_folder", prefix + "second_folder"}, System.in, output);
-        assertArrayEquals((TEMP + CHAR_FILE_SEP + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
-                STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "first_folder" + CHAR_FILE_SEP + "subfolderA:" +
-                STRING_NEWLINE + STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder:" + STRING_NEWLINE + "subfolderB" +
-                STRING_NEWLINE + STRING_NEWLINE + TEMP + CHAR_FILE_SEP + "second_folder" + CHAR_FILE_SEP + "subfolderB:" +
+        String prefix = TEMP_PATH.toString() + STRING_FILE_SEP;
+
+        new LsApplication().run(new String[]{"-RdX",
+                prefix + "first_folder",
+                prefix + "second_folder"}, System.in, output);
+        assertArrayEquals((prefix + "first_folder:" + STRING_NEWLINE + "subfolderA" + STRING_NEWLINE +
+                STRING_NEWLINE + prefix + "first_folder" + STRING_FILE_SEP + "subfolderA:" +
+                STRING_NEWLINE + STRING_NEWLINE + prefix + "second_folder:" + STRING_NEWLINE + "subfolderB" +
+                STRING_NEWLINE + STRING_NEWLINE + prefix + "second_folder" + STRING_FILE_SEP + "subfolderB:" +
                 STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
     void run_NonexistentDirectory_DisplaysErrorMessage() throws AbstractApplicationException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         new LsApplication().run(toArgs("", "nonexistent_folder"), System.in, output);
-        assertArrayEquals(("ls: cannot access '" + TEMP + CHAR_FILE_SEP + "nonexistent_folder': No such file or directory"
-                + STRING_NEWLINE).getBytes(), output.toByteArray());
+
+        String expected = new LsException(new InvalidDirectoryException(TEMP + STRING_FILE_SEP + "nonexistent_folder", ERR_FILE_NOT_FOUND).getMessage()).getMessage();
+
+        assertArrayEquals(STRING_EMPTY.getBytes(), output.toByteArray());
+
+        assertEquals(expected + STRING_NEWLINE, getErrOutput());
     }
 
     @Test
-    void run_UnknownFlag_Throws() {
+    void run_UnknownFlag_ThrowsException() {
         assertThrows(LsException.class, () -> new LsApplication().run(toArgs("q", ""), System.in, System.out));
     }
 }

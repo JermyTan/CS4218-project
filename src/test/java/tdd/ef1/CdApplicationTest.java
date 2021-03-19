@@ -16,6 +16,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.CdException;
@@ -34,7 +35,7 @@ class CdApplicationTest {
 
     static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     static final String FOLDER = "folder";
-    static final String SUBFOLDER = "folder" + StringUtils.CHAR_FILE_SEP + "subfolder";
+    static final String SUBFOLDER = "folder" + StringUtils.STRING_FILE_SEP + "subfolder";
     static final String BLOCKED_FOLDER = "blocked";
 
     static final String VALID_FILE = "file.txt";
@@ -64,7 +65,7 @@ class CdApplicationTest {
     // Cd into valid relative path
     @Test
     public void run_CdIntoValidRelativePath_Success() throws CdException {
-        String finalPath = tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + FOLDER;
+        String finalPath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + FOLDER;
         String[] argList = new String[]{FOLDER};
         cdApplication.run(argList, System.in, System.out);
         String currDirectory = EnvironmentUtil.currentDirectory;
@@ -73,7 +74,7 @@ class CdApplicationTest {
 
     @Test
     public void run_CdIntoNestedFolder_Success() throws CdException {
-        String finalPath = tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + SUBFOLDER;
+        String finalPath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + SUBFOLDER;
         String[] argList = new String[]{SUBFOLDER};
         cdApplication.run(argList, System.in, System.out);
         String currDirectory = EnvironmentUtil.currentDirectory;
@@ -82,7 +83,7 @@ class CdApplicationTest {
 
     @Test
     public void run_CdOutFromFolder_Success() throws CdException {
-        String relativePath = tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + FOLDER;
+        String relativePath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + FOLDER;
         EnvironmentUtil.setCurrentDirectory(relativePath);
         String[] argList = new String[]{"../"};
         cdApplication.run(argList, System.in, System.out);
@@ -92,7 +93,7 @@ class CdApplicationTest {
 
     @Test
     public void run_CdOutFromNestedFolder_Success() throws CdException {
-        String relativePath = tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + SUBFOLDER;
+        String relativePath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + SUBFOLDER;
         EnvironmentUtil.setCurrentDirectory(relativePath);
         String[] argList = new String[]{"../../"};
         cdApplication.run(argList, System.in, System.out);
@@ -113,7 +114,7 @@ class CdApplicationTest {
     // Cd into valid absolute path
     @Test
     public void run_CdIntoValidAbsolutePath_Success() throws CdException {
-        String absolutePath = tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + FOLDER;
+        String absolutePath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + FOLDER;
         String[] argList = new String[]{absolutePath};
         cdApplication.run(argList, System.in, System.out);
         String currDirectory = EnvironmentUtil.currentDirectory;
@@ -123,7 +124,7 @@ class CdApplicationTest {
     // Cd into invalid absolute path
     @Test
     public void run_CdIntoInvalidAbsolutePath_ThrowsException() throws CdException {
-        String absolutePath = tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + "invalid";
+        String absolutePath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + "invalid";
         String[] argList = new String[]{absolutePath};
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
@@ -175,7 +176,7 @@ class CdApplicationTest {
     // Cd with blank arg
     @Test
     public void run_CdIntoBlankPath_ThrowsCdException() throws CdException {
-        String[] argList = new String[]{""};
+        String[] argList = new String[]{STRING_EMPTY};
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
         });

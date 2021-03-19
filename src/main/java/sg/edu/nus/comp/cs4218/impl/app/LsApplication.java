@@ -7,9 +7,9 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.File;
@@ -35,7 +35,7 @@ import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public class LsApplication implements LsInterface {
-    private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
+    private final static String PATH_CURR_DIR = STRING_CURR_DIR + STRING_FILE_SEP;
 
     /**
      * Runs the ls application with the specified arguments.
@@ -130,7 +130,7 @@ public class LsApplication implements LsInterface {
             result.add(content);
 
             if (isRecursive) {
-                for (File file : content.getFiles()) {
+                for (File file : content.getFiles().stream().sorted().collect(Collectors.toList())) {
                     if (!file.isDirectory()) {
                         continue;
                     }

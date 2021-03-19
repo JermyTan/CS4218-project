@@ -1,16 +1,22 @@
 package tdd.bf;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,6 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
 
@@ -34,6 +41,17 @@ public class WcApplicationTest {
     public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
     public static String currPathString;
     public static Deque<Path> files = new ArrayDeque<>();
+    private OutputStream stderr;
+
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
+    }
 
     @BeforeEach
     void changeDirectory() throws IOException {
@@ -69,7 +87,7 @@ public class WcApplicationTest {
     private String[] toArgs(String flag, String... files) {
         List<String> args = new ArrayList<>();
         if (!flag.isEmpty()) {
-            args.add("-" + flag);
+            args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
             args.add(Paths.get(file).toString());
@@ -83,8 +101,8 @@ public class WcApplicationTest {
         String fileName = "fileA.txt";
         Path filePath = createFile(fileName);
         long fileSize = Files.size(filePath);
-        new WcApplication().run(toArgs("", fileName), System.in, output);
-        assertArrayEquals(("       4       8" + String.format("%8s", fileSize) + " " + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new WcApplication().run(toArgs(STRING_EMPTY, fileName), System.in, output);
+        assertArrayEquals(("4\t8\t" + fileSize + CHAR_TAB + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -93,7 +111,7 @@ public class WcApplicationTest {
         String fileName = "fileB.txt";
         createFile(fileName);
         new WcApplication().run(toArgs("l", fileName), System.in, output);
-        assertArrayEquals(("       4 " + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(("4\t" + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -102,7 +120,7 @@ public class WcApplicationTest {
         String fileName = "fileC.txt";
         createFile(fileName);
         new WcApplication().run(toArgs("w", fileName), System.in, output);
-        assertArrayEquals(("       8 " + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(("8\t" + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -112,7 +130,7 @@ public class WcApplicationTest {
         Path filePath = createFile(fileName);
         long fileSize = Files.size(filePath);
         new WcApplication().run(toArgs("c", fileName), System.in, output);
-        assertArrayEquals((String.format("%8s", fileSize) + " " + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((String.valueOf(fileSize) + CHAR_TAB + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -122,11 +140,11 @@ public class WcApplicationTest {
         Path filePath = createFile(fileName);
         long fileSize = Files.size(filePath);
         new WcApplication().run(toArgs("clw", fileName), System.in, output);
-        assertArrayEquals(("       4       8" + String.format("%8s", fileSize) + " " + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(("4\t8\t" + fileSize + CHAR_TAB + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
-    void run_SingleFileUnknownFlag_Throws() throws IOException {
+    void run_SingleFileUnknownFlag_ThrowsException() throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileF.txt";
         createFile(fileName);
@@ -139,8 +157,8 @@ public class WcApplicationTest {
         String input = "First line\nSecond line\nThird line\nFourth line\n";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long fileSize = input.getBytes().length;
-        new WcApplication().run(toArgs(""), inputStream, output);
-        assertArrayEquals(("       4       8" + String.format("%8s", fileSize) + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new WcApplication().run(toArgs(STRING_EMPTY), inputStream, output);
+        assertArrayEquals(("4\t8\t" + fileSize + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -149,8 +167,8 @@ public class WcApplicationTest {
         String input = "First line\nSecond line\nThird line\nFourth line\n";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long fileSize = input.getBytes().length;
-        new WcApplication().run(toArgs("", "-"), inputStream, output);
-        assertArrayEquals(("       4       8" + String.format("%8s", fileSize) + " -" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new WcApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG), inputStream, output);
+        assertArrayEquals(("4\t8\t" + fileSize + WcApplication.STDIN_LABEL + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -162,10 +180,10 @@ public class WcApplicationTest {
         Path fileHPath = createFile(fileHName);
         long fileGSize = Files.size(fileGPath);
         long fileHSize = Files.size(fileHPath);
-        new WcApplication().run(toArgs("", fileGName, fileHName), System.in, output);
-        assertArrayEquals(("       4       8" + String.format("%8s", fileGSize) + " " + fileGName + STRING_NEWLINE
-                + "       4       8" + String.format("%8s", fileHSize) + " " + fileHName + STRING_NEWLINE
-                + "       8      16" + String.format("%8s", fileGSize + fileHSize) + " total" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new WcApplication().run(toArgs(STRING_EMPTY, fileGName, fileHName), System.in, output);
+        assertArrayEquals(("4\t8\t" + fileGSize + CHAR_TAB + fileGName + STRING_NEWLINE
+                + "4\t8\t" + fileHSize + CHAR_TAB + fileHName + STRING_NEWLINE
+                + "8\t16\t" + (fileGSize + fileHSize) + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -177,71 +195,112 @@ public class WcApplicationTest {
         String input = "First line\nSecond line\nThird line\nFourth line\n";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long inputSize = input.getBytes().length;
-        new WcApplication().run(toArgs("", fileIName, "-"), inputStream, output);
-        assertArrayEquals(("       4       8" + String.format("%8s", fileISize) + " " + fileIName + STRING_NEWLINE
-                + "       4       8" + String.format("%8s", inputSize) + " -" + STRING_NEWLINE
-                + "       8      16" + String.format("%8s", fileISize + inputSize) + " total" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new WcApplication().run(toArgs(STRING_EMPTY, fileIName, STRING_STDIN_FLAG), inputStream, output);
+        assertArrayEquals(("4\t8\t" + fileISize + CHAR_TAB + fileIName + STRING_NEWLINE
+                + "4\t8\t" + inputSize + WcApplication.STDIN_LABEL + STRING_NEWLINE
+                + "8\t16\t" + (fileISize + inputSize) + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
-    void run_SingleFileAndNonexistentFile_DisplaysLinesWordsBytesFilenameErrorMessageTotal() throws IOException, AbstractApplicationException{
+    void run_SingleFileAndNonexistentFile_DisplaysLinesWordsBytesFilenameErrorMessageTotal() throws IOException, AbstractApplicationException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileJName = "fileJ.txt";
         Path fileJPath = createFile(fileJName);
         long fileJSize = Files.size(fileJPath);
         String nonexistentFileName = "nonexistent_file.txt";
-        new WcApplication().run(toArgs("", fileJName, nonexistentFileName), System.in, output);
-        assertArrayEquals(("       4       8" + String.format("%8s", fileJSize) + " " + fileJName + STRING_NEWLINE
-                + "wc: " + ERR_FILE_NOT_FOUND + STRING_NEWLINE
-                + "       4       8" + String.format("%8s", fileJSize) + " total" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new WcApplication().run(toArgs(STRING_EMPTY, fileJName, nonexistentFileName), System.in, output);
+
+        String expectedOutput = "4\t8\t" + fileJSize + CHAR_TAB + fileJName + STRING_NEWLINE
+                + "4\t8\t" + fileJSize + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE;
+        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+
+        String expectedErr = new WcException(
+                new InvalidDirectoryException(
+                        nonexistentFileName,
+                        ERR_FILE_NOT_FOUND
+                ).getMessage()
+        ).getMessage();
+        assertEquals(expectedErr + STRING_NEWLINE, getErrOutput());
     }
 
     @Test
-    void run_SingleInputAndNonexistentFile_DisplaysLinesWordsBytesDashErrorMessageTotal() throws AbstractApplicationException{
+    void run_SingleInputAndNonexistentFile_DisplaysLinesWordsBytesDashErrorMessageTotal() throws AbstractApplicationException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String input = "First line\nSecond line\nThird line\nFourth line\n";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long inputSize = input.getBytes().length;
         String nonexistentFileName = "nonexistent_file.txt";
-        new WcApplication().run(toArgs("", "-", nonexistentFileName), inputStream, output);
-        assertArrayEquals(("       4       8" + String.format("%8s", inputSize) + " -" + STRING_NEWLINE
-                + "wc: " + ERR_FILE_NOT_FOUND + STRING_NEWLINE
-                + "       4       8" + String.format("%8s", inputSize) + " total" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new WcApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG, nonexistentFileName), inputStream, output);
+
+        String expectedOutput = "4\t8\t" + inputSize + WcApplication.STDIN_LABEL + STRING_NEWLINE
+                + "4\t8\t" + inputSize + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE;
+        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+
+        String expectedErr = new WcException(
+                new InvalidDirectoryException(
+                        nonexistentFileName,
+                        ERR_FILE_NOT_FOUND
+                ).getMessage()
+        ).getMessage();
+        assertEquals(expectedErr + STRING_NEWLINE, getErrOutput());
     }
 
     @Test
-    void run_FilenameIsNull_Throws() {
+    void run_FilenameIsNull_ThrowsException() {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        assertThrows(Exception.class, () -> new WcApplication().run(toArgs("", (String[]) null), System.in, output));
+        assertThrows(Exception.class, () -> new WcApplication().run(toArgs(STRING_EMPTY, (String[]) null), System.in, output));
     }
 
     @Test
-    void run_OutputStreamIsNull_Throws() throws IOException {
+    void run_OutputStreamIsNull_ThrowsException() throws IOException {
         String fileKName = "fileK.txt";
         createFile(fileKName);
-        assertThrows(Exception.class, () -> new WcApplication().run(toArgs("", fileKName), System.in, null));
+        assertThrows(Exception.class, () -> new WcApplication().run(toArgs(STRING_EMPTY, fileKName), System.in, null));
     }
 
     @Test
-    void run_InputStreamIsNull_Throws() {
+    void run_InputStreamIsNull_ThrowsException() {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        assertThrows(Exception.class, () -> new WcApplication().run(toArgs("", ""), null, output));
+        assertThrows(Exception.class, () -> new WcApplication().run(toArgs(STRING_EMPTY, STRING_EMPTY), null, output));
     }
 
     @Test
     void run_FilenameIsDirectory_DisplaysErrorMessage() throws IOException, AbstractApplicationException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String folderName = "folder";
         createDirectory(folderName);
-        new WcApplication().run(toArgs("", folderName), System.in, output);
-        assertArrayEquals(("wc: " + ERR_IS_DIR + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new WcApplication().run(toArgs(STRING_EMPTY, folderName), System.in, output);
+
+        String expectedErr = new WcException(
+                new InvalidDirectoryException(
+                        folderName,
+                        ERR_IS_DIR
+                ).getMessage()
+        ).getMessage();
+        assertEquals(expectedErr + STRING_NEWLINE, getErrOutput());
     }
 
     @Test
     void run_NonexistentFile_DisplaysErrorMessage() throws AbstractApplicationException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String nonexistentFileName = "nonexistent_file.txt";
-        new WcApplication().run(toArgs("", nonexistentFileName), System.in, output);
-        assertArrayEquals(("wc: " + ERR_FILE_NOT_FOUND + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new WcApplication().run(toArgs(STRING_EMPTY, nonexistentFileName), System.in, output);
+
+
+        String expectedErr = new WcException(
+                new InvalidDirectoryException(
+                        nonexistentFileName,
+                        ERR_FILE_NOT_FOUND
+                ).getMessage()
+        ).getMessage();
+        assertEquals(expectedErr + STRING_NEWLINE, getErrOutput());
     }
 }

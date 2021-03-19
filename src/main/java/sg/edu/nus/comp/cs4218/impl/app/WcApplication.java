@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -39,8 +40,8 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 @SuppressWarnings("PMD.GodClass")
 public class WcApplication implements WcInterface {
 
-    private static final String TOTAL_LABEL = "total";
-    private static final String STDIN_LABEL = STRING_EMPTY;
+    public static final String TOTAL_LABEL = "total";
+    public static final String STDIN_LABEL = STRING_EMPTY;
 
     /**
      * Runs the wc application with the specified arguments.
@@ -71,7 +72,11 @@ public class WcApplication implements WcInterface {
         boolean isWords = parser.isWords() || isDefault;
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
-        if (stdin == null && (fileNames == null || fileNames.length == 0)) {
+        if (stdin == null
+                && (fileNames == null
+                || fileNames.length == 0
+                || Arrays.stream(fileNames).allMatch(StringUtils::isBlank))
+        ) {
             throw new WcException(ERR_NO_INPUT);
         }
 

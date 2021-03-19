@@ -4,12 +4,12 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 
 import java.io.File;
@@ -29,6 +29,10 @@ import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public class MvApplication implements MvInterface {
+
+    public static String constructRenameErrorMsg(String srcFile, String destFile, String error) {
+        return String.format("rename %s to %s: %s", srcFile, destFile, error);
+    }
 
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws MvException {
@@ -169,10 +173,6 @@ public class MvApplication implements MvInterface {
                     return Files.notExists(destPath.resolve(fileName));
                 })
                 .toArray(String[]::new);
-    }
-
-    private String constructRenameErrorMsg(String srcFile, String destFile, String error) {
-        return String.format("rename %s to %s: %s", srcFile, destFile, error);
     }
 
     private boolean isFormatOne(String destFile) throws ShellException {

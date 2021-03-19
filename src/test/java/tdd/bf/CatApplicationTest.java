@@ -1,14 +1,20 @@
 package tdd.bf;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,19 +23,21 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterAll;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
 
 public class CatApplicationTest {
     public static final String TEMP = "temp-cat";
     public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
     public static Deque<Path> files = new ArrayDeque<>();
+    private OutputStream stderr;
 
     @BeforeAll
     static void createTemp() throws IOException {
@@ -44,6 +52,16 @@ public class CatApplicationTest {
         Files.delete(TEMP_PATH);
     }
 
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
+    }
+
     private Path createFile(String name, String text) throws IOException {
         Path path = TEMP_PATH.resolve(name);
         Files.createFile(path);
@@ -55,16 +73,20 @@ public class CatApplicationTest {
     private String[] toArgs(String flag, String... files) {
         List<String> args = new ArrayList<>();
         if (!flag.isEmpty()) {
-            args.add("-" + flag);
+            args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
-            if (file.equals("-")) {
+            if (file.equals(STRING_STDIN_FLAG)) {
                 args.add(file);
             } else {
-                args.add(Paths.get(TEMP, file).toString());
+                args.add(getRelativePath(file).toString());
             }
         }
         return args.toArray(new String[0]);
+    }
+
+    private Path getRelativePath(String name) {
+        return Paths.get(TEMP, name);
     }
 
     @Test
@@ -72,14 +94,14 @@ public class CatApplicationTest {
         ByteArrayOutputStream output = null;
         String text = "Test line 1\nTest line 2\nTest line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        assertThrows(CatException.class, () -> new CatApplication().run(toArgs(""), inputStream, output));
+        assertThrows(CatException.class, () -> new CatApplication().run(toArgs(STRING_EMPTY), inputStream, output));
     }
 
     @Test
     void run_NullStdinNullFilesNoFlag_ThrowsException() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream inputStream = null;
-        assertThrows(CatException.class, () -> new CatApplication().run(toArgs(""), inputStream, output));
+        assertThrows(CatException.class, () -> new CatApplication().run(toArgs(STRING_EMPTY), inputStream, output));
     }
 
     @Test
@@ -95,7 +117,7 @@ public class CatApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String text = "Test line 1\nTest line 2\nTest line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        new CatApplication().run(toArgs(""), inputStream, output);
+        new CatApplication().run(toArgs(STRING_EMPTY), inputStream, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -114,7 +136,7 @@ public class CatApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String text = "Test line 1\nTest line 2\nTest line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        new CatApplication().run(toArgs("", "-"), inputStream, output);
+        new CatApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG), inputStream, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -124,46 +146,76 @@ public class CatApplicationTest {
         String text = "Test line 1\nTest line 2\nTest line 3";
         String expectedText = "1 Test line 1\n2 Test line 2\n3 Test line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        new CatApplication().run(toArgs("n", "-"), inputStream, output);
+        new CatApplication().run(toArgs("n", STRING_STDIN_FLAG), inputStream, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
     void run_SingleEmptyStdinNoFlag_DisplaysEmpty() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = "";
+        String text = STRING_EMPTY;
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        new CatApplication().run(toArgs(""), inputStream, output);
-        assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new CatApplication().run(toArgs(STRING_EMPTY), inputStream, output);
+        assertArrayEquals((text).getBytes(), output.toByteArray());
     }
 
     @Test
     void run_SingleEmptyStdinFlag_DisplaysEmpty() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = "";
+        String text = STRING_EMPTY;
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new CatApplication().run(toArgs("n"), inputStream, output);
-        assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((text).getBytes(), output.toByteArray());
     }
 
     //catFiles cases
     @Test
-    void run_NonexistentFileNoFlag_ThrowsException() throws AbstractApplicationException {
+    void run_NonexistentFileNoFlag_OutputsError() throws AbstractApplicationException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String nonexistentFileName = "nonexistent_file.txt";
-        assertThrows(CatException.class, () -> new CatApplication().run(toArgs("", nonexistentFileName),
-                System.in, output));
+
+        new CatApplication().run(toArgs(STRING_EMPTY, nonexistentFileName), System.in, output);
+
+        String expectedOutput = STRING_EMPTY;
+        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+
+        String expectedErr = new CatException(
+                new InvalidDirectoryException(
+                        getRelativePath(nonexistentFileName).toString(),
+                        ERR_FILE_NOT_FOUND
+                ).getMessage()
+        ).getMessage() + STRING_NEWLINE;
+        assertEquals(expectedErr, getErrOutput());
     }
 
     @Test
-    void run_DirectoryNoFlag_ThrowsException() throws AbstractApplicationException, IOException {
+    void run_DirectoryNoFlag_OutputsError() throws AbstractApplicationException, IOException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String directoryName = "nonexistent_file.txt";
         Path path = Paths.get(EnvironmentUtil.currentDirectory, directoryName);
-        Files.createDirectory(path);
-        assertThrows(CatException.class, () -> new CatApplication().run(toArgs("", directoryName),
-                System.in, output));
+
+        if (Files.notExists(path)) {
+            Files.createDirectory(path);
+        }
+
+        new CatApplication().run(toArgs(STRING_EMPTY, directoryName), System.in, output);
+
         Files.delete(path);
+
+        String expectedOutput = STRING_EMPTY;
+        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+
+        String expectedErr = new CatException(
+                new InvalidDirectoryException(
+                        getRelativePath(directoryName).toString(),
+                        ERR_FILE_NOT_FOUND
+                ).getMessage()
+        ).getMessage() + STRING_NEWLINE;
+        assertEquals(expectedErr, getErrOutput());
     }
 
     @Test
@@ -173,7 +225,7 @@ public class CatApplicationTest {
         String text = "Test line 1\nTest line 2\nTest line 3";
         Path filePath = createFile(fileName, text);
         File file = new File(filePath.toString());
-        new CatApplication().run(toArgs("", fileName), System.in, output);
+        new CatApplication().run(toArgs(STRING_EMPTY, fileName), System.in, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -192,21 +244,21 @@ public class CatApplicationTest {
     void run_SingleEmptyFileNoFlag_DisplaysEmpty() throws IOException, AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileC.txt";
-        String text = "";
+        String text = STRING_EMPTY;
         Path filePath = createFile(fileName, text);
         File file = new File(filePath.toString());
-        new CatApplication().run(toArgs("", fileName), System.in, output);
-        assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new CatApplication().run(toArgs(STRING_EMPTY, fileName), System.in, output);
+        assertArrayEquals((text).getBytes(), output.toByteArray());
     }
 
     @Test
     void run_SingleEmptyFileFlag_DisplaysEmpty() throws IOException, AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileD.txt";
-        String text = "";
+        String text = STRING_EMPTY;
         createFile(fileName, text);
         new CatApplication().run(toArgs("n", fileName), System.in, output);
-        assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((text).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -230,7 +282,7 @@ public class CatApplicationTest {
         File file1 = new File(filePath1.toString());
         Path filePath2 = createFile(fileName2, text2);
         File file2 = new File(filePath2.toString());
-        new CatApplication().run(toArgs("", fileName1, fileName2), System.in, output);
+        new CatApplication().run(toArgs(STRING_EMPTY, fileName1, fileName2), System.in, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -241,13 +293,13 @@ public class CatApplicationTest {
         String fileName2 = "fileI.txt";
         String text1 = "Test line 1.1\nTest line 1.2\nTest line 1.3";
         String text2 = "Test line 2.1\nTest line 2.2";
-        String expectedText = "1 Test line 1.1\n2 Test line 1.2\n3 Test line 1.3\n4 Test line 2.1\n5 Test line 2.2";
+        String expectedText = "1 Test line 1.1\n2 Test line 1.2\n3 Test line 1.3\n1 Test line 2.1\n2 Test line 2.2\n";
         Path filePath1 = createFile(fileName1, text1);
         File file1 = new File(filePath1.toString());
         Path filePath2 = createFile(fileName2, text2);
         File file2 = new File(filePath2.toString());
         new CatApplication().run(toArgs("n", fileName1, fileName2), System.in, output);
-        assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((expectedText).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -255,13 +307,13 @@ public class CatApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileJ.txt";
         String fileName2 = "fileK.txt";
-        String text = "";
+        String text = STRING_EMPTY;
         Path filePath1 = createFile(fileName1, text);
         File file1 = new File(filePath1.toString());
         Path filePath2 = createFile(fileName2, text);
         File file2 = new File(filePath2.toString());
-        new CatApplication().run(toArgs("", fileName1, fileName2), System.in, output);
-        assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
+        new CatApplication().run(toArgs(STRING_EMPTY, fileName1, fileName2), System.in, output);
+        assertArrayEquals((text).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -269,37 +321,65 @@ public class CatApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileL.txt";
         String fileName2 = "fileM.txt";
-        String text = "";
+        String text = STRING_EMPTY;
         Path filePath1 = createFile(fileName1, text);
         File file1 = new File(filePath1.toString());
         Path filePath2 = createFile(fileName2, text);
         File file2 = new File(filePath2.toString());
         new CatApplication().run(toArgs("n", fileName1, fileName2), System.in, output);
-        assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((text).getBytes(), output.toByteArray());
     }
 
     //catFilesAndStdin cases
     @Test
-    void run_SingleStdinNonexistentFileNoFlag_ThrowsException() throws AbstractApplicationException {
+    void run_SingleStdinNonexistentFileNoFlag_OutputsError() throws AbstractApplicationException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String stdinText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String nonexistentFileName = "nonexistent_file.txt";
-        assertThrows(CatException.class, () -> new CatApplication().run(toArgs("", nonexistentFileName),
-                inputStream, output));
+        new CatApplication().run(toArgs(STRING_EMPTY, nonexistentFileName), inputStream, output);
+
+        String expectedOutput = STRING_EMPTY;
+        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+
+        String expectedErr = new CatException(
+                new InvalidDirectoryException(
+                        getRelativePath(nonexistentFileName).toString(),
+                        ERR_FILE_NOT_FOUND
+                ).getMessage()
+        ).getMessage() + STRING_NEWLINE;
+        assertEquals(expectedErr, getErrOutput());
     }
 
     @Test
-    void run_SingleStdinDirectoryNoFlag_ThrowsException() throws AbstractApplicationException, IOException {
+    void run_SingleStdinDirectoryNoFlag_OutputsError() throws AbstractApplicationException, IOException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String stdinText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String directoryName = "nonexistent_file.txt";
         Path path = Paths.get(EnvironmentUtil.currentDirectory, directoryName);
-        Files.createDirectory(path);
-        assertThrows(CatException.class, () -> new CatApplication().run(toArgs("", directoryName),
-                inputStream, output));
+        if (Files.notExists(path)) {
+            Files.createDirectory(path);
+        }
+
+        new CatApplication().run(toArgs(STRING_EMPTY, directoryName), inputStream, output);
+
         Files.delete(path);
+
+        String expectedOutput = STRING_EMPTY;
+        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+
+        String expectedErr = new CatException(
+                new InvalidDirectoryException(
+                        getRelativePath(directoryName).toString(),
+                        ERR_FILE_NOT_FOUND
+                ).getMessage()
+        ).getMessage() + STRING_NEWLINE;
+        assertEquals(expectedErr, getErrOutput());
     }
 
     @Test
@@ -313,7 +393,7 @@ public class CatApplicationTest {
         Path filePath = createFile(fileName, fileText);
         File file = new File(filePath.toString());
         String expectedText = "Test line 1.1\nTest line 1.2\nTest line 1.3\nTest line 2.1\nTest line 2.2";
-        new CatApplication().run(toArgs("", "-", fileName), inputStream, output);
+        new CatApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG, fileName), inputStream, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -328,7 +408,7 @@ public class CatApplicationTest {
         String stdinText = "Test line 2.1\nTest line 2.2";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String expectedText = "Test line 1.1\nTest line 1.2\nTest line 1.3\nTest line 2.1\nTest line 2.2";
-        new CatApplication().run(toArgs("", fileName, "-"), inputStream, output);
+        new CatApplication().run(toArgs(STRING_EMPTY, fileName, STRING_STDIN_FLAG), inputStream, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 }

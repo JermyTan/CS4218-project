@@ -43,7 +43,7 @@ class WcResultTest {
     void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
-        new WcResult("").outputError();
+        new WcResult(STRING_EMPTY).outputError();
 
         assertEquals(STRING_EMPTY, getErrOutput());
     }

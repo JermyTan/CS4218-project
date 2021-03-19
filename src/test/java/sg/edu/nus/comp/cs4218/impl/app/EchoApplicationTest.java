@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,7 +19,7 @@ import sg.edu.nus.comp.cs4218.exception.EchoException;
 
 class EchoApplicationTest {
 
-    private static final String[] EMPTY = {""};
+    private static final String[] EMPTY = {STRING_EMPTY};
     private static final String[] SPACE = {"  "};
     private static final String[] STRING_1 = {"ABC", "123"};
     private static final String[] STRING_2 = {"0", "5", "abc"};
@@ -35,7 +36,7 @@ class EchoApplicationTest {
     @Test
     public void constructResult_Blank_ShouldWriteBlank() {
         assertDoesNotThrow(() -> {
-            assertEquals("", app.constructResult(EMPTY));
+            assertEquals(STRING_EMPTY, app.constructResult(EMPTY));
             assertEquals("  ", app.constructResult(SPACE));
         });
     }

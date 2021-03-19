@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.Command;
@@ -14,6 +15,7 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 
+@Disabled
 public class SequenceCommandTest {
     public static final String TEST_COMMAND_STRING = "Test command executed" + STRING_NEWLINE;
     public static final String SHELL_EXCEPTION_STRING = "shell: ShellException" + STRING_NEWLINE;

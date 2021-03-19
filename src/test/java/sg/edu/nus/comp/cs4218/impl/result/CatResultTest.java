@@ -17,8 +17,6 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
-
 class CatResultTest {
     private OutputStream stderr;
 

@@ -10,6 +10,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.IOUtils.getLinesFromInputStream;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
@@ -467,7 +468,7 @@ public class UniqApplicationTest {
     @Test
     public void run_NoFlagAndOutputFilenameIsDash_RemovesAdjacentDup() {
         assertDoesNotThrow(() -> {
-            app.run(new String[]{INPUT_FILE_1, "-"}, System.in, System.out);
+            app.run(new String[]{INPUT_FILE_1, STRING_STDIN_FLAG}, System.in, System.out);
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,

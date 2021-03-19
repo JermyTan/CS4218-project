@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayInputStream;
@@ -121,7 +122,7 @@ class PasteApplicationTest {
         String expected = STD_INPUT;
         provideInput(expected);
 
-        assertDoesNotThrow(() -> app.run(new String[]{"-"}, stdin, stdout));
+        assertDoesNotThrow(() -> app.run(new String[]{STRING_STDIN_FLAG}, stdin, stdout));
 
         assertEquals(expected, stdout.toString());
     }
@@ -131,7 +132,7 @@ class PasteApplicationTest {
         String stdinInput = STD_INPUT;
         provideInput(stdinInput);
 
-        assertDoesNotThrow(() -> app.run(new String[]{FILE_1, "-"}, stdin, stdout));
+        assertDoesNotThrow(() -> app.run(new String[]{FILE_1, STRING_STDIN_FLAG}, stdin, stdout));
 
         String expected = "A\tHello word" + STRING_NEWLINE + "B\tCS4218" + STRING_NEWLINE
                 + "C" + STRING_NEWLINE + "D" + STRING_NEWLINE;
@@ -245,7 +246,7 @@ class PasteApplicationTest {
                 + "C" + STRING_NEWLINE + "D" + STRING_NEWLINE;
 
         assertDoesNotThrow(() -> {
-            String output = app.mergeFileAndStdin(false, stdin, "-", FILE_1);
+            String output = app.mergeFileAndStdin(false, stdin, STRING_STDIN_FLAG, FILE_1);
             assertEquals(expected, output);
         });
     }

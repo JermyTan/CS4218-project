@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
+import static sg.edu.nus.comp.cs4218.impl.app.MvApplication.constructRenameErrorMsg;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 
 @SuppressWarnings({"PMD.LongVariable"})
@@ -155,7 +156,14 @@ class MvApplicationTest {
         // no permissions to move files into blocked folder
         String[] argList = new String[]{"file1.txt", "file2.txt", "blocked"};
         Throwable unwritableDest = assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
-        assertEquals(new MvException(ERR_NO_PERM).getMessage(), unwritableDest.getMessage());
+        assertEquals(
+                new MvException(constructRenameErrorMsg(
+                        "file1.txt",
+                        "blocked/file1.txt",
+                        ERR_CANNOT_RENAME
+                )).getMessage(),
+                unwritableDest.getMessage()
+        );
 
         File expectedRemainingFile1 = new File(tempDir, "file1.txt");
         File expectedRemainingFile2 = new File(tempDir, "file2.txt");
@@ -286,12 +294,10 @@ class MvApplicationTest {
         assertEquals(FILE1_CONTENTS, expectedNewFileContents.get(0));
     }
 
-    // throw exception?
     @Test
-    public void run_WithoutFlagsSameSrcAndDestExist_ThrowException() {
+    public void run_WithoutFlagsSameSrcAndDestExist_DoesNothing() {
         String[] argList = new String[]{"file1.txt", "file1.txt"};
-        Throwable sameFile = assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
-        assertEquals(new MvException(ERR_SAME_FILE).getMessage(), sameFile.getMessage());
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
     }
 
     @Test
@@ -352,8 +358,8 @@ class MvApplicationTest {
 
     @Test
     public void run_WithoutFlagMoveOneAbsolutePathFileIntoSubFolder_MovedIntoSubFolder() throws Exception {
-        String[] argList = new String[]{tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + "subfolder1/file2.txt",
-                tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + "subfolder2/subsubfolder2/"};
+        String[] argList = new String[]{tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + "subfolder1/file2.txt",
+                tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + "subfolder2/subsubfolder2/"};
         mvApplication.run(argList, System.in, System.out);
 
         File expectedRemovedFile = new File(tempDir, "subfolder1/file2.txt");
@@ -496,7 +502,13 @@ class MvApplicationTest {
     public void run_invalidSrcFilesAfter_ThrowsException() {
         String[] argList = new String[]{"subfolder2", "subfolder", "subfolder1"};
         Throwable invalidSrcFile = assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
-        assertEquals(new MvException("subfolder: " + ERR_FILE_NOT_FOUND).getMessage(), invalidSrcFile.getMessage());
+        assertEquals(
+                new MvException(constructRenameErrorMsg(
+                        "subfolder",
+                        "subfolder/subfolder",
+                        ERR_FILE_NOT_FOUND
+                )).getMessage(),
+                invalidSrcFile.getMessage());
 
         File expectedMovedFile = new File(tempDir, "subfolder2");
         File expectedNewFile = new File(tempDir, "subfolder1/subfolder2");

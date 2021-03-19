@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.app.CatInterface;
@@ -29,6 +30,7 @@ import sg.edu.nus.comp.cs4218.impl.parser.CatArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.CatResult;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.GodClass")
 public class CatApplication implements CatInterface {
@@ -60,7 +62,11 @@ public class CatApplication implements CatInterface {
         boolean isLineNumber = parser.isLineNumber();
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
-        if (stdin == null && (fileNames == null || fileNames.length == 0)) {
+        if (stdin == null
+                && (fileNames == null
+                || fileNames.length == 0
+                || Arrays.stream(fileNames).allMatch(StringUtils::isBlank))
+        ) {
             throw new CatException(ERR_NO_INPUT);
         }
 

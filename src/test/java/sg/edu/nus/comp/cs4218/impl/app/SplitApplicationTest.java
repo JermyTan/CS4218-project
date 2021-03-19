@@ -21,6 +21,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_OPTIO
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayInputStream;
@@ -236,7 +237,7 @@ class SplitApplicationTest {
     void run_FilenameDash_UseStdin() throws Exception {
         String expectedContent = generateString(1);
         testStream = generateStream(expectedContent);
-        String[] args = {LINES_OPTION, "1", "-"};
+        String[] args = {LINES_OPTION, "1", STRING_STDIN_FLAG};
         assertDoesNotThrow(() -> splitApp.run(args, testStream, null));
         File file = new File(TEST_DIR + STRING_FILE_SEP + XAA);
         assertTrue(file.exists());

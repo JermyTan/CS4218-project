@@ -5,8 +5,10 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.SplitException;
 import sg.edu.nus.comp.cs4218.impl.app.SplitApplication;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -23,17 +25,10 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 @SuppressWarnings({"PMD.LongVariable"})
 public class SplitApplicationTest {
-
-    // split related
-    public static final String ERR_INVALID_LINES = "invalid number of lines";
-    public static final String ERR_MISSING_ARGS_LINES = "option requires an argument -- l";
-    public static final String ERR_INVALID_BYTES = "invalid number of bytes";
-    public static final String ERR_MISSING_ARGS_BYTES = "option requires an argument -- b";
-    public static final String ERR_EXTRA_OPERAND = "extra operand";
-
     @TempDir
     static File tempDir;
     static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
@@ -58,7 +53,6 @@ public class SplitApplicationTest {
     private static final String OUTPUT_XZAB = "xzab";
     private static final String OUTPUT_XZZZ = "xzzz";
     private static final String OUTPUT_XZZAA = "xzzaa";
-    private static final String SPLIT_ERR_FORMAT = ERR_GENERAL + " %s: %s";
 
 
     private static final String lineOne = "This is the first line" + StringUtils.STRING_NEWLINE;
@@ -95,32 +89,32 @@ public class SplitApplicationTest {
         new File(tempDir.getAbsolutePath(), "nested").mkdir();
 
         // create test-lines.txt
-        fileWriter = new FileWriter(tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + "test-lines.txt");
+        fileWriter = new FileWriter(tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + "test-lines.txt");
         fileWriter.write(fileContentByLines);
         fileWriter.close();
 
         // create test-bytes.txt
-        fileWriter = new FileWriter(tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + "test-bytes.txt");
+        fileWriter = new FileWriter(tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + "test-bytes.txt");
         fileWriter.write(fileContentByBytes);
         fileWriter.close();
 
         // create nested/test1.txt
-        fileWriter = new FileWriter(tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP
-                + "nested" + StringUtils.CHAR_FILE_SEP + "test1.txt");
+        fileWriter = new FileWriter(tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP
+                + "nested" + StringUtils.STRING_FILE_SEP + "test1.txt");
         fileWriter.write(fileContentByLines);
         fileWriter.close();
 
         // create test-unreadable.txt
-        fileWriter = new FileWriter(tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + "test-unreadable.txt");
+        fileWriter = new FileWriter(tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + "test-unreadable.txt");
         fileWriter.write(fileContentByLines);
         fileWriter.close();
-        File unreadable = new File(tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + "test-unreadable.txt");
+        File unreadable = new File(tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + "test-unreadable.txt");
         unreadable.setReadable(false);
     }
 
     @AfterAll
     static void tearDownAll() {
-        EnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
+        EnvironmentUtil.setCurrentDirectory(ORIGINAL_DIR);
     }
 
     @BeforeEach
@@ -142,62 +136,71 @@ public class SplitApplicationTest {
 
     // [OPTIONS] is empty and [FILES] is - means LINES DEFAULT 1000
     @Test
-    public void run_FileIsDash_ReadsStdinAndCreateByLine() throws AbstractApplicationException, SplitException, IOException {
-        String[] args = new String[]{"-"};
+    public void run_FileIsDash_ReadsStdinAndCreateByLine() throws Exception {
+        String[] args = new String[]{STRING_STDIN_FLAG};
         InputStream stdin = new ByteArrayInputStream(fileContentByLines.getBytes(StandardCharsets.UTF_8));
         splitApplication.run(args, stdin, stdout);
-        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
+        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
     }
 
     // [OPTIONS] and [FILES] are empty means LINES DEFAULT 1000
     @Test
-    public void run_FileIsEmpty_ReadsStdinAndCreateByLine() throws AbstractApplicationException,SplitException, IOException {
+    public void run_FileIsEmpty_ReadsStdinAndCreateByLine() throws Exception {
         String[] args = new String[]{};
         InputStream stdin = new ByteArrayInputStream(fileContentByLines.getBytes(StandardCharsets.UTF_8));
         splitApplication.run(args, stdin, stdout);
-        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
+        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
+    }
+
+    // Null Stdout
+    @Test
+    public void run_FileIsEmptyStdoutIsNull_ReadsStdinAndCreateByLine() throws Exception {
+        String[] args = new String[]{};
+        InputStream stdin = new ByteArrayInputStream(fileContentByLines.getBytes(StandardCharsets.UTF_8));
+        splitApplication.run(args, stdin, null);
+        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
     }
 
 
     // [OPTIONS] -l and [FILES] is single file with absolute path
     @Test
-    public void run_SingleFileAbsolutePathByLine_CreateFile() throws AbstractApplicationException, SplitException, IOException {
-        String[] args = new String[]{"-l", "10", "nested" + StringUtils.CHAR_FILE_SEP + "test1.txt"};
+    public void run_SingleFileAbsolutePathByLine_CreateFile() throws Exception {
+        String[] args = new String[]{"-l", "10", "nested" + StringUtils.STRING_FILE_SEP + "test1.txt"};
         splitApplication.run(args, System.in, stdout);
-        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
+        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
     }
 
     // [OPTIONS] -l and [FILES] is single file with relative path
     @Test
-    public void run_SingleFileRelativePathByLine_CreateFile() throws AbstractApplicationException, SplitException, IOException {
+    public void run_SingleFileRelativePathByLine_CreateFile() throws Exception {
         String[] args = new String[]{"-l", "10", "test-lines.txt"};
         splitApplication.run(args, System.in, stdout);
-        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
+        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
     }
 
     // STDIN and [OPTIONS] -l and [FILES] is none
     @Test
-    public void run_ByLineAndStdin_CreateFile() throws AbstractApplicationException, SplitException, IOException {
-        String[] args = new String[]{"-", "-l", "100"};
+    public void run_ByLineAndStdin_CreateFile() throws Exception {
+        String[] args = new String[]{"-l", "100", STRING_STDIN_FLAG};
         InputStream stdin = new ByteArrayInputStream(fileContentByLines.getBytes(StandardCharsets.UTF_8));
         splitApplication.run(args, stdin, stdout);
-        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
+        assertArrayEquals(fileContentByLines.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
     }
 
     // [OPTIONS] -b and [FILES] is single file
     @Test
-    public void run_ByByteSingleFile_CreateFile() throws AbstractApplicationException, SplitException, IOException {
+    public void run_ByByteSingleFile_CreateFile() throws Exception {
         String[] args = new String[]{"-b", "100m", "test-bytes.txt"};
         splitApplication.run(args, System.in, stdout);
-        assertArrayEquals(fileContentByBytes.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
+        assertArrayEquals(fileContentByBytes.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
     }
     // STDIN and [OPTIONS] -b and [FILES] is none
     @Test
-    public void run_ByBytesAndStdin_CreateFile() throws AbstractApplicationException, SplitException, IOException {
-        String[] args = new String[]{"-", "-b", "100m"};
+    public void run_ByBytesAndStdin_CreateFile() throws Exception {
+        String[] args = new String[]{"-b", "100m", STRING_STDIN_FLAG};
         InputStream stdin = new ByteArrayInputStream(fileContentByBytes.getBytes(StandardCharsets.UTF_8));
         splitApplication.run(args, stdin, stdout);
-        assertArrayEquals(fileContentByBytes.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
+        assertArrayEquals(fileContentByBytes.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
     }
 
     // [OPTIONS] -l and [FILES] are empty
@@ -205,7 +208,7 @@ public class SplitApplicationTest {
     public void run_ByLineAndFileIsEmpty_ThrowsException() {
         String[] args = new String[]{"-l"};
         Throwable missingArgs = assertThrows(SplitException.class, () -> splitApplication.run(args, System.in, stdout));
-        assertEquals(new SplitException(ERR_MISSING_ARGS_LINES).getMessage(), missingArgs.getMessage());
+        assertEquals(new SplitException(ERR_OPTION_REQUIRES_ARGUMENT).getMessage(), missingArgs.getMessage());
     }
 
     // [OPTIONS] -b and [FILES] are empty
@@ -213,23 +216,23 @@ public class SplitApplicationTest {
     public void run_ByByteAndFileIsEmpty_ThrowsException() {
         String[] args = new String[]{"-b"};
         Throwable missingArgs = assertThrows(SplitException.class, () -> splitApplication.run(args, System.in, stdout));
-        assertEquals(new SplitException(ERR_MISSING_ARGS_BYTES).getMessage(), missingArgs.getMessage());
+        assertEquals(new SplitException(ERR_OPTION_REQUIRES_ARGUMENT).getMessage(), missingArgs.getMessage());
     }
 
     // wrong line args indicated
     @Test
     public void run_ByLineWithWrongLineNum_ThrowsException() {
-        String[] args = new String[]{"-l", "100b", "text-lines.txt"};
+        String[] args = new String[]{"-l", "100b", "test-lines.txt"};
         Throwable wrongArgs = assertThrows(SplitException.class, () -> splitApplication.run(args, System.in, stdout));
-        assertEquals(new SplitException(ERR_INVALID_LINES + ": '100b'").getMessage(), wrongArgs.getMessage());
+        assertEquals(new SplitException(ERR_ILLEGAL_LINE_COUNT).getMessage(), wrongArgs.getMessage());
     }
 
     // wrong byte args indicated
     @Test
     public void run_ByBytesWithWrongByteStr_ThrowsException() {
-        String[] args = new String[]{"-b", "100a", "text-bytes.txt"};
+        String[] args = new String[]{"-b", "100a", "test-bytes.txt"};
         Throwable wrongArgs = assertThrows(SplitException.class, () -> splitApplication.run(args, System.in, stdout));
-        assertEquals(new SplitException(ERR_INVALID_BYTES + ": '100a'").getMessage(), wrongArgs.getMessage());
+        assertEquals(new SplitException(ERR_ILLEGAL_BYTE_COUNT).getMessage(), wrongArgs.getMessage());
     }
 
     // Too many arguments
@@ -237,62 +240,58 @@ public class SplitApplicationTest {
     public void run_ExtraArgs_ThrowsException() {
         String[] args = new String[]{"-b", "100b", "test-bytes.txt", "x", "extra-args"};
         Throwable extraArgs = assertThrows(SplitException.class, () -> splitApplication.run(args, System.in, stdout));
-        assertEquals(new SplitException(ERR_EXTRA_OPERAND + ": 'extra-args'").getMessage(), extraArgs.getMessage());
+        assertEquals(new SplitException(ERR_TOO_MANY_ARGS).getMessage(), extraArgs.getMessage());
     }
 
     // [FILES] is invalid file: prints error
     @Test
-    public void run_InvalidFile_ThrowsSplitException() {
+    public void run_InvalidFile_ThrowsException() {
         String[] args = new String[]{"-l", "10", "notfound.txt"};
         Throwable invalidFile = assertThrows(SplitException.class, () -> splitApplication.run(args, System.in, stdout));
-        String expected = String.format(SPLIT_ERR_FORMAT,"notfound.txt", ERR_FILE_NOT_FOUND);
-        assertEquals(new SplitException(expected).getMessage(), invalidFile.getMessage());
+        String expected = new SplitException(
+                new InvalidDirectoryException("notfound.txt", ERR_FILE_NOT_FOUND).getMessage()
+        ).getMessage();
+        assertEquals(expected, invalidFile.getMessage());
     }
 
     // [FILES] is a directory: prints error
     @Test
-    public void run_FileIsDirectory_ThrowsSplitException() {
+    public void run_FileIsDirectory_ThrowsException() {
         String[] args = new String[]{"-l", "10", "nested"};
         Throwable isDir = assertThrows(SplitException.class, () -> splitApplication.run(args, System.in, stdout));
-        String expected = String.format(SPLIT_ERR_FORMAT,"nested", ERR_IS_DIR);
-        assertEquals(new SplitException(expected).getMessage(), isDir.getMessage());
+        String expected = new SplitException(
+                new InvalidDirectoryException("nested", ERR_IS_DIR).getMessage()
+        ).getMessage();
+        assertEquals(expected, isDir.getMessage());
     }
 
     // [FILES] is a unreadable: prints error
     @Test
     @DisabledOnOs(WINDOWS)
-    public void run_FileIsUnreadable_ThrowsSplitException() {
+    public void run_FileIsUnreadable_ThrowsException() {
         String[] args = new String[]{"-l", "10", "test-unreadable.txt"};
         Throwable isDir = assertThrows(SplitException.class, () -> splitApplication.run(args, System.in, stdout));
-        String expected = String.format(SPLIT_ERR_FORMAT,"test-unreadable.txt", ERR_READING_FILE);
-        assertEquals(new SplitException(expected).getMessage(), isDir.getMessage());
+        String expected = new SplitException(
+                new InvalidDirectoryException("test-unreadable.txt", ERR_READING_FILE).getMessage()
+        ).getMessage();
+        assertEquals(expected, isDir.getMessage());
     }
 
     // Null Args
     @Test
-    public void run_ArgsIsNull_ThrowsSplitException() {
+    public void run_ArgsIsNull_ThrowsException() {
         Throwable argsIsNull = assertThrows(SplitException.class, () ->
                 splitApplication.run(null, null, null));
-        assertEquals(new SplitException(ERR_NULL_ARGS).getMessage(), argsIsNull.getMessage());
+        assertEquals(new SplitException(ERR_NO_ISTREAM).getMessage(), argsIsNull.getMessage());
     }
 
     // Null Stdin
     @Test
-    public void run_StdinIsNull_ThrowsSplitException() {
+    public void run_StdinIsNull_ThrowsException() {
         String[] args = new String[]{};
         Throwable stdinIsNull = assertThrows(SplitException.class, () ->
                 splitApplication.run(args, null, null));
         assertEquals(new SplitException(ERR_NO_ISTREAM).getMessage(), stdinIsNull.getMessage());
-    }
-
-    // Null Stdout
-    @Test
-    public void run_StdoutIsNull_ThrowsSplitException() {
-        String[] args = new String[]{};
-        InputStream stdin = new ByteArrayInputStream(fileContentByBytes.getBytes(StandardCharsets.UTF_8));
-        Throwable stdoutIsNull = assertThrows(SplitException.class, () ->
-                splitApplication.run(args, stdin, null));
-        assertEquals(new SplitException(ERR_NO_OSTREAM).getMessage(), stdoutIsNull.getMessage());
     }
 
     @Test
@@ -303,19 +302,19 @@ public class SplitApplicationTest {
         String thirdFile = lineFive + lineSix;
         String fourthFile = lineSeven + lineEight;
         String fifthFile = lineNine + lineTen;
-        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
-        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAB))));
-        assertArrayEquals(thirdFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAC))));
-        assertArrayEquals(fourthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAD))));
-        assertArrayEquals(fifthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAE))));
+        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
+        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAB)));
+        assertArrayEquals(thirdFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAC)));
+        assertArrayEquals(fourthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAD)));
+        assertArrayEquals(fifthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAE)));
     }
     @Test
     public void splitFileByLines_SevenLines_CreateTwoFiles() throws Exception {
         splitApplication.splitFileByLines("test-lines.txt", DEFAULT_PREFIX, 7);
         String firstFile = lineOne + lineTwo + lineThree + lineFour + lineFive + lineSix + lineSeven ;
         String secondFile = lineEight + lineNine + lineTen;
-        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
-        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAB))));
+        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
+        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAB)));
     }
 
     @Test
@@ -326,10 +325,10 @@ public class SplitApplicationTest {
         String secondFile = lineFour + lineFive + lineSix;
         String thirdFile = lineSeven + lineEight + lineNine;
         String fourthFile = lineTen;
-        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
-        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAB))));
-        assertArrayEquals(thirdFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAC))));
-        assertArrayEquals(fourthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAD))));
+        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
+        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAB)));
+        assertArrayEquals(thirdFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAC)));
+        assertArrayEquals(fourthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAD)));
     }
 
     @Test
@@ -338,8 +337,8 @@ public class SplitApplicationTest {
         splitApplication.splitStdinByLines(stdin, DEFAULT_PREFIX, 8);
         String firstFile = lineOne + lineTwo + lineThree + lineFour + lineFive + lineSix + lineSeven + lineEight;
         String secondFile = lineNine + lineTen;
-        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
-        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAB))));
+        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
+        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAB)));
     }
 
     // Null Stdin
@@ -348,7 +347,7 @@ public class SplitApplicationTest {
         Throwable stdinIsNull = assertThrows(Exception.class, () -> {
             splitApplication.splitStdinByLines(null, DEFAULT_PREFIX, DEFAULT_LINES);
         });
-        assertEquals(new Exception(ERR_NO_ISTREAM).getMessage(), stdinIsNull.getMessage());
+        assertEquals(new SplitException(ERR_NO_ISTREAM).getMessage(), stdinIsNull.getMessage());
     }
 
     @Test
@@ -359,18 +358,18 @@ public class SplitApplicationTest {
         String thirdFile = byteFive + byteSix;
         String fourthFile = byteSeven + byteEight;
         String fifthFile = byteNine + byteTen;
-        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
-        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAB))));
-        assertArrayEquals(thirdFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAC))));
-        assertArrayEquals(fourthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAD))));
-        assertArrayEquals(fifthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAE))));
+        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
+        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAB)));
+        assertArrayEquals(thirdFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAC)));
+        assertArrayEquals(fourthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAD)));
+        assertArrayEquals(fifthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAE)));
     }
 
     @Test
     public void splitStdinByBytes_OneB_CreateOneFile() throws Exception {
         InputStream stdin = new ByteArrayInputStream(fileContentByBytes.getBytes(StandardCharsets.UTF_8));
         splitApplication.splitStdinByBytes(stdin, DEFAULT_PREFIX, "1b");
-        assertArrayEquals(fileContentByBytes.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
+        assertArrayEquals(fileContentByBytes.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
     }
 
     @Test
@@ -382,11 +381,11 @@ public class SplitApplicationTest {
         String thirdFile = byteFive + byteSix;
         String fourthFile = byteSeven + byteEight;
         String fifthFile = byteNine + byteTen;
-        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAA))));
-        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAB))));
-        assertArrayEquals(thirdFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAC))));
-        assertArrayEquals(fourthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAD))));
-        assertArrayEquals(fifthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes((Paths.get(OUTPUT_XAE))));
+        assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
+        assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAB)));
+        assertArrayEquals(thirdFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAC)));
+        assertArrayEquals(fourthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAD)));
+        assertArrayEquals(fifthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAE)));
     }
 
     // Null Stdin
@@ -395,7 +394,7 @@ public class SplitApplicationTest {
         Throwable stdinIsNull = assertThrows(Exception.class, () -> {
             splitApplication.splitStdinByBytes(null, DEFAULT_PREFIX, "100m");
         });
-        assertEquals(new Exception(ERR_NO_ISTREAM).getMessage(), stdinIsNull.getMessage());
+        assertEquals(new SplitException(ERR_NO_ISTREAM).getMessage(), stdinIsNull.getMessage());
     }
 
 //    @Test

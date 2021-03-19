@@ -41,13 +41,10 @@ public class LsResult extends Result {
             return STRING_EMPTY;
         }
 
-        List<String> result = files.stream().map(File::getName).collect(Collectors.toList());
-
-        if (isSortByExt) {
-            result = result.stream()
-                    .sorted(Comparator.comparing(StringUtils::getFileExtension).thenComparing(Comparator.naturalOrder()))
-                    .collect(Collectors.toList());
-        }
+        List<String> result = files.stream()
+                .map(File::getName)
+                .sorted(isSortByExt ? Comparator.comparing(StringUtils::getFileExtension).thenComparing(Comparator.naturalOrder()) : Comparator.naturalOrder())
+                .collect(Collectors.toList());
 
         if (showLabel && !label.isEmpty()) {
             result = Stream.concat(Stream.of(

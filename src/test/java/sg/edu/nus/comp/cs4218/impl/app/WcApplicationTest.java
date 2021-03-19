@@ -9,6 +9,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayInputStream;
@@ -153,7 +154,7 @@ class WcApplicationTest {
         int testLines = 1;
         testInputStream = createInputStream(generateString(testLines));
 
-        String[] args = {"-"};
+        String[] args = {STRING_STDIN_FLAG};
         assertDoesNotThrow(() -> wcApp.run(args, testInputStream, testOutputStream));
         String[] result = testOutputStream.toString().split(REGEX);
 

@@ -2,6 +2,7 @@ package tdd.ef2;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
@@ -23,8 +24,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
+@Disabled
 public class PasteApplicationTest {
     public static final String TEMP = "temp-paste";
     public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
@@ -54,10 +58,10 @@ public class PasteApplicationTest {
     private String[] toArgs(String flag, String... files) {
         List<String> args = new ArrayList<>();
         if (!flag.isEmpty()) {
-            args.add("-" + flag);
+            args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
-            if (file.equals("-")) {
+            if (file.equals(STRING_STDIN_FLAG)) {
                 args.add(file);
             } else {
                 args.add(Paths.get(TEMP, file).toString());
@@ -71,14 +75,14 @@ public class PasteApplicationTest {
         ByteArrayOutputStream output = null;
         String text = "Test line 1\nTest line 2\nTest line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(""), inputStream, output));
+        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY), inputStream, output));
     }
 
     @Test
     void run_NullStdinNullFilesNoFlag_ThrowsException() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream inputStream = null;
-        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(""), inputStream, output));
+        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY), inputStream, output));
     }
 
     @Test
@@ -94,7 +98,7 @@ public class PasteApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String text = "Test line 1\nTest line 2\nTest line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        new PasteApplication().run(toArgs(""), inputStream, output);
+        new PasteApplication().run(toArgs(STRING_EMPTY), inputStream, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -114,7 +118,7 @@ public class PasteApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String text = "Test line 1\nTest line 2\nTest line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        new PasteApplication().run(toArgs("", "-"), inputStream, output);
+        new PasteApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG), inputStream, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -124,23 +128,23 @@ public class PasteApplicationTest {
         String text = "Test line 1\nTest line 2\nTest line 3";
         String expectedText = "Test line 1\tTest line 2\tTest line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        new PasteApplication().run(toArgs("s", "-"), inputStream, output);
+        new PasteApplication().run(toArgs("s", STRING_STDIN_FLAG), inputStream, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
     void run_SingleEmptyStdinNoFlag_DisplaysEmpty() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = "";
+        String text = STRING_EMPTY;
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        new PasteApplication().run(toArgs(""), inputStream, output);
+        new PasteApplication().run(toArgs(STRING_EMPTY), inputStream, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
     void run_SingleEmptyStdinFlag_DisplaysEmpty() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = "";
+        String text = STRING_EMPTY;
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new PasteApplication().run(toArgs("s"), inputStream, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
@@ -151,7 +155,7 @@ public class PasteApplicationTest {
     void run_NonexistentFileNoFlag_ThrowsException() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String nonexistentFileName = "nonexistent_file.txt";
-        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs("", nonexistentFileName),
+        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY, nonexistentFileName),
                 System.in, output));
     }
 
@@ -161,7 +165,7 @@ public class PasteApplicationTest {
         String directoryName = "nonexistent_file.txt";
         Path path = Paths.get(EnvironmentUtil.currentDirectory, directoryName);
         Files.createDirectory(path);
-        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs("", directoryName),
+        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY, directoryName),
                 System.in, output));
         Files.delete(path);
     }
@@ -173,7 +177,7 @@ public class PasteApplicationTest {
         String text = "Test line 1\nTest line 2\nTest line 3";
         Path filePath = createFile(fileName, text);
         File file = new File(filePath.toString());
-        new PasteApplication().run(toArgs("", fileName), System.in, output);
+        new PasteApplication().run(toArgs(STRING_EMPTY, fileName), System.in, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -192,10 +196,10 @@ public class PasteApplicationTest {
     void run_SingleEmptyFileNoFlag_DisplaysEmpty() throws IOException, AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileC.txt";
-        String text = "";
+        String text = STRING_EMPTY;
         Path filePath = createFile(fileName, text);
         File file = new File(filePath.toString());
-        new PasteApplication().run(toArgs("", fileName), System.in, output);
+        new PasteApplication().run(toArgs(STRING_EMPTY, fileName), System.in, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -203,14 +207,14 @@ public class PasteApplicationTest {
     void run_SingleEmptyFileFlag_DisplaysEmpty() throws IOException, AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileD.txt";
-        String text = "";
+        String text = STRING_EMPTY;
         createFile(fileName, text);
         new PasteApplication().run(toArgs("s", fileName), System.in, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
-    void run_SingleFileUnknownFlag_Throws() throws IOException {
+    void run_SingleFileUnknownFlag_ThrowsException() throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileE.txt";
         String text = "Test line 1\nTest line 2\nTest line 3";
@@ -230,7 +234,7 @@ public class PasteApplicationTest {
         File file1 = new File(filePath1.toString());
         Path filePath2 = createFile(fileName2, text2);
         File file2 = new File(filePath2.toString());
-        new PasteApplication().run(toArgs("", fileName1, fileName2), System.in, output);
+        new PasteApplication().run(toArgs(STRING_EMPTY, fileName1, fileName2), System.in, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -255,12 +259,12 @@ public class PasteApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileJ.txt";
         String fileName2 = "fileK.txt";
-        String text = "";
+        String text = STRING_EMPTY;
         Path filePath1 = createFile(fileName1, text);
         File file1 = new File(filePath1.toString());
         Path filePath2 = createFile(fileName2, text);
         File file2 = new File(filePath2.toString());
-        new PasteApplication().run(toArgs("", fileName1, fileName2), System.in, output);
+        new PasteApplication().run(toArgs(STRING_EMPTY, fileName1, fileName2), System.in, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -269,7 +273,7 @@ public class PasteApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileL.txt";
         String fileName2 = "fileM.txt";
-        String text = "";
+        String text = STRING_EMPTY;
         Path filePath1 = createFile(fileName1, text);
         File file1 = new File(filePath1.toString());
         Path filePath2 = createFile(fileName2, text);
@@ -285,7 +289,7 @@ public class PasteApplicationTest {
         String stdinText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String nonexistentFileName = "nonexistent_file.txt";
-        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs("", nonexistentFileName),
+        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY, nonexistentFileName),
                 inputStream, output));
     }
 
@@ -297,7 +301,7 @@ public class PasteApplicationTest {
         String directoryName = "nonexistent_file.txt";
         Path path = Paths.get(EnvironmentUtil.currentDirectory, directoryName);
         Files.createDirectory(path);
-        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs("", directoryName),
+        assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY, directoryName),
                 inputStream, output));
         Files.delete(path);
     }
@@ -313,7 +317,7 @@ public class PasteApplicationTest {
         Path filePath = createFile(fileName, fileText);
         File file = new File(filePath.toString());
         String expectedText = "Test line 1.1\tTest line 2.1\nTest line 1.2\tTest line 2.2\nTest line 1.3";
-        new PasteApplication().run(toArgs("", "-", fileName), inputStream, output);
+        new PasteApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG, fileName), inputStream, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -328,7 +332,7 @@ public class PasteApplicationTest {
         String stdinText = "Test line 2.1\nTest line 2.2";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String expectedText = "Test line 1.1\tTest line 2.1\nTest line 1.2\tTest line 2.2\nTest line 1.3";
-        new PasteApplication().run(toArgs("", fileName, "-"), inputStream, output);
+        new PasteApplication().run(toArgs(STRING_EMPTY, fileName, STRING_STDIN_FLAG), inputStream, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 }

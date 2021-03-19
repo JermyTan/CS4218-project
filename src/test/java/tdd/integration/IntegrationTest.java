@@ -2,7 +2,7 @@ package tdd.integration;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -14,6 +14,7 @@ import java.util.Comparator;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
@@ -21,6 +22,7 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.ShellImpl;
 
+@Disabled
 public class IntegrationTest {
     public static final String TEMP = "temp";
     public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
@@ -72,9 +74,9 @@ public class IntegrationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "file.txt";
         Path filePath = createFile(fileName);
-        String commandString = "wc `echo " + TEMP + CHAR_FILE_SEP + fileName + "`";
+        String commandString = "wc `echo " + TEMP + STRING_FILE_SEP + fileName + "`";
         new ShellImpl().parseAndEvaluate(commandString, output);
-        assertArrayEquals(("       0       0       0 " + TEMP + CHAR_FILE_SEP + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(("       0       0       0 " + TEMP + STRING_FILE_SEP + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -103,7 +105,7 @@ public class IntegrationTest {
         Path filePath = createFile(fileName);
         String text = "file contents";
         Files.write(filePath, text.getBytes());
-        String commandString = "echo 1; cat " + TEMP + CHAR_FILE_SEP + fileName;
+        String commandString = "echo 1; cat " + TEMP + STRING_FILE_SEP + fileName;
         new ShellImpl().parseAndEvaluate(commandString, output);
         assertArrayEquals((1 + STRING_NEWLINE + text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
@@ -116,7 +118,7 @@ public class IntegrationTest {
         Path filePath = createFile(fileName);
         String text = "file contents";
         Files.write(filePath, text.getBytes());
-        String commandString = "echo 1; paste " + TEMP + CHAR_FILE_SEP + fileName;
+        String commandString = "echo 1; paste " + TEMP + STRING_FILE_SEP + fileName;
         new ShellImpl().parseAndEvaluate(commandString, output);
         assertArrayEquals((1 + STRING_NEWLINE + text + STRING_NEWLINE).getBytes(), output.toByteArray());
     }

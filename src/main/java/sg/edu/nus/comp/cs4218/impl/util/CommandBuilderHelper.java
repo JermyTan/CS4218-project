@@ -52,7 +52,7 @@ public final class CommandBuilderHelper {
             ArgumentResolver argumentResolver,
             List<CallCommand> callCmdsForPipe,
             List<String> tokens
-            ) throws ShellException {
+    ) throws ShellException {
         if (tokens.isEmpty()) {
             // cannot start a new command with pipe
             throw new ShellException(ERR_SYNTAX);
@@ -95,7 +95,7 @@ public final class CommandBuilderHelper {
             List<Command> cmdsForSequence,
             List<CallCommand> callCmdsForPipe,
             List<String> tokens
-            ) throws ShellException {
+    ) throws ShellException {
         switch (firstChar) {
         case CHAR_REDIR_INPUT:
         case CHAR_REDIR_OUTPUT:

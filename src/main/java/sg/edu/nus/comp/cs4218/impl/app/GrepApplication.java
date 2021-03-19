@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -35,11 +36,12 @@ import sg.edu.nus.comp.cs4218.impl.parser.GrepArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.GrepResult;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.GodClass")
 public class GrepApplication implements GrepInterface {
 
-    private static final String STDIN_LABEL = "(standard input)";
+    public static final String STDIN_LABEL = "(standard input)";
 
     /**
      * Runs the grep application with the specified arguments.
@@ -70,7 +72,11 @@ public class GrepApplication implements GrepInterface {
         String pattern = parser.getPattern();
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
-        if (stdin == null && (fileNames == null || fileNames.length == 0)) {
+        if (stdin == null
+                && (fileNames == null
+                || fileNames.length == 0
+                || Arrays.stream(fileNames).allMatch(StringUtils::isBlank))
+        ) {
             throw new GrepException(ERR_NO_INPUT);
         }
 

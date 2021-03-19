@@ -37,8 +37,6 @@ public class PipeCommand implements Command {
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException {
-        AbstractApplicationException absAppException = null;
-        ShellException shellException = null;
 
         InputStream nextInputStream = stdin;
         OutputStream nextOutputStream;//NOPMD
@@ -46,27 +44,17 @@ public class PipeCommand implements Command {
         for (int i = 0; i < callCommands.size(); i++) {
             CallCommand callCommand = callCommands.get(i);
 
-            try {
-                nextOutputStream = new ByteArrayOutputStream();
-                if (i == callCommands.size() - 1) {
-                    nextOutputStream = stdout;
-                }
-                callCommand.evaluate(nextInputStream, nextOutputStream);
-                if (i != callCommands.size() - 1) {
-                    nextInputStream = new ByteArrayInputStream(((ByteArrayOutputStream) nextOutputStream).toByteArray());//NOPMD
-                }
-            } catch (AbstractApplicationException e) {
-                absAppException = e;
-            } catch (ShellException e) {
-                shellException = e;
+            nextOutputStream = new ByteArrayOutputStream();
+            if (i == callCommands.size() - 1) {
+                nextOutputStream = stdout;
             }
-        }
 
-        if (absAppException != null) {
-            throw absAppException;
-        }
-        if (shellException != null) {
-            throw shellException;
+            callCommand.evaluate(nextInputStream, nextOutputStream);
+
+            if (i != callCommands.size() - 1) {
+                nextInputStream = new ByteArrayInputStream(((ByteArrayOutputStream) nextOutputStream).toByteArray());//NOPMD
+            }
+
         }
     }
 

@@ -9,6 +9,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 
@@ -172,7 +173,7 @@ class GrepApplicationTest {
 
     @Test
     void run_FilenameDash_UseStdin() {
-        String[] args = {"Copyright", "-"};
+        String[] args = {"Copyright", STRING_STDIN_FLAG};
         assertDoesNotThrow(() -> grepApp.run(args, testInputStream, testOutputStream));
         List<String> result = testOutputStream.toString().lines().collect(Collectors.toList());
         assertEquals(1, result.size());
@@ -250,8 +251,8 @@ class GrepApplicationTest {
         String output = assertDoesNotThrow(() -> grepApp.grepFromStdin(TEST_LINE_7, false, false, true, testInputStream));
         List<String> result = output.lines().collect(Collectors.toList());
         assertEquals(2, result.size());
-        assertEquals("(standard input): " + TEST_LINE_4, result.get(0));
-        assertEquals("(standard input): " + TEST_LINE_5, result.get(1));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, TEST_LINE_4), result.get(0));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, TEST_LINE_5), result.get(1));
     }
 
     @Test

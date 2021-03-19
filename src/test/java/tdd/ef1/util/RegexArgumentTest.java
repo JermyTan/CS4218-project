@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.*;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_PARENT_DIR;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
@@ -76,11 +79,11 @@ class RegexArgumentTest {
     @BeforeAll
     static void setupAll() throws IOException {
         new File(tempDir, FOLDER_NAME).mkdir();
-        new File(tempDir, FOLDER_NAME + StringUtils.CHAR_FILE_SEP + SUBFOLDER_NAME).mkdir();
+        new File(tempDir, FOLDER_NAME + STRING_FILE_SEP + SUBFOLDER_NAME).mkdir();
         for(String filename : ASTERISK_FILES) {
             new File(tempDir, filename).createNewFile();
-            new File(tempDir, FOLDER_NAME + StringUtils.CHAR_FILE_SEP + filename).createNewFile();
-            new File(tempDir, FOLDER_NAME + StringUtils.CHAR_FILE_SEP + SUBFOLDER_NAME + StringUtils.CHAR_FILE_SEP + filename).createNewFile();
+            new File(tempDir, FOLDER_NAME + STRING_FILE_SEP + filename).createNewFile();
+            new File(tempDir, FOLDER_NAME + STRING_FILE_SEP + SUBFOLDER_NAME + STRING_FILE_SEP + filename).createNewFile();
         }
     }
 
@@ -160,36 +163,36 @@ class RegexArgumentTest {
     // folder/x_*
     @Test
     public void globFiles_FolderStringAsterisk_ReturnsAll() throws ShellException {
-        for(char c: (FOLDER_NAME + StringUtils.CHAR_FILE_SEP + "x_").toCharArray()) {
+        for(char c: (FOLDER_NAME + STRING_FILE_SEP + "x_").toCharArray()) {
             regexArgument.append(c);
         }
         regexArgument.appendAsterisk();
         List<String> fileList = regexArgument.globFiles();
         assertEquals(X_ASTERISK_FILES.length, fileList.size());
         for(String filename : X_ASTERISK_FILES) {
-            assertTrue(fileList.contains(FOLDER_NAME + StringUtils.CHAR_FILE_SEP + filename));
+            assertTrue(fileList.contains(FOLDER_NAME + STRING_FILE_SEP + filename));
         }
     }
 
     // folder/x_*/
     @Test
     public void globFiles_FolderStringAsteriskWithEndingSlash_ReturnsAll() throws ShellException {
-        for(char c: (FOLDER_NAME + StringUtils.CHAR_FILE_SEP + "x_").toCharArray()) {
+        for(char c: (FOLDER_NAME + STRING_FILE_SEP + "x_").toCharArray()) {
             regexArgument.append(c);
         }
         regexArgument.appendAsterisk();
-        regexArgument.append(StringUtils.CHAR_FILE_SEP);
+        regexArgument.append(CHAR_FILE_SEP);
         List<String> fileList = regexArgument.globFiles();
         assertEquals(X_ASTERISK_FILES.length, fileList.size());
         for(String filename : X_ASTERISK_FILES) {
-            assertTrue(fileList.contains(FOLDER_NAME + StringUtils.CHAR_FILE_SEP + filename));
+            assertTrue(fileList.contains(FOLDER_NAME + STRING_FILE_SEP + filename));
         }
     }
 
     // folder/subfolder/*_x
     @Test
     public void globFiles_SubfolderAsteriskString_ReturnsAll() throws ShellException {
-        for(char c: (FOLDER_NAME + StringUtils.CHAR_FILE_SEP + SUBFOLDER_NAME + StringUtils.CHAR_FILE_SEP).toCharArray()) {
+        for(char c: (FOLDER_NAME + STRING_FILE_SEP + SUBFOLDER_NAME + STRING_FILE_SEP).toCharArray()) {
             regexArgument.append(c);
         }
         regexArgument.appendAsterisk();
@@ -198,15 +201,15 @@ class RegexArgumentTest {
         List<String> fileList = regexArgument.globFiles();
         assertEquals(ASTERISK_X_FILES.length, fileList.size());
         for(String filename : ASTERISK_X_FILES) {
-            assertTrue(fileList.contains(FOLDER_NAME + StringUtils.CHAR_FILE_SEP + SUBFOLDER_NAME + StringUtils.CHAR_FILE_SEP + filename));
+            assertTrue(fileList.contains(FOLDER_NAME + STRING_FILE_SEP + SUBFOLDER_NAME + STRING_FILE_SEP + filename));
         }
     }
 
     // ../*_x
     @Test
     public void globFiles_UpOneLevelStringAsterisk_ReturnsAll() throws ShellException {
-        EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + FOLDER_NAME);
-        for(char c: (".." + StringUtils.CHAR_FILE_SEP).toCharArray()) {
+        EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath() + STRING_FILE_SEP + FOLDER_NAME);
+        for(char c: (STRING_PARENT_DIR + STRING_FILE_SEP).toCharArray()) {
             regexArgument.append(c);
         }
         regexArgument.appendAsterisk();
@@ -215,33 +218,33 @@ class RegexArgumentTest {
         List<String> fileList = regexArgument.globFiles();
         assertEquals(ASTERISK_X_FILES.length, fileList.size());
         for(String filename : ASTERISK_X_FILES) {
-            assertTrue(fileList.contains(".." + StringUtils.CHAR_FILE_SEP + filename));
+            assertTrue(fileList.contains(STRING_PARENT_DIR+ STRING_FILE_SEP + filename));
         }
     }
 
     // ../../x_*
     @Test
     public void globFiles_UpTwoLevelStringAsterisk_ReturnsAll() throws ShellException {
-        EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + FOLDER_NAME + StringUtils.CHAR_FILE_SEP + SUBFOLDER_NAME);
-        for(char c: (".." + StringUtils.CHAR_FILE_SEP + ".." + StringUtils.CHAR_FILE_SEP + "x_").toCharArray()) {
+        EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath() + STRING_FILE_SEP + FOLDER_NAME + StringUtils.STRING_FILE_SEP + SUBFOLDER_NAME);
+        for(char c: (STRING_PARENT_DIR + STRING_FILE_SEP + STRING_PARENT_DIR + STRING_FILE_SEP + "x_").toCharArray()) {
             regexArgument.append(c);
         }
         regexArgument.appendAsterisk();
         List<String> fileList = regexArgument.globFiles();
         assertEquals(X_ASTERISK_FILES.length, fileList.size());
         for(String filename : X_ASTERISK_FILES) {
-            assertTrue(fileList.contains(".." + StringUtils.CHAR_FILE_SEP + ".." + StringUtils.CHAR_FILE_SEP + filename));
+            assertTrue(fileList.contains(STRING_PARENT_DIR + STRING_FILE_SEP + STRING_PARENT_DIR + STRING_FILE_SEP + filename));
         }
     }
 
     // folder/*/x_and_x
     @Test
     public void globFile_AsteriskInNonTerminal_ThrowsException() {
-        for (char c: (FOLDER_NAME + StringUtils.CHAR_FILE_SEP).toCharArray()) {
+        for (char c: (FOLDER_NAME + StringUtils.STRING_FILE_SEP).toCharArray()) {
             regexArgument.append(c);
         }
         regexArgument.appendAsterisk();
-        for (char c: (StringUtils.CHAR_FILE_SEP + X_AND_X).toCharArray()) {
+        for (char c: (StringUtils.STRING_FILE_SEP + X_AND_X).toCharArray()) {
             regexArgument.append(c);
         }
         Exception expectedException =  assertThrows(ShellException.class, () -> {

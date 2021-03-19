@@ -95,7 +95,7 @@ class TeeApplicationTest {
     // tee with absolute path: write to stdout and file
     @Test
     public void run_SingleFileAbsolutePath_WriteToFileAndStdout() throws AbstractApplicationException, TeeException, IOException {
-        String[] argList = new String[]{tempDir.getAbsolutePath() + StringUtils.CHAR_FILE_SEP + "tee1.txt"};
+        String[] argList = new String[]{tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + "tee1.txt"};
         teeApplication.run(argList, stdin, System.out);
         assertEquals(STDIN_STRING, stdout.toString());
         File outputFile = new File(tempDir, "tee1.txt");

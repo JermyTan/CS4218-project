@@ -3,6 +3,8 @@ package tdd.ef2;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
@@ -22,6 +25,7 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CpException;
 import sg.edu.nus.comp.cs4218.impl.app.CpApplication;
 
+@Disabled
 public class CpApplicationTest {
     public static final String TEMP = "temp-cp";
     public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
@@ -66,7 +70,7 @@ public class CpApplicationTest {
     private String[] toArgs(String flag, String... files) {
         List<String> args = new ArrayList<>();
         if (!flag.isEmpty()) {
-            args.add("-" + flag);
+            args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
             args.add(Paths.get(TEMP, file).toString());
@@ -82,8 +86,8 @@ public class CpApplicationTest {
         Path destFile = createFile(destName);
         String destContent = "This file is not empty.";
         writeToFile(destFile, destContent);
-        new CpApplication().run(toArgs("", srcName, destName), System.in, System.out);
-        assertArrayEquals(("").getBytes(), Files.readAllBytes(destFile));
+        new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out);
+        assertArrayEquals(STRING_EMPTY.getBytes(), Files.readAllBytes(destFile));
     }
 
     @Test
@@ -94,7 +98,7 @@ public class CpApplicationTest {
         Path destFile = createFile(destName);
         String srcContent = "This file is not empty.";
         writeToFile(srcFile, srcContent);
-        new CpApplication().run(toArgs("", srcName, destName), System.in, System.out);
+        new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out);
         assertArrayEquals(srcContent.getBytes(), Files.readAllBytes(destFile));
     }
 
@@ -108,38 +112,38 @@ public class CpApplicationTest {
         String destContent = "This is the destination file.";
         writeToFile(srcFile, srcContent);
         writeToFile(destFile, destContent);
-        new CpApplication().run(toArgs("", srcName, destName), System.in, System.out);
+        new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out);
         assertArrayEquals(srcContent.getBytes(), Files.readAllBytes(destFile));
     }
 
     @Test
-    void run_NonemptyFileToSameFile_Throws() throws IOException {
+    void run_NonemptyFileToSameFile_ThrowsException() throws IOException {
         String srcName = "src_file.txt";
         Path srcFile = createFile(srcName);
         String srcContent = "This is the same file.";
         writeToFile(srcFile, srcContent);
-        assertThrows(CpException.class, () -> new CpApplication().run(toArgs("", srcName, srcName), System.in, System.out));
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY, srcName, srcName), System.in, System.out));
     }
 
     @Test
-    void run_DirectoryToFile_Throws() throws IOException {
+    void run_DirectoryToFile_ThrowsException() throws IOException {
         String srcName = "src_dir";
         String destName = "dest_file.txt";
         createDirectory(srcName);
         Path destFile = createFile(destName);
         String destContent = "This is the destination file.";
         writeToFile(destFile, destContent);
-        assertThrows(CpException.class, () -> new CpApplication().run(toArgs("", srcName, destName), System.in, System.out));
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out));
     }
 
     @Test
-    void run_NonexistentFileToFile_Throws() throws IOException {
+    void run_NonexistentFileToFile_ThrowsException() throws IOException {
         String srcName = "src_file.txt";
         String destName = "dest_file.txt";
         Path destFile = createFile(destName);
         String destContent = "This is the destination file.";
         writeToFile(destFile, destContent);
-        assertThrows(CpException.class, () -> new CpApplication().run(toArgs("", srcName, destName), System.in, System.out));
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out));
     }
 
     @Test
@@ -149,7 +153,7 @@ public class CpApplicationTest {
         Path srcFile = createFile(srcName);
         String srcContent = "This is the source file.";
         writeToFile(srcFile, srcContent);
-        new CpApplication().run(toArgs("", srcName, destName), System.in, System.out);
+        new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out);
         Path destFile = TEMP_PATH.resolve(destName);
         assertTrue(Files.exists(destFile));
         assertArrayEquals(srcContent.getBytes(), Files.readAllBytes(destFile));
@@ -181,7 +185,7 @@ public class CpApplicationTest {
         String srcContent = "This is the source file.";
         writeToFile(srcFile, srcContent);
         Path destDir = createDirectory(destName);
-        new CpApplication().run(toArgs("", srcName, destName), System.in, System.out);
+        new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out);
         Path destFile = destDir.resolve(srcName);
         assertTrue(Files.exists(destFile));
         assertArrayEquals(srcContent.getBytes(), Files.readAllBytes(destFile));
@@ -197,7 +201,7 @@ public class CpApplicationTest {
         Path destDir = createDirectory(destName);
         String destOrigName = "dest_orig_file.txt";
         Path destOrigFile = createFile(destOrigName, destDir);
-        new CpApplication().run(toArgs("", srcName, destName), System.in, System.out);
+        new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out);
         assertTrue(Files.exists(destOrigFile));
         Path destFile = destDir.resolve(srcName);
         assertTrue(Files.exists(destFile));
@@ -222,20 +226,20 @@ public class CpApplicationTest {
         String destName = "dest_dir";
         createDirectory(srcName);
         Path destDir = createDirectory(destName);
-        new CpApplication().run(toArgs("", srcName, destName), System.in, System.out);
+        new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out);
         Path destFile = destDir.resolve(srcName);
         assertTrue(Files.notExists(destFile));
     }
 
     @Test
-    void run_DirectoryToSameDirectoryWithFlag_Throws() throws IOException {
+    void run_DirectoryToSameDirectoryWithFlag_ThrowsException() throws IOException {
         String sameName = "same_dir";
         createDirectory(sameName);
         assertThrows(CpException.class, () -> new CpApplication().run(toArgs("r", sameName, sameName), System.in, System.out));
     }
 
     @Test
-    void run_NonexistentDirectoryToDirectoryWithFlag_Throws() throws IOException {
+    void run_NonexistentDirectoryToDirectoryWithFlag_ThrowsException() throws IOException {
         String nonexistentSrcName = "nonexistent_dir";
         String destName = "dest_dir";
         createDirectory(destName);
@@ -249,18 +253,18 @@ public class CpApplicationTest {
         String srcContent = "This is the source file.";
         writeToFile(srcFile, srcContent);
         String destName = "dest_dir";
-        new CpApplication().run(toArgs("", srcName, destName), System.in, System.out);
+        new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out);
         Path destFile = TEMP_PATH.resolve(destName);
         assertTrue(Files.exists(destFile));
         assertArrayEquals(srcContent.getBytes(), Files.readAllBytes(destFile));
     }
 
     @Test
-    void run_DirectoryToNonexistentDirectoryWithoutFlag_Throws() throws IOException {
+    void run_DirectoryToNonexistentDirectoryWithoutFlag_ThrowsException() throws IOException {
         String srcName = "src_dir";
         createDirectory(srcName);
         String nonexistentDestName = "nonexistent_dir";
-        assertThrows(CpException.class, () -> new CpApplication().run(toArgs("", srcName, nonexistentDestName), System.in, System.out));
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY, srcName, nonexistentDestName), System.in, System.out));
     }
 
     @Test
@@ -282,22 +286,22 @@ public class CpApplicationTest {
     }
 
     @Test
-    void run_MissingSrcAndDestArguments_Throws() {
-        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(""), System.in, System.out));
+    void run_MissingSrcAndDestArguments_ThrowsException() {
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY), System.in, System.out));
     }
 
     @Test
-    void run_FileToMissingDestArgument_Throws() throws IOException {
+    void run_FileToMissingDestArgument_ThrowsException() throws IOException {
         String srcName = "src_file.txt";
         createFile(srcName);
-        assertThrows(CpException.class, () -> new CpApplication().run(toArgs("", srcName), System.in, System.out));
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY, srcName), System.in, System.out));
     }
 
     @Test
-    void run_DirectoryToMissingDestArgument_Throws() throws IOException {
+    void run_DirectoryToMissingDestArgument_ThrowsException() throws IOException {
         String srcName = "src_dir";
         createDirectory(srcName);
-        assertThrows(CpException.class, () -> new CpApplication().run(toArgs("", srcName), System.in, System.out));
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY, srcName), System.in, System.out));
     }
 
     @Test
@@ -308,7 +312,7 @@ public class CpApplicationTest {
         createFile(srcAName);
         createFile(srcBName);
         Path destDir = createDirectory(destName);
-        new CpApplication().run(toArgs("", srcAName, srcBName, destName), System.in, System.out);
+        new CpApplication().run(toArgs(STRING_EMPTY, srcAName, srcBName, destName), System.in, System.out);
         Path destAFile = destDir.resolve(srcAName);
         Path destBFile = destDir.resolve(srcBName);
         assertTrue(Files.exists(destAFile));
@@ -316,7 +320,7 @@ public class CpApplicationTest {
     }
 
     @Test
-    void run_MultipleFilesToFile_Throws() throws IOException {
+    void run_MultipleFilesToFile_ThrowsException() throws IOException {
         String srcAName = "srcA_file.txt";
         String srcBName = "srcB_file.txt";
         String destName = "dest_file.txt";
@@ -344,7 +348,7 @@ public class CpApplicationTest {
     }
 
     @Test
-    void run_MultipleDirectoriesToFile_Throws() throws IOException {
+    void run_MultipleDirectoriesToFile_ThrowsException() throws IOException {
         String srcAName = "srcA_dir";
         String srcBName = "srcB_dir";
         String destName = "dest_file.txt";
@@ -370,7 +374,7 @@ public class CpApplicationTest {
     }
 
     @Test
-    void run_MultipleFilesAndDirectoriesToFile_Throws() throws IOException {
+    void run_MultipleFilesAndDirectoriesToFile_ThrowsException() throws IOException {
         String srcAName = "srcA_file.txt";
         String srcBName = "srcB_dir";
         String destName = "dest_file.txt";

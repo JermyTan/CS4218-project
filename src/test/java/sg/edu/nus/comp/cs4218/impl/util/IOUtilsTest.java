@@ -152,10 +152,10 @@ class IOUtilsTest {
         String testString = "This is the start of the test file\n\ntesting 123     21212    12 12  .\ntesting 121\n\nThis is the end of the test file";
         List<String> expected = List.of(
                 "This is the start of the test file",
-                "",
+                STRING_EMPTY,
                 "testing 123     21212    12 12  .",
                 "testing 121",
-                "",
+                STRING_EMPTY,
                 "This is the end of the test file"
         );
 

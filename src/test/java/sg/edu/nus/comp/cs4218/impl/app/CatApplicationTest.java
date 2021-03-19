@@ -16,6 +16,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayInputStream;
@@ -145,7 +146,7 @@ class CatApplicationTest {
         String expected = STD_INPUT;
         provideInput(expected);
 
-        assertDoesNotThrow(() -> app.run(new String[]{"-"}, stdin, stdout));
+        assertDoesNotThrow(() -> app.run(new String[]{STRING_STDIN_FLAG}, stdin, stdout));
 
         assertEquals(expected, stdout.toString());
     }
@@ -156,7 +157,7 @@ class CatApplicationTest {
         String stdinInput = STD_INPUT;
         provideInput(stdinInput);
 
-        assertDoesNotThrow(() -> app.run(new String[]{FILE_1, "-"}, stdin, stdout));
+        assertDoesNotThrow(() -> app.run(new String[]{FILE_1, STRING_STDIN_FLAG}, stdin, stdout));
 
         assertEquals(fileContent + stdinInput, stdout.toString());
     }
@@ -289,7 +290,7 @@ class CatApplicationTest {
         provideInput(stdinInput);
 
         assertDoesNotThrow(() -> {
-            String output = app.catFileAndStdin(false, stdin, "-", FILE_1);
+            String output = app.catFileAndStdin(false, stdin, STRING_STDIN_FLAG, FILE_1);
             assertEquals(stdinInput + fileContent, output);
         });
     }

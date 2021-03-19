@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_WHITESPACE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_CUSTOM_EXT_FILE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_JPG;
@@ -137,7 +138,7 @@ class StringUtilsTest {
 
     @Test
     void multipleChar_WhitespaceChar_ReturnsCharMultipledString() {
-        assertEquals(" ".repeat(4), StringUtils.multiplyChar(' ', 4));
+        assertEquals(STRING_WHITESPACE.repeat(4), StringUtils.multiplyChar(' ', 4));
     }
 
     @Test

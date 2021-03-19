@@ -2,6 +2,7 @@ package tdd.ef2;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
@@ -19,7 +20,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
+@Disabled
 public class RmApplicationTest {
     public static final String TEMP = "temp";
     public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
@@ -63,7 +67,7 @@ public class RmApplicationTest {
     private String[] toArgs(String flag, String... files) {
         List<String> args = new ArrayList<>();
         if (!flag.isEmpty()) {
-            args.add("-" + flag);
+            args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
             args.add(Paths.get(TEMP, file).toString());
@@ -75,7 +79,7 @@ public class RmApplicationTest {
     void run_SingleFile_DeletesFile() throws IOException, AbstractApplicationException {
         Path fileA = createFile("a.txt");
         Path fileB = createFile("bobby");
-        new RmApplication().run(toArgs("", "a.txt"), System.in, System.out);
+        new RmApplication().run(toArgs(STRING_EMPTY, "a.txt"), System.in, System.out);
         assertTrue(Files.notExists(fileA));
         assertTrue(Files.exists(fileB));
     }
@@ -83,7 +87,7 @@ public class RmApplicationTest {
     @Test
     void run_SpaceInName_DeletesFile() throws IOException, AbstractApplicationException {
         Path fileC = createFile("c   c");
-        new RmApplication().run(toArgs("","c   c"), System.in, System.out);
+        new RmApplication().run(toArgs(STRING_EMPTY,"c   c"), System.in, System.out);
         assertTrue(Files.notExists(fileC));
     }
 
@@ -91,7 +95,7 @@ public class RmApplicationTest {
     void run_MultipleFiles_DeletesFiles() throws IOException, AbstractApplicationException {
         Path fileD = createFile("d.txt");
         Path fileE = createFile("eerie");
-        new RmApplication().run(toArgs("","d.txt", "eerie"), System.in, System.out);
+        new RmApplication().run(toArgs(STRING_EMPTY,"d.txt", "eerie"), System.in, System.out);
         assertTrue(Files.notExists(fileD));
         assertTrue(Files.notExists(fileE));
     }
@@ -164,35 +168,35 @@ public class RmApplicationTest {
     }
 
     @Test
-    void run_ZeroArguments_Throws() {
-        assertThrows(RmException.class, () -> new RmApplication().run(toArgs(""), System.in, System.out));
+    void run_ZeroArguments_ThrowsException() {
+        assertThrows(RmException.class, () -> new RmApplication().run(toArgs(STRING_EMPTY), System.in, System.out));
     }
 
     @Test
-    void run_FlagOnly_Throws() {
+    void run_FlagOnly_ThrowsException() {
         assertThrows(RmException.class, () -> new RmApplication().run(toArgs("d"), System.in, System.out));
     }
 
     @Test
-    void run_UnknownFlag_Throws() throws IOException {
+    void run_UnknownFlag_ThrowsException() throws IOException {
         Path fileK = createFile("kick");
         assertThrows(RmException.class, () -> new RmApplication().run(toArgs("x", "kick"), System.in, System.out));
         assertTrue(Files.exists(fileK));
     }
 
     @Test
-    void run_NonexistentFile_Throws() {
-        assertThrows(RmException.class, () -> new RmApplication().run(toArgs("", "not exist"), System.in, System.out));
+    void run_NonexistentFile_ThrowsException() {
+        assertThrows(RmException.class, () -> new RmApplication().run(toArgs(STRING_EMPTY, "not exist"), System.in, System.out));
     }
 
     @Test
-    void run_DirectoryWithoutFlag_Throws() throws IOException {
+    void run_DirectoryWithoutFlag_ThrowsException() throws IOException {
         createDirectory("directoryF");
-        assertThrows(RmException.class, () -> new RmApplication().run(toArgs("", "directoryF"), System.in, System.out));
+        assertThrows(RmException.class, () -> new RmApplication().run(toArgs(STRING_EMPTY, "directoryF"), System.in, System.out));
     }
 
     @Test
-    void run_NonemptyDirectoryWithDFlag_Throws() throws IOException {
+    void run_NonemptyDirectoryWithDFlag_ThrowsException() throws IOException {
         Path directory = createDirectory("directoryG");
         createFile("a.txt", directory);
         assertThrows(RmException.class, () -> new RmApplication().run(toArgs("d", "directoryG"), System.in, System.out));

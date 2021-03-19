@@ -1,16 +1,20 @@
 package tdd.bf;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.GrepException;
-import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,16 +23,23 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.GrepException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
 
 public class GrepApplicationTest {
-    private static final String TEMP = "temp-grep";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
     public static final byte[] BYTES_A = "First line\nSecond line\nThird line\nFourth line\n".getBytes();
     public static final byte[] BYTES_B = "Fifth line\nSixth line\nSeventh line\nEighth line\n".getBytes();
+    private static final String TEMP = "temp-grep";
+    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
     public static Deque<Path> files = new ArrayDeque<>();
+    private OutputStream stderr;
 
     @BeforeAll
     static void createTemp() throws IOException {
@@ -41,6 +52,16 @@ public class GrepApplicationTest {
             Files.deleteIfExists(file);
         }
         Files.delete(TEMP_PATH);
+    }
+
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
     }
 
     private Path createFile(String name) throws IOException {
@@ -60,14 +81,14 @@ public class GrepApplicationTest {
     private String[] toArgs(String flags, String pattern, String... files) {
         List<String> args = new ArrayList<>();
         if (!flags.isEmpty()) {
-            args.add("-" + flags);
+            args.add(STRING_STDIN_FLAG + flags);
         }
         args.add(pattern);
         for (String file : files) {
-            if (file.equals("-")) {
+            if (file.equals(STRING_STDIN_FLAG)) {
                 args.add(file);
             } else {
-                args.add(Paths.get(TEMP, file).toString());
+                args.add(getRelativePath(file).toString());
             }
         }
         return args.toArray(new String[0]);
@@ -81,7 +102,7 @@ public class GrepApplicationTest {
     void run_SingleFile_PrintsLine() throws AbstractApplicationException, IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("a.txt"), BYTES_A);
-        new GrepApplication().run(toArgs("", "th", "a.txt"), System.in, output);
+        new GrepApplication().run(toArgs(STRING_EMPTY, "th", "a.txt"), System.in, output);
         assertArrayEquals(("Fourth line" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -89,7 +110,7 @@ public class GrepApplicationTest {
     void run_SingleFileRegex_PrintsLines() throws AbstractApplicationException, IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("b.txt"), BYTES_A);
-        new GrepApplication().run(toArgs("", "[th] l", "b.txt"), System.in, output);
+        new GrepApplication().run(toArgs(STRING_EMPTY, "[th] l", "b.txt"), System.in, output);
         assertArrayEquals(("First line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -98,7 +119,7 @@ public class GrepApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("c.txt"), BYTES_A);
         Files.write(createFile("d.txt"), BYTES_B);
-        new GrepApplication().run(toArgs("", "Fi", "c.txt", "d.txt"), System.in, output);
+        new GrepApplication().run(toArgs(STRING_EMPTY, "Fi", "c.txt", "d.txt"), System.in, output);
         String expected = getRelativePath("c.txt") + ": First line" + STRING_NEWLINE +
                 getRelativePath("d.txt") + ": Fifth line" + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
@@ -236,7 +257,7 @@ public class GrepApplicationTest {
         String inputString = "abc" + STRING_NEWLINE + "def" + STRING_NEWLINE + "ghi" + STRING_NEWLINE;
         ByteArrayInputStream input = new ByteArrayInputStream(inputString.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new GrepApplication().run(toArgs("", "[ci]"), input, output);
+        new GrepApplication().run(toArgs(STRING_EMPTY, "[ci]"), input, output);
         assertArrayEquals(("abc" + STRING_NEWLINE + "ghi" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -246,7 +267,12 @@ public class GrepApplicationTest {
         ByteArrayInputStream input = new ByteArrayInputStream(inputString.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         new GrepApplication().run(toArgs("Hi", "a"), input, output);
-        String expected = "(standard input): Abc" + STRING_NEWLINE + "(standard input): aaf" + STRING_NEWLINE;
+        String expected = String.join(
+                STRING_NEWLINE,
+                String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, "Abc"),
+                String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, "aaf"),
+                STRING_EMPTY
+        );
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -256,7 +282,7 @@ public class GrepApplicationTest {
         ByteArrayInputStream input = new ByteArrayInputStream(inputString.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         new GrepApplication().run(new String[]{"-c", "-Hi", "a"}, input, output);
-        String expected = "(standard input): 2" + STRING_NEWLINE;
+        String expected = String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, 2) + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -265,7 +291,7 @@ public class GrepApplicationTest {
         String inputString = "jkl" + STRING_NEWLINE + "mno" + STRING_NEWLINE + "pqr" + STRING_NEWLINE;
         ByteArrayInputStream input = new ByteArrayInputStream(inputString.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new GrepApplication().run(toArgs("", "[lo]", "-"), input, output);
+        new GrepApplication().run(toArgs(STRING_EMPTY, "[lo]", STRING_STDIN_FLAG), input, output);
         assertArrayEquals(("jkl" + STRING_NEWLINE + "mno" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
@@ -274,8 +300,13 @@ public class GrepApplicationTest {
         String inputString = "Dbc" + STRING_NEWLINE + "daf" + STRING_NEWLINE + "aab" + STRING_NEWLINE;
         ByteArrayInputStream input = new ByteArrayInputStream(inputString.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new GrepApplication().run(toArgs("Hi", "d", "-"), input, output);
-        String expected = "(standard input): Dbc" + STRING_NEWLINE + "(standard input): daf" + STRING_NEWLINE;
+        new GrepApplication().run(toArgs("Hi", "d", STRING_STDIN_FLAG), input, output);
+        String expected = String.join(
+                STRING_NEWLINE,
+                String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, "Dbc"),
+                String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, "daf"),
+                STRING_EMPTY
+        );
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -284,8 +315,8 @@ public class GrepApplicationTest {
         String inputString = "Bbc" + STRING_NEWLINE + "bac" + STRING_NEWLINE + "cde" + STRING_NEWLINE;
         ByteArrayInputStream input = new ByteArrayInputStream(inputString.getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new GrepApplication().run(new String[]{"-c", "-Hi", "b", "-"}, input, output);
-        String expected = "(standard input): 2" + STRING_NEWLINE;
+        new GrepApplication().run(new String[]{"-c", "-Hi", "b", STRING_STDIN_FLAG}, input, output);
+        String expected = String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, 2) + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -294,8 +325,8 @@ public class GrepApplicationTest {
         ByteArrayInputStream input = new ByteArrayInputStream(BYTES_A);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("aa.txt"), BYTES_B);
-        new GrepApplication().run(toArgs("", "Fi", "-", "aa.txt"), input, output);
-        String expected = "(standard input): First line" + STRING_NEWLINE +
+        new GrepApplication().run(toArgs(STRING_EMPTY, "Fi", STRING_STDIN_FLAG, "aa.txt"), input, output);
+        String expected = String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, "First line") + STRING_NEWLINE +
                 getRelativePath("aa.txt") + ": Fifth line" + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
@@ -305,8 +336,8 @@ public class GrepApplicationTest {
         ByteArrayInputStream input = new ByteArrayInputStream(BYTES_B);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("ab.txt"), BYTES_A);
-        new GrepApplication().run(toArgs("Hi", "fi", "-", "ab.txt"), input, output);
-        String expected = "(standard input): Fifth line" + STRING_NEWLINE +
+        new GrepApplication().run(toArgs("Hi", "fi", STRING_STDIN_FLAG, "ab.txt"), input, output);
+        String expected = String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, "Fifth line") + STRING_NEWLINE +
                 getRelativePath("ab.txt") + ": First line" + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
@@ -316,9 +347,9 @@ public class GrepApplicationTest {
         ByteArrayInputStream input = new ByteArrayInputStream(BYTES_B);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("ac.txt"), BYTES_A);
-        new GrepApplication().run(toArgs("cHi", "th", "ac.txt", "-"), input, output);
+        new GrepApplication().run(toArgs("cHi", "th", "ac.txt", STRING_STDIN_FLAG), input, output);
         String expected = getRelativePath("ac.txt") + ": 2" + STRING_NEWLINE +
-                "(standard input): 4" + STRING_NEWLINE;
+                String.format(STRING_LABEL_VALUE_PAIR, GrepApplication.STDIN_LABEL, 4) + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -326,7 +357,7 @@ public class GrepApplicationTest {
     void run_EmptyFile_PrintsNothing() throws AbstractApplicationException, IOException {
         createFile("x.txt");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new GrepApplication().run(toArgs("", "a", "x.txt"), System.in, output);
+        new GrepApplication().run(toArgs(STRING_EMPTY, "a", "x.txt"), System.in, output);
         assertArrayEquals(new byte[]{}, output.toByteArray());
     }
 
@@ -334,41 +365,63 @@ public class GrepApplicationTest {
     void run_NoMatch_PrintsNothing() throws AbstractApplicationException, IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("y.txt"), BYTES_A);
-        new GrepApplication().run(toArgs("", "a", "y.txt"), System.in, output);
+        new GrepApplication().run(toArgs(STRING_EMPTY, "a", "y.txt"), System.in, output);
         assertArrayEquals(new byte[]{}, output.toByteArray());
     }
 
     @Test
     void run_Directory_OutputsError() throws AbstractApplicationException, IOException {
+        captureErr();
+
         createDirectory("directory");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new GrepApplication().run(toArgs("", "a", "directory"), System.in, output);
-        String expected = getRelativePath("directory") + ": Is a directory" + STRING_NEWLINE;
-        assertArrayEquals(expected.getBytes(), output.toByteArray());
+        new GrepApplication().run(toArgs(STRING_EMPTY, "a", "directory"), System.in, output);
+
+        String expectedOutput = STRING_EMPTY;
+        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+
+        String expectedErr = new GrepException(
+                new InvalidDirectoryException(
+                        getRelativePath("directory").toString(),
+                        ERR_IS_DIR
+                ).getMessage()
+        ).getMessage() + STRING_NEWLINE;
+        assertEquals(expectedErr, getErrOutput());
     }
 
     @Test
     void run_NonexistentFile_OutputsError() throws AbstractApplicationException {
+        captureErr();
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        new GrepApplication().run(toArgs("", "a", "not exist"), System.in, output);
-        String expected = getRelativePath("not exist") + ": No such file or directory" + STRING_NEWLINE;
-        assertArrayEquals(expected.getBytes(), output.toByteArray());
+        new GrepApplication().run(toArgs(STRING_EMPTY, "a", "not exist"), System.in, output);
+
+        String expectedOutput = STRING_EMPTY;
+        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+
+        String expectedErr = new GrepException(
+                new InvalidDirectoryException(
+                        getRelativePath("not exist").toString(),
+                        ERR_FILE_NOT_FOUND
+                ).getMessage()
+        ).getMessage() + STRING_NEWLINE;
+        assertEquals(expectedErr, getErrOutput());
     }
 
     @Test
-    void run_UnknownFlag_Throws() throws IOException {
+    void run_UnknownFlag_ThrowsException() throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("z.txt"), BYTES_A);
         assertThrows(GrepException.class, () -> new GrepApplication().run(toArgs("x", "l", "z.txt"), System.in, output));
     }
 
     @Test
-    void run_ZeroArguments_Throws() {
+    void run_ZeroArguments_ThrowsException() {
         assertThrows(GrepException.class, () -> new GrepApplication().run(new String[]{}, System.in, System.out));
     }
 
     @Test
-    void run_FlagOnly_Throws() {
+    void run_FlagOnly_ThrowsException() {
         assertThrows(GrepException.class, () -> new GrepApplication().run(new String[]{"-c"}, System.in, System.out));
     }
 }

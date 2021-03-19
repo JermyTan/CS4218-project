@@ -191,7 +191,7 @@ public class ArgumentResolver {
         if (parsedArgsSegment.isEmpty()) {
             parsedArgsSegment.add(parsedArg);
         } else {
-            RegexArgument lastParsedArg = parsedArgsSegment.remove(parsedArgsSegment.size()-1);
+            RegexArgument lastParsedArg = parsedArgsSegment.remove(parsedArgsSegment.size() - 1);
             parsedArgsSegment.add(lastParsedArg);
             lastParsedArg.merge(parsedArg);
         }

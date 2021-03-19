@@ -9,6 +9,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.IOUtils.getLinesFromInputStream;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
@@ -55,7 +56,7 @@ class TeeApplicationTest {
     private static final String FOLDER = "folder";
 
     private static final String FILE_CONTENT_1 = "This is old content.";
-    private static final String FILE_CONTENT_2 = "";
+    private static final String FILE_CONTENT_2 = STRING_EMPTY;
 
     private final ByteArrayOutputStream ERR_OUTPUT = new ByteArrayOutputStream();
     private final ByteArrayOutputStream STD_OUTPUT = new ByteArrayOutputStream();
