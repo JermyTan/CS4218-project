@@ -8,6 +8,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
@@ -22,12 +23,14 @@ import java.util.Arrays;
 
 import sg.edu.nus.comp.cs4218.app.MvInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+@SuppressWarnings("PMD.GodClass")
 public class MvApplication implements MvInterface {
 
     public static String constructRenameErrorMsg(String srcFile, String destFile, String error) {
@@ -67,7 +70,7 @@ public class MvApplication implements MvInterface {
     }
 
     @Override
-    public String mvSrcFileToDestFile(Boolean isOverwrite, String srcFile, String destFile) throws Exception {
+    public String mvSrcFileToDestFile(Boolean isOverwrite, String srcFile, String destFile) throws Exception { //NOPMD
         if (CollectionUtils.isAnyNull(isOverwrite, srcFile, destFile)) {
             throw new Exception(ERR_NULL_ARGS);
         }
@@ -77,7 +80,7 @@ public class MvApplication implements MvInterface {
 
         // srcFile must exist
         if (Files.notExists(srcPath)) {
-            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND));
+            throw new InvalidDirectoryException(srcFile, ERR_FILE_NOT_FOUND);
         }
 
         // Cannot rename a file/folder to a existing directory
@@ -105,6 +108,10 @@ public class MvApplication implements MvInterface {
 
         if (!isOverwrite && Files.exists(destPath)) {
             return null;
+        }
+
+        if (Files.exists(destPath) && !Files.isWritable(destPath)) {
+            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_NO_PERM));
         }
 
         try {

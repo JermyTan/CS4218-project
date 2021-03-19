@@ -327,7 +327,7 @@ public class CpApplicationTest {
         createFile(srcAName);
         createFile(srcBName);
         createFile(destName);
-        assertThrows(CpException.class, () -> new CpApplication().run(toArgs("", srcAName, srcBName, destName), System.in, System.out));
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY, srcAName, srcBName, destName), System.in, System.out));
     }
 
     @Test
@@ -381,6 +381,6 @@ public class CpApplicationTest {
         createFile(srcAName);
         createDirectory(srcBName);
         createFile(destName);
-        assertThrows(CpException.class, () -> new CpApplication().run(toArgs("", srcAName, srcBName, destName), System.in, System.out));
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY, srcAName, srcBName, destName), System.in, System.out));
     }
 }

@@ -41,6 +41,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.SplitException;
 
 class SplitApplicationTest {
@@ -502,7 +503,10 @@ class SplitApplicationTest {
         Throwable exception = assertThrows(SplitException.class, () -> {
             splitApp.splitFileByBytes(NON_EXISTENT_FILE, null, "16");
         });
-        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_SPLIT, ERR_FILE_NOT_FOUND), exception.getMessage());
+        assertEquals(
+                new SplitException(new InvalidDirectoryException(NON_EXISTENT_FILE, ERR_FILE_NOT_FOUND).getMessage()).getMessage(),
+                exception.getMessage()
+        );
     }
 
     @Test
@@ -510,7 +514,9 @@ class SplitApplicationTest {
         Throwable exception = assertThrows(SplitException.class, () -> {
             splitApp.splitFileByBytes(TEST_FOLDER, null, "16");
         });
-        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_SPLIT, ERR_IS_DIR), exception.getMessage());
+        assertEquals(
+                new SplitException(new InvalidDirectoryException(TEST_FOLDER, ERR_IS_DIR).getMessage()).getMessage(),
+                exception.getMessage());
     }
 
     @Test

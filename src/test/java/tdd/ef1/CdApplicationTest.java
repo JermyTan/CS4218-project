@@ -1,6 +1,6 @@
 package tdd.ef1;
 
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,8 +11,6 @@ import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
@@ -20,6 +18,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.CdException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.app.CdApplication;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -50,16 +49,16 @@ class CdApplicationTest {
         blockedFolder.mkdir();
         blockedFolder.setExecutable(false);
     }
-    
-    @AfterAll
-    static void tearDownAll() {
-        EnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
-    }
 
     @BeforeEach
     void setUp() {
         cdApplication = new CdApplication();
         EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath());
+    }
+
+    @AfterEach
+    void tearDown() {
+        EnvironmentUtil.setCurrentDirectory(ORIGINAL_DIR);
     }
 
     // Cd into valid relative path
@@ -68,6 +67,15 @@ class CdApplicationTest {
         String finalPath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + FOLDER;
         String[] argList = new String[]{FOLDER};
         cdApplication.run(argList, System.in, System.out);
+        String currDirectory = EnvironmentUtil.currentDirectory;
+        assertEquals(finalPath, currDirectory);
+    }
+
+    @Test
+    public void run_CdIntoValidPathNullStreams_Success() throws CdException {
+        String finalPath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + FOLDER;
+        String[] argList = new String[]{FOLDER};
+        cdApplication.run(argList, null, null);
         String currDirectory = EnvironmentUtil.currentDirectory;
         assertEquals(finalPath, currDirectory);
     }
@@ -108,7 +116,9 @@ class CdApplicationTest {
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
         });
-        assertEquals(new CdException(ERR_FILE_NOT_FOUND).getMessage(), expectedException.getMessage());
+        assertEquals(
+                new CdException(new InvalidDirectoryException("invalid", ERR_FILE_NOT_FOUND).getMessage()).getMessage(),
+                expectedException.getMessage());
     }
 
     // Cd into valid absolute path
@@ -129,7 +139,9 @@ class CdApplicationTest {
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
         });
-        assertEquals(new CdException(ERR_FILE_NOT_FOUND).getMessage(), expectedException.getMessage());
+        assertEquals(
+                new CdException(new InvalidDirectoryException(absolutePath, ERR_FILE_NOT_FOUND).getMessage()).getMessage(),
+                expectedException.getMessage());
     }
 
     // Cd into non directory
@@ -139,7 +151,9 @@ class CdApplicationTest {
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
         });
-        assertEquals(new CdException(ERR_IS_NOT_DIR).getMessage(), expectedException.getMessage());
+        assertEquals(
+                new CdException(new InvalidDirectoryException(VALID_FILE, ERR_IS_NOT_DIR).getMessage()).getMessage(),
+                expectedException.getMessage());
     }
 
     // Cd into folder with no permissions
@@ -150,12 +164,15 @@ class CdApplicationTest {
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
         });
-        assertEquals(new CdException(ERR_NO_PERM).getMessage(), expectedException.getMessage());
+        assertEquals(
+                new CdException(new InvalidDirectoryException(BLOCKED_FOLDER, ERR_NO_PERM).getMessage()).getMessage(),
+                expectedException.getMessage()
+        );
     }
 
     // Cd with too many args
     @Test
-    public void run_CdWithManyArgs_ThrowsCdException() {
+    public void run_CdWithManyArgs_ThrowsException() {
         String[] argList = new String[]{FOLDER, SUBFOLDER};
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
@@ -165,7 +182,7 @@ class CdApplicationTest {
 
     // Cd with no args
     @Test
-    public void run_CdWithNoArgs_ThrowsCdException() {
+    public void run_CdWithNoArgs_ThrowsException() {
         String[] argList = new String[]{};
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
@@ -175,7 +192,7 @@ class CdApplicationTest {
 
     // Cd with blank arg
     @Test
-    public void run_CdIntoBlankPath_ThrowsCdException() throws CdException {
+    public void run_CdIntoBlankPath_ThrowsException() {
         String[] argList = new String[]{STRING_EMPTY};
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
@@ -185,30 +202,31 @@ class CdApplicationTest {
 
     // Cd with null args
     @Test
-    public void run_CdWithNullArgs_ThrowsCdException() {
+    public void run_CdWithNullArgs_ThrowsException() {
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(null, System.in, System.out);
         });
         assertEquals(new CdException(ERR_NULL_ARGS).getMessage(), expectedException.getMessage());
     }
 
-    // Cd with null input stream
+    // Cd with null streams
     @Test
-    public void run_CdWithNullInputStream_ThrowsCdException() {
+    public void run_CdWithoutArgsNullStreams_ThrowsException() {
         String[] argList = new String[]{};
-        Exception expectedException = assertThrows(CdException.class, () -> {
+
+        Exception expectedException1 = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, null, System.out);
         });
-        assertEquals(new CdException(ERR_NO_ISTREAM).getMessage(), expectedException.getMessage());
-    }
+        assertEquals(new CdException(ERR_MISSING_ARG).getMessage(), expectedException1.getMessage());
 
-    // Cd with null output stream
-    @Test
-    public void run_CdWithNullOutputStream_ThrowsCdException() {
-        String[] argList = new String[]{};
-        Exception expectedException = assertThrows(CdException.class, () -> {
+        Exception expectedException2 = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, null);
         });
-        assertEquals(new CdException(ERR_NO_OSTREAM).getMessage(), expectedException.getMessage());
+        assertEquals(new CdException(ERR_MISSING_ARG).getMessage(), expectedException2.getMessage());
+
+        Exception expectedException3 = assertThrows(CdException.class, () -> {
+            cdApplication.run(argList, null, null);
+        });
+        assertEquals(new CdException(ERR_MISSING_ARG).getMessage(), expectedException3.getMessage());
     }
 }

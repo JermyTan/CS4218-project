@@ -1,6 +1,6 @@
 package tdd.bf;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
@@ -15,27 +15,27 @@ public class EchoApplicationTest {
     public void run_SingleArgument_OutputsArgument() throws EchoException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         new EchoApplication().run(new String[]{"A*B*C"}, System.in, output);
-        assertArrayEquals(("A*B*C" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("A*B*C" + STRING_NEWLINE, output.toString());
     }
 
     @Test
     public void run_MultipleArgument_SpaceSeparated() throws EchoException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         new EchoApplication().run(new String[]{"A", "B", "C"}, System.in, output);
-        assertArrayEquals(("A B C" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("A B C" + STRING_NEWLINE, output.toString());
     }
 
     @Test
     public void run_MultipleArgumentWithSpace_SpaceSeparated() throws EchoException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         new EchoApplication().run(new String[]{"A B", "C D"}, System.in, output);
-        assertArrayEquals(("A B C D" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("A B C D" + STRING_NEWLINE, output.toString());
     }
 
     @Test
     public void run_ZeroArguments_OutputsNewline() throws EchoException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         new EchoApplication().run(new String[]{}, System.in, output);
-        assertArrayEquals(STRING_NEWLINE.getBytes(), output.toByteArray());
+        assertEquals(STRING_NEWLINE, output.toString());
     }
 }

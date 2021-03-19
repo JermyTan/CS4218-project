@@ -43,6 +43,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 
 class MvApplicationTest {
@@ -328,7 +329,7 @@ class MvApplicationTest {
         String destFile = FILE_1;
 
         Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(true, srcFile, destFile));
-        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), exception.getMessage());
+        assertEquals(new InvalidDirectoryException(srcFile, ERR_FILE_NOT_FOUND).getMessage(), exception.getMessage());
     }
 
     @Test
@@ -338,7 +339,7 @@ class MvApplicationTest {
         String destFile = FOLDER_1;
 
         Throwable exception = assertThrows(Exception.class, () -> app.mvSrcFileToDestFile(true, srcFile, destFile));
-        assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND), exception.getMessage());
+        assertEquals(new InvalidDirectoryException(srcFile, ERR_FILE_NOT_FOUND).getMessage(), exception.getMessage());
     }
 
     @Test
@@ -432,7 +433,7 @@ class MvApplicationTest {
     @Test
     public void mvFilesToFolder_FileDoesNotExist_ThrowsException() {
         Throwable exception = assertThrows(Exception.class, () -> app.mvFilesToFolder(true, FOLDER_1, FILE_2));
-        assertEquals(constructRenameErrorMsg(FILE_2, Paths.get(FOLDER_1, FILE_2).toString(), ERR_FILE_NOT_FOUND),
+        assertEquals(new InvalidDirectoryException(FILE_2, ERR_FILE_NOT_FOUND).getMessage(),
                 exception.getMessage());
     }
 

@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 
@@ -59,6 +60,10 @@ public class CdApplication implements CdInterface {
 
             if (!Files.isDirectory(path)) {
                 throw new InvalidDirectoryException(pathStr, ERR_IS_NOT_DIR);
+            }
+
+            if (!Files.isExecutable(path)) {
+                throw new InvalidDirectoryException(pathStr, ERR_NO_PERM);
             }
 
             return path.toString();

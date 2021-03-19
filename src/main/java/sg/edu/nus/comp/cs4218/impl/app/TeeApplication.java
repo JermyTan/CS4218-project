@@ -9,6 +9,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
@@ -97,6 +98,10 @@ public class TeeApplication implements TeeInterface {
 
             if (Files.isDirectory(filePath)) {
                 throw new InvalidDirectoryException(fileName, ERR_IS_DIR);
+            }
+
+            if (Files.exists(filePath) && !Files.isWritable(filePath)) {
+                throw new InvalidDirectoryException(fileName, ERR_NO_PERM);
             }
 
             try {

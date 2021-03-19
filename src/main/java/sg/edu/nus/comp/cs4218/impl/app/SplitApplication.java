@@ -136,7 +136,7 @@ public class SplitApplication implements SplitInterface {
             try {
                 splitStdinByLines(Files.newInputStream(filePath), prefix, linesPerFile);
             } catch (AccessDeniedException e) {
-                throw new InvalidDirectoryException(fileName, ERR_READING_FILE);
+                throw new InvalidDirectoryException(fileName, ERR_READING_FILE, e);
             }
         } catch (SplitException e) {
             // allow exception to propagate
@@ -160,7 +160,7 @@ public class SplitApplication implements SplitInterface {
             try {
                 splitStdinByBytes(Files.newInputStream(filePath), prefix, bytesPerFile);
             } catch (AccessDeniedException e) {
-                throw new InvalidDirectoryException(fileName, ERR_READING_FILE);
+                throw new InvalidDirectoryException(fileName, ERR_READING_FILE, e);
             }
         } catch (SplitException e) {
             // allow exception to propagate

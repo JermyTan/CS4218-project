@@ -120,19 +120,19 @@ class LsResultTest {
                 new File(TEST_FILE_3)
         );
 
-        List<String> expectedUnsorted = List.of(
+        List<String> expectedSortedByName = List.of(
+                FILE_NAME_2,
                 FILE_NAME_2,
                 FILE_NAME_1,
-                FILE_NAME_2,
                 FILE_NAME_3
         );
 
         assertEquals(
-                String.join(STRING_NEWLINE, expectedUnsorted),
+                String.join(STRING_NEWLINE, expectedSortedByName),
                 new LsResult(STRING_EMPTY, files).formatToString(true, false)
         );
 
-        List<String> expectedSorted = List.of(
+        List<String> expectedSortedByExt = List.of(
                 FILE_NAME_3,
                 FILE_NAME_2,
                 FILE_NAME_2,
@@ -140,7 +140,7 @@ class LsResultTest {
         );
 
         assertEquals(
-                String.join(STRING_NEWLINE, expectedSorted),
+                String.join(STRING_NEWLINE, expectedSortedByExt),
                 new LsResult(STRING_EMPTY, files).formatToString(true, true)
         );
     }
@@ -154,20 +154,20 @@ class LsResultTest {
                 new File(TEST_FILE_3)
         );
 
-        List<String> expectedUnsorted = List.of(
+        List<String> expectedSortedByName = List.of(
                 STRING_SINGLE_WORD + ":",
                 FILE_NAME_2,
-                FILE_NAME_1,
                 FILE_NAME_2,
+                FILE_NAME_1,
                 FILE_NAME_3
         );
 
         assertEquals(
-                String.join(STRING_NEWLINE, expectedUnsorted),
+                String.join(STRING_NEWLINE, expectedSortedByName),
                 new LsResult(STRING_SINGLE_WORD, files).formatToString(true, false)
         );
 
-        List<String> expectedSorted = List.of(
+        List<String> expectedSortedByExt = List.of(
                 STRING_MULTI_WORDS + ":",
                 FILE_NAME_3,
                 FILE_NAME_2,
@@ -176,7 +176,7 @@ class LsResultTest {
         );
 
         assertEquals(
-                String.join(STRING_NEWLINE, expectedSorted),
+                String.join(STRING_NEWLINE, expectedSortedByExt),
                 new LsResult(STRING_MULTI_WORDS, files).formatToString(true, true)
         );
     }

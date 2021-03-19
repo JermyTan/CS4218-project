@@ -1,6 +1,5 @@
 package tdd.bf;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
@@ -102,7 +101,7 @@ public class WcApplicationTest {
         Path filePath = createFile(fileName);
         long fileSize = Files.size(filePath);
         new WcApplication().run(toArgs(STRING_EMPTY, fileName), System.in, output);
-        assertArrayEquals(("4\t8\t" + fileSize + CHAR_TAB + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("4\t8\t" + fileSize + CHAR_TAB + fileName + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -111,7 +110,7 @@ public class WcApplicationTest {
         String fileName = "fileB.txt";
         createFile(fileName);
         new WcApplication().run(toArgs("l", fileName), System.in, output);
-        assertArrayEquals(("4\t" + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("4\t" + fileName + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -120,7 +119,7 @@ public class WcApplicationTest {
         String fileName = "fileC.txt";
         createFile(fileName);
         new WcApplication().run(toArgs("w", fileName), System.in, output);
-        assertArrayEquals(("8\t" + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("8\t" + fileName + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -130,7 +129,7 @@ public class WcApplicationTest {
         Path filePath = createFile(fileName);
         long fileSize = Files.size(filePath);
         new WcApplication().run(toArgs("c", fileName), System.in, output);
-        assertArrayEquals((String.valueOf(fileSize) + CHAR_TAB + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals(String.valueOf(fileSize) + CHAR_TAB + fileName + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -140,7 +139,7 @@ public class WcApplicationTest {
         Path filePath = createFile(fileName);
         long fileSize = Files.size(filePath);
         new WcApplication().run(toArgs("clw", fileName), System.in, output);
-        assertArrayEquals(("4\t8\t" + fileSize + CHAR_TAB + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("4\t8\t" + fileSize + CHAR_TAB + fileName + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -158,7 +157,7 @@ public class WcApplicationTest {
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long fileSize = input.getBytes().length;
         new WcApplication().run(toArgs(STRING_EMPTY), inputStream, output);
-        assertArrayEquals(("4\t8\t" + fileSize + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("4\t8\t" + fileSize + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -168,7 +167,7 @@ public class WcApplicationTest {
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long fileSize = input.getBytes().length;
         new WcApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG), inputStream, output);
-        assertArrayEquals(("4\t8\t" + fileSize + WcApplication.STDIN_LABEL + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("4\t8\t" + fileSize + WcApplication.STDIN_LABEL + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -181,9 +180,9 @@ public class WcApplicationTest {
         long fileGSize = Files.size(fileGPath);
         long fileHSize = Files.size(fileHPath);
         new WcApplication().run(toArgs(STRING_EMPTY, fileGName, fileHName), System.in, output);
-        assertArrayEquals(("4\t8\t" + fileGSize + CHAR_TAB + fileGName + STRING_NEWLINE
+        assertEquals("4\t8\t" + fileGSize + CHAR_TAB + fileGName + STRING_NEWLINE
                 + "4\t8\t" + fileHSize + CHAR_TAB + fileHName + STRING_NEWLINE
-                + "8\t16\t" + (fileGSize + fileHSize) + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE).getBytes(), output.toByteArray());
+                + "8\t16\t" + (fileGSize + fileHSize) + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -196,9 +195,9 @@ public class WcApplicationTest {
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long inputSize = input.getBytes().length;
         new WcApplication().run(toArgs(STRING_EMPTY, fileIName, STRING_STDIN_FLAG), inputStream, output);
-        assertArrayEquals(("4\t8\t" + fileISize + CHAR_TAB + fileIName + STRING_NEWLINE
+        assertEquals("4\t8\t" + fileISize + CHAR_TAB + fileIName + STRING_NEWLINE
                 + "4\t8\t" + inputSize + WcApplication.STDIN_LABEL + STRING_NEWLINE
-                + "8\t16\t" + (fileISize + inputSize) + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE).getBytes(), output.toByteArray());
+                + "8\t16\t" + (fileISize + inputSize) + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -214,7 +213,7 @@ public class WcApplicationTest {
 
         String expectedOutput = "4\t8\t" + fileJSize + CHAR_TAB + fileJName + STRING_NEWLINE
                 + "4\t8\t" + fileJSize + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE;
-        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+        assertEquals(expectedOutput, output.toString());
 
         String expectedErr = new WcException(
                 new InvalidDirectoryException(
@@ -238,7 +237,7 @@ public class WcApplicationTest {
 
         String expectedOutput = "4\t8\t" + inputSize + WcApplication.STDIN_LABEL + STRING_NEWLINE
                 + "4\t8\t" + inputSize + CHAR_TAB + WcApplication.TOTAL_LABEL + STRING_NEWLINE;
-        assertArrayEquals(expectedOutput.getBytes(), output.toByteArray());
+        assertEquals(expectedOutput, output.toString());
 
         String expectedErr = new WcException(
                 new InvalidDirectoryException(

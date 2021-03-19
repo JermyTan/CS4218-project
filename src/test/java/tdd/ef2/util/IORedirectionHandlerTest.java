@@ -1,6 +1,7 @@
 package tdd.ef2.util;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Disabled
 public class IORedirectionHandlerTest {
     public static final Path CURR_PATH = Paths.get(EnvironmentUtil.currentDirectory);
     public static Deque<Path> files = new ArrayDeque<>();

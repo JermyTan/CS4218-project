@@ -49,7 +49,7 @@ class GrepResultTest {
     void outputError_EmptyErrorMessage_DoesNothing() {
         captureErr();
 
-        new GrepResult("").outputError();
+        new GrepResult(STRING_EMPTY).outputError();
 
         assertEquals(STRING_EMPTY, getErrOutput());
     }
