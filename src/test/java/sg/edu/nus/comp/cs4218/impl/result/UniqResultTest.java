@@ -12,8 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
@@ -132,7 +130,7 @@ public class UniqResultTest {
                         STRING_MULTI_WORDS,
                         STRING_UNICODE,
                         STRING_BLANK
-                        ),
+                ),
                 new UniqResult(lines).formatToString(false, true, false)
         );
 
