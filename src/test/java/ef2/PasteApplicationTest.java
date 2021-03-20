@@ -65,11 +65,6 @@ class PasteApplicationTest {
     }
 
     @Test
-    public void run_NullArgList_Success() {
-        assertDoesNotThrow(() -> app.run(null, stdin, stdout));
-    }
-
-    @Test
     public void run_ArgListContainsNull_ThrowsException() {
         assertThrows(Exception.class, () -> app.run(new String[]{null}, stdin, stdout));
     }
@@ -112,6 +107,16 @@ class PasteApplicationTest {
         provideInput(expected);
 
         assertDoesNotThrow(() -> app.run(new String[]{}, stdin, stdout));
+
+        assertEquals(expected, stdout.toString());
+    }
+
+    @Test
+    public void run_NullArgList_ReadFromStdin() {
+        String expected = STD_INPUT;
+        provideInput(expected);
+
+        assertDoesNotThrow(() -> app.run(null, stdin, stdout));
 
         assertEquals(expected, stdout.toString());
     }
