@@ -28,7 +28,7 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(e.getMessage(), e);
         }
 
-        Boolean isSerial = parser.isSerial();
+        boolean isSerial = parser.isSerial();
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
         try {
