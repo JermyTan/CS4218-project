@@ -86,7 +86,6 @@ public class UniqApplicationTest {
     private static final String INPUT_FILE_4 = "in4.txt"; // does not exist
 
     private static final String FOLDER_1 = "folder1";
-    private static final String FOLDER_2 = "folder2";
 
     private static final String OUTPUT_FILE_1 = "out1.txt";
     private static final String OUTPUT_FILE_2 = "out2.txt";

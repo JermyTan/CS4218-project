@@ -9,6 +9,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_PARENT_DIR;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +100,7 @@ class CdApplicationTest {
     public void run_CdOutFromFolder_Success() throws Exception {
         String relativePath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + FOLDER;
         EnvironmentUtil.setCurrentDirectory(relativePath);
-        String[] argList = new String[]{"../"};
+        String[] argList = new String[]{STRING_PARENT_DIR + STRING_FILE_SEP};
         cdApplication.run(argList, System.in, System.out);
         String currDirectory = EnvironmentUtil.currentDirectory;
         assertEquals(tempDir.getAbsolutePath(), currDirectory);
@@ -108,7 +110,7 @@ class CdApplicationTest {
     public void run_CdOutFromNestedFolder_Success() throws Exception {
         String relativePath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + SUBFOLDER;
         EnvironmentUtil.setCurrentDirectory(relativePath);
-        String[] argList = new String[]{"../../"};
+        String[] argList = new String[]{STRING_PARENT_DIR + STRING_FILE_SEP + STRING_PARENT_DIR + STRING_FILE_SEP};
         cdApplication.run(argList, System.in, System.out);
         String currDirectory = EnvironmentUtil.currentDirectory;
         assertEquals(tempDir.getAbsolutePath(), currDirectory);

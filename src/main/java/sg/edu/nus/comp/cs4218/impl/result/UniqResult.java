@@ -44,7 +44,7 @@ public class UniqResult extends Result {
             count++;
         }
 
-        if (previousLine != null && count > 0) {
+        if (previousLine != null) {
             adjCounts.add(count);
             distinctAdjLines.add(previousLine);
         }
