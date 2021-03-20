@@ -30,7 +30,7 @@ public class UniqResult extends Result {
         String previousLine = null;
         int count = 0;
 
-        for (String line: lines) {
+        for (String line : lines) {
             if (!line.equals(previousLine)) {
                 if (previousLine != null) {
                     adjCounts.add(count);

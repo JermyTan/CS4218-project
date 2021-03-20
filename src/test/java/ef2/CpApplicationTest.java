@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
@@ -49,13 +48,13 @@ public class CpApplicationTest {
     private static final String FOLDER_2 = "folder2";
     private static final String FOLDER_3 = "folder3";
 
-    private final Path file1 = Paths.get(TEST_DIR, FILE_1); // exists
-    private final Path file2 = Paths.get(TEST_DIR, FILE_2); // does not exist
-    private final Path file3 = Paths.get(TEST_DIR, FILE_3); // exists
+    private final Path file1 = Path.of(TEST_DIR, FILE_1); // exists
+    private final Path file2 = Path.of(TEST_DIR, FILE_2); // does not exist
+    private final Path file3 = Path.of(TEST_DIR, FILE_3); // exists
 
-    private final Path folder1 = Paths.get(TEST_DIR, FOLDER_1); // exists
-    private final Path folder2 = Paths.get(TEST_DIR, FOLDER_2); // does not exist
-    private final Path folder3 = Paths.get(TEST_DIR, FOLDER_3); // exists
+    private final Path folder1 = Path.of(TEST_DIR, FOLDER_1); // exists
+    private final Path folder2 = Path.of(TEST_DIR, FOLDER_2); // does not exist
+    private final Path folder3 = Path.of(TEST_DIR, FOLDER_3); // exists
 
     private final List<Path> paths = List.of(file1, file2, file3, folder1, folder2, folder3);
     private final InputStream stdin = mock(InputStream.class);
@@ -155,11 +154,11 @@ public class CpApplicationTest {
         verifyNoInteractions(stdout);
 
         // Dir not copied
-        Path destPath1 = Paths.get(TEST_DIR, FOLDER_3, FOLDER_1);
+        Path destPath1 = Path.of(TEST_DIR, FOLDER_3, FOLDER_1);
         assertTrue(Files.notExists(destPath1));
 
         // Only file3.txt is copied
-        Path destPath2 = Paths.get(TEST_DIR, FOLDER_3, FILE_3);
+        Path destPath2 = Path.of(TEST_DIR, FOLDER_3, FILE_3);
         checkContent(file3, destPath2);
     }
 
@@ -176,7 +175,7 @@ public class CpApplicationTest {
         verifyNoInteractions(stdout);
 
         // Dir copied into folder3
-        Path destPath1 = Paths.get(TEST_DIR, FOLDER_3, FOLDER_1);
+        Path destPath1 = Path.of(TEST_DIR, FOLDER_3, FOLDER_1);
         assertTrue(Files.exists(destPath1));
         // File copied over as well
         assertTrue(Files.exists(destPath1.resolve(FILE_1)));
@@ -216,7 +215,7 @@ public class CpApplicationTest {
     @Test
     public void cpSrcFileToDestFile_DestFolderDirDoesNotExist_ThrowsException() {
         String srcFile = FILE_1;
-        String destFile = Paths.get(FOLDER_2, FILE_1).toString();
+        String destFile = Path.of(FOLDER_2, FILE_1).toString();
 
         assertThrows(Exception.class, () -> app.cpSrcFileToDestFile(false, srcFile, destFile));
     }
@@ -233,7 +232,7 @@ public class CpApplicationTest {
     @Test
     public void cpSrcFileToDestFile_DestFileNotWritable_ThrowsException() {
         String srcFile = FILE_1;
-        String destFile = Paths.get(FOLDER_1, FILE_1).toString();
+        String destFile = Path.of(FOLDER_1, FILE_1).toString();
         folder1.toFile().setWritable(false);
 
         assertThrows(Exception.class, () -> app.cpSrcFileToDestFile(false, srcFile, destFile));
@@ -267,14 +266,14 @@ public class CpApplicationTest {
     public void cpFilesToFolder_SrcFolderContainsDestFolder_ThrowsException() {
         // Create dir folder1/folder2/
         try {
-            Path destPath = Paths.get(TEST_DIR, FOLDER_1, FOLDER_2);
+            Path destPath = Path.of(TEST_DIR, FOLDER_1, FOLDER_2);
             Files.createDirectory(destPath);
         } catch (IOException e) {
             fail(e.getMessage());
         }
 
         String srcFile = FOLDER_1;
-        String destFile = Paths.get(FOLDER_1, FOLDER_2).toString();
+        String destFile = Path.of(FOLDER_1, FOLDER_2).toString();
 
         // Cp folder1/ to folder1/folder2/
         assertThrows(Exception.class, () -> app.cpFilesToFolder(true, destFile, srcFile));

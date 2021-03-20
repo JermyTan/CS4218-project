@@ -23,7 +23,6 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -105,7 +104,7 @@ class WcApplicationTest {
         testInputStream = createInputStream(generateString(0));
         testOutputStream = new ByteArrayOutputStream();
 
-        testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
+        testFolder = Path.of(TEST_DIR, TEST_FOLDER);
         Files.createDirectory(testFolder);
     }
 

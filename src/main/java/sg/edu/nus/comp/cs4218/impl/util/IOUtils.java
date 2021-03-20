@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,7 +106,7 @@ public final class IOUtils {
         }
 
         try {
-            return Paths.get(EnvironmentUtil.currentDirectory).resolve(fileName).normalize();
+            return Path.of(EnvironmentUtil.currentDirectory).resolve(fileName).normalize();
 
         } catch (InvalidPathException e) {
             throw new Exception(ERR_INVALID_FILES, e);

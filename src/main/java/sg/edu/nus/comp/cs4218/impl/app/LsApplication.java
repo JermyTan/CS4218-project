@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -127,7 +126,7 @@ public class LsApplication implements LsInterface {
                         continue;
                     }
 
-                    String newFolderName = Paths.get(
+                    String newFolderName = Path.of(
                             folderName.isEmpty() ? PATH_CURR_DIR : folderName,
                             file.getName()
                     ).toString();

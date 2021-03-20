@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -135,11 +135,11 @@ public class SplitApplicationTest {
     @AfterEach
     void tearDown() throws IOException {
         stdout.flush();
-        Files.deleteIfExists(Paths.get(OUTPUT_XAA));
-        Files.deleteIfExists(Paths.get(OUTPUT_XAB));
-        Files.deleteIfExists(Paths.get(OUTPUT_XAC));
-        Files.deleteIfExists(Paths.get(OUTPUT_XAD));
-        Files.deleteIfExists(Paths.get(OUTPUT_XAE));
+        Files.deleteIfExists(Path.of(OUTPUT_XAA));
+        Files.deleteIfExists(Path.of(OUTPUT_XAB));
+        Files.deleteIfExists(Path.of(OUTPUT_XAC));
+        Files.deleteIfExists(Path.of(OUTPUT_XAD));
+        Files.deleteIfExists(Path.of(OUTPUT_XAE));
     }
 
 

@@ -18,7 +18,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,7 +36,7 @@ import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
 
 public class WcApplicationTest {
     public static final String TEMP = "temp-wc";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
+    public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
     public static String currPathString;
     public static Deque<Path> files = new ArrayDeque<>();
     private OutputStream stderr;
@@ -89,7 +88,7 @@ public class WcApplicationTest {
             args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
-            args.add(Paths.get(file).toString());
+            args.add(Path.of(file).toString());
         }
         return args.toArray(new String[0]);
     }

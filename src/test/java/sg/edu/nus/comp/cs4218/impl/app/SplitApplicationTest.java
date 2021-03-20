@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -104,7 +103,7 @@ class SplitApplicationTest {
     void setUp() throws Exception {
         testFile = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME);
         testFile.createNewFile();
-        testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
+        testFolder = Path.of(TEST_DIR, TEST_FOLDER);
         Files.createDirectory(testFolder);
         testStream = generateStream(generateString(0));
     }

@@ -11,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -29,7 +28,7 @@ import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 
 @Disabled
 public class IORedirectionHandlerTest {
-    public static final Path CURR_PATH = Paths.get(EnvironmentUtil.currentDirectory);
+    public static final Path CURR_PATH = Path.of(EnvironmentUtil.currentDirectory);
     public static Deque<Path> files = new ArrayDeque<>();
     public static IORedirectionHandler handler;
 

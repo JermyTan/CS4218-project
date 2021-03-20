@@ -10,7 +10,7 @@ import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
@@ -47,7 +47,7 @@ class RegexArgumentTest {
     }
 
     private String resolveArg(String arg) {
-        return Paths.get(TEST_DIR, arg).toString();
+        return Path.of(TEST_DIR, arg).toString();
     }
 
     @BeforeEach

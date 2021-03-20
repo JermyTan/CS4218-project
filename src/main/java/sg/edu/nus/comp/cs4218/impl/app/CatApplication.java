@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -151,7 +150,7 @@ public class CatApplication implements CatInterface {
 
                     String contentString = content.formatToString(isLineNumber);
 
-                    return !contentString.isEmpty() ? Stream.of(contentString) : Stream.empty();
+                    return contentString.isEmpty() ? Stream.empty() : Stream.of(contentString);
                 })
                 .collect(Collectors.toList());
 
@@ -203,7 +202,7 @@ public class CatApplication implements CatInterface {
 
                     String contentString = content.formatToString(isLineNumber);
 
-                    return !contentString.isEmpty() ? Stream.of(contentString) : Stream.empty();
+                    return contentString.isEmpty() ? Stream.empty() : Stream.of(contentString);
                 })
                 .collect(Collectors.toList());
 

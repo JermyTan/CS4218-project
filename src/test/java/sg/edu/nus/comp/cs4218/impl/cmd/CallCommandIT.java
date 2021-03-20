@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
@@ -40,8 +39,8 @@ class CallCommandIT {
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
 
-    private final Path file1 = Paths.get(TEST_DIR, FILE_1);
-    private final Path file2 = Paths.get(TEST_DIR, FILE_2);
+    private final Path file1 = Path.of(TEST_DIR, FILE_1);
+    private final Path file2 = Path.of(TEST_DIR, FILE_2);
 
     private final List<Path> paths = List.of(file1, file2);
 

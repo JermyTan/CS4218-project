@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.parser;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 
-
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class UniqArgsParser extends ArgsParser {
@@ -56,6 +55,10 @@ public class UniqArgsParser extends ArgsParser {
 
         if (nonFlagArgs.size() > 2) {
             throw new InvalidArgsException(ERR_TOO_MANY_ARGS);
+        }
+
+        if (isAllRepeated() && isCount()) {
+            throw new InvalidArgsException(ILLEGAL_FLAG_MSG + FLAG_IS_COUNT + FLAG_IS_ALL_REPEATED);
         }
     }
 }

@@ -19,7 +19,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -99,7 +99,7 @@ class TeeApplicationTest {
         assertEquals(STDIN_STRING, stdout.toString());
         File outputFile = new File(tempDir, "tee1.txt");
         assertTrue(outputFile.exists());
-        String fileContents = Files.readString(Paths.get(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
+        String fileContents = Files.readString(Path.of(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
         assertEquals(STDIN_STRING, fileContents);
     }
 
@@ -111,7 +111,7 @@ class TeeApplicationTest {
         assertEquals(STDIN_STRING, stdout.toString());
         File outputFile = new File(tempDir, "tee1.txt");
         assertTrue(outputFile.exists());
-        String fileContents = Files.readString(Paths.get(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
+        String fileContents = Files.readString(Path.of(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
         assertEquals(STDIN_STRING, fileContents);
     }
 
@@ -123,11 +123,11 @@ class TeeApplicationTest {
         assertEquals(STDIN_STRING, stdout.toString());
         File outputFile = new File(tempDir, "tee1.txt");
         assertTrue(outputFile.exists());
-        String fileContents = Files.readString(Paths.get(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
+        String fileContents = Files.readString(Path.of(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
         assertEquals(STDIN_STRING, fileContents);
         File outputFile2 = new File(tempDir, "tee2.txt");
         assertTrue(outputFile2.exists());
-        String fileContents2 = Files.readString(Paths.get(outputFile2.getAbsolutePath()), StandardCharsets.UTF_8);
+        String fileContents2 = Files.readString(Path.of(outputFile2.getAbsolutePath()), StandardCharsets.UTF_8);
         assertEquals(STDIN_STRING, fileContents2);
     }
 
@@ -171,7 +171,7 @@ class TeeApplicationTest {
 
         File outputFile = new File(tempDir, "tee1.txt");
         assertTrue(outputFile.exists());
-        String fileContents = Files.readString(Paths.get(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
+        String fileContents = Files.readString(Path.of(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
         assertEquals(STDIN_STRING, fileContents);
     }
 
@@ -183,7 +183,7 @@ class TeeApplicationTest {
         assertEquals(STDIN_STRING, stdout.toString());
         File outputFile = new File(tempDir, "existing.txt");
         assertTrue(outputFile.exists());
-        String fileContents = Files.readString(Paths.get(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
+        String fileContents = Files.readString(Path.of(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
         assertEquals("Hello World" + STRING_NEWLINE + STDIN_STRING, fileContents);
     }
 
@@ -195,12 +195,12 @@ class TeeApplicationTest {
         assertEquals(STDIN_STRING, stdout.toString());
         File outputFile = new File(tempDir, "existing.txt");
         assertTrue(outputFile.exists());
-        String fileContents = Files.readString(Paths.get(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
+        String fileContents = Files.readString(Path.of(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
         assertEquals("Hello World" + STRING_NEWLINE + STDIN_STRING, fileContents);
 
         File outputFile2 = new File(tempDir, "existing2.txt");
         assertTrue(outputFile2.exists());
-        String fileContents2 = Files.readString(Paths.get(outputFile2.getAbsolutePath()), StandardCharsets.UTF_8);
+        String fileContents2 = Files.readString(Path.of(outputFile2.getAbsolutePath()), StandardCharsets.UTF_8);
         assertEquals("Hello CS4218" + STRING_NEWLINE + STDIN_STRING, fileContents2);
     }
 

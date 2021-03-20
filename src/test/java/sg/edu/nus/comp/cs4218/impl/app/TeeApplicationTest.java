@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
@@ -61,10 +60,10 @@ class TeeApplicationTest {
     private final ByteArrayOutputStream ERR_OUTPUT = new ByteArrayOutputStream();
     private final ByteArrayOutputStream STD_OUTPUT = new ByteArrayOutputStream();
 
-    private final Path file1 = Paths.get(TEST_DIR, OUTPUT_FILE_1); // exists
-    private final Path file2 = Paths.get(TEST_DIR, OUTPUT_FILE_2); // exists
-    private final Path file3 = Paths.get(TEST_DIR, OUTPUT_FILE_3); // does not exist
-    private final Path folder = Paths.get(TEST_DIR, FOLDER); // exists
+    private final Path file1 = Path.of(TEST_DIR, OUTPUT_FILE_1); // exists
+    private final Path file2 = Path.of(TEST_DIR, OUTPUT_FILE_2); // exists
+    private final Path file3 = Path.of(TEST_DIR, OUTPUT_FILE_3); // does not exist
+    private final Path folder = Path.of(TEST_DIR, FOLDER); // exists
     private final List<Path> paths = List.of(file1, file2, file3, folder);
 
     private InputStream inputStream;

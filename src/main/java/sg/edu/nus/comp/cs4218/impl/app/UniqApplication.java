@@ -4,8 +4,9 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
@@ -31,14 +32,11 @@ import sg.edu.nus.comp.cs4218.impl.result.UniqResult;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+@SuppressWarnings("PMD.GodClass")
 public class UniqApplication implements UniqInterface {
 
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws UniqException {
-        if (stdout == null) {
-            throw new UniqException(ERR_NO_OSTREAM);
-        }
-
         UniqArgsParser parser = new UniqArgsParser();
 
         try {
@@ -53,7 +51,7 @@ public class UniqApplication implements UniqInterface {
         String inputFileName = parser.getInputFileName();
         String outputFileName = parser.getOutputFilename();
 
-        if (inputFileName == null && stdin == null) {
+        if ((inputFileName == null || inputFileName.equals(STRING_STDIN_FLAG)) && stdin == null) {
             throw new UniqException(ERR_NO_INPUT);
         }
 
@@ -126,11 +124,15 @@ public class UniqApplication implements UniqInterface {
     @Override
     public String uniqFromFile(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, String inputFileName, String outputFileName) throws UniqException {
         if (inputFileName == null) {
-            throw new UniqException(ERR_INVALID_FILES);
+            throw new UniqException(ERR_NO_FILE_ARGS);
         }
 
         if (CollectionUtils.isAnyNull(isCount, isRepeated, isAllRepeated)) {
             throw new UniqException(ERR_NULL_ARGS);
+        }
+
+        if (isAllRepeated && isCount) {
+            throw new UniqException(ERR_INVALID_ARGS);
         }
 
         UniqResult result;
@@ -176,6 +178,10 @@ public class UniqApplication implements UniqInterface {
 
         if (CollectionUtils.isAnyNull(isCount, isRepeated, isAllRepeated)) {
             throw new UniqException(ERR_NULL_ARGS);
+        }
+
+        if (isAllRepeated && isCount) {
+            throw new UniqException(ERR_INVALID_ARGS);
         }
 
         UniqResult result;

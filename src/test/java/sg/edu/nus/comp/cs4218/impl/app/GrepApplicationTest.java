@@ -26,7 +26,6 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,7 +108,7 @@ class GrepApplicationTest {
         testFile2 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), TEST_STRING);
-        testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
+        testFolder = Path.of(TEST_DIR, TEST_FOLDER);
         Files.createDirectory(testFolder);
     }
 

@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -29,7 +28,7 @@ import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 
 @Disabled
 public class UniqApplicationTest {
-    public static final Path CURR_PATH = Paths.get(EnvironmentUtil.currentDirectory);
+    public static final Path CURR_PATH = Path.of(EnvironmentUtil.currentDirectory);
     private static final String testInput = "Hello World" + STRING_NEWLINE +
             "Hello World" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +

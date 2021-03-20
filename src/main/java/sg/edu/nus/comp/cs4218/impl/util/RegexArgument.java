@@ -5,7 +5,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 
 import java.io.File;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,12 +66,12 @@ public final class RegexArgument {
                 dir += tokens[i] + STRING_FILE_SEP;
             }
 
-            boolean isAbsolute = Paths.get(dir).isAbsolute();
+            boolean isAbsolute = Path.of(dir).isAbsolute();
             boolean onlyDirectories = modifiedPlaintext.charAt(plaintext.length() - 1) == '/';
 
-            File currentDir = Paths.get(dir).toFile();
+            File currentDir = Path.of(dir).toFile();
             if (!isAbsolute) {
-                currentDir = Paths.get(EnvironmentUtil.currentDirectory, dir).normalize().toFile();
+                currentDir = Path.of(EnvironmentUtil.currentDirectory, dir).normalize().toFile();
             }
 
             globbedFiles = traverseAndFilter(regexPattern, currentDir, isAbsolute, onlyDirectories);

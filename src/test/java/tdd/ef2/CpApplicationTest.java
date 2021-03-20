@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -28,7 +27,7 @@ import sg.edu.nus.comp.cs4218.impl.app.CpApplication;
 @Disabled
 public class CpApplicationTest {
     public static final String TEMP = "temp-cp";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
+    public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
 
     @BeforeEach
     void createTemp() throws IOException {
@@ -73,7 +72,7 @@ public class CpApplicationTest {
             args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
-            args.add(Paths.get(TEMP, file).toString());
+            args.add(Path.of(TEMP, file).toString());
         }
         return args.toArray(new String[0]);
     }

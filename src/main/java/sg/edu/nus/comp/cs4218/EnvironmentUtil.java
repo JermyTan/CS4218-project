@@ -3,7 +3,6 @@ package sg.edu.nus.comp.cs4218;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public final class EnvironmentUtil {

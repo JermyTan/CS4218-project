@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 
 import org.junit.jupiter.api.AfterEach;
@@ -25,7 +24,7 @@ import sg.edu.nus.comp.cs4218.impl.ShellImpl;
 @Disabled
 public class IntegrationTest {
     public static final String TEMP = "temp";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
+    public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
 
     @BeforeEach
     void createTemp() throws IOException {

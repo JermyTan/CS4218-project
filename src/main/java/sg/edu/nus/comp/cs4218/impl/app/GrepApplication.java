@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -32,7 +31,6 @@ import sg.edu.nus.comp.cs4218.app.GrepInterface;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.GrepArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.GrepResult;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
@@ -212,7 +210,7 @@ public class GrepApplication implements GrepInterface {
 
                     String contentString = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
 
-                    return !contentString.isEmpty() ? Stream.of(contentString) : Stream.empty();
+                    return contentString.isEmpty() ? Stream.empty() : Stream.of(contentString);
                 })
                 .collect(Collectors.toList());
 
@@ -289,7 +287,7 @@ public class GrepApplication implements GrepInterface {
 
                     String contentString = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
 
-                    return !contentString.isEmpty() ? Stream.of(contentString) : Stream.empty();
+                    return contentString.isEmpty() ? Stream.empty() : Stream.of(contentString);
                 })
                 .collect(Collectors.toList());
 

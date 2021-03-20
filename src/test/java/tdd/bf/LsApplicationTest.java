@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -34,7 +33,7 @@ import sg.edu.nus.comp.cs4218.impl.app.LsApplication;
 
 public class LsApplicationTest {
     public static final String TEMP = "temp-ls";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
+    public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
     public static Deque<Path> files = new ArrayDeque<>();
     private OutputStream stderr;
 
@@ -89,7 +88,7 @@ public class LsApplicationTest {
             args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
-            args.add(Paths.get(TEMP, file).toString());
+            args.add(Path.of(TEMP, file).toString());
         }
         return args.toArray(new String[0]);
     }

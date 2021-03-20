@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -30,7 +29,7 @@ import sg.edu.nus.comp.cs4218.impl.app.PasteApplication;
 
 public class PasteApplicationTest {
     public static final String TEMP = "temp-paste";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
+    public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
     public static Deque<Path> files = new ArrayDeque<>();
 
     @BeforeAll
@@ -63,7 +62,7 @@ public class PasteApplicationTest {
             if (file.equals(STRING_STDIN_FLAG)) {
                 args.add(file);
             } else {
-                args.add(Paths.get(TEMP, file).toString());
+                args.add(Path.of(TEMP, file).toString());
             }
         }
         return args.toArray(new String[0]);
@@ -162,7 +161,7 @@ public class PasteApplicationTest {
     void run_DirectoryNoFlag_ThrowsException() throws AbstractApplicationException, IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String directoryName = "nonexistent_file.txt";
-        Path path = Paths.get(EnvironmentUtil.currentDirectory, directoryName);
+        Path path = Path.of(EnvironmentUtil.currentDirectory, directoryName);
         Files.createDirectory(path);
         assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY, directoryName),
                 System.in, output));
@@ -298,7 +297,7 @@ public class PasteApplicationTest {
         String stdinText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String directoryName = "nonexistent_file.txt";
-        Path path = Paths.get(EnvironmentUtil.currentDirectory, directoryName);
+        Path path = Path.of(EnvironmentUtil.currentDirectory, directoryName);
         Files.createDirectory(path);
         assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY, directoryName),
                 inputStream, output));

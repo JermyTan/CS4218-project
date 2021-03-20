@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -33,7 +32,7 @@ import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
 
 public class CatApplicationTest {
     public static final String TEMP = "temp-cat";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
+    public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
     public static Deque<Path> files = new ArrayDeque<>();
     private OutputStream stderr;
 
@@ -84,7 +83,7 @@ public class CatApplicationTest {
     }
 
     private Path getRelativePath(String name) {
-        return Paths.get(TEMP, name);
+        return Path.of(TEMP, name);
     }
 
     @Test
@@ -194,7 +193,7 @@ public class CatApplicationTest {
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String directoryName = "nonexistent_file.txt";
-        Path path = Paths.get(EnvironmentUtil.currentDirectory, directoryName);
+        Path path = Path.of(EnvironmentUtil.currentDirectory, directoryName);
 
         if (Files.notExists(path)) {
             Files.createDirectory(path);
@@ -367,7 +366,7 @@ public class CatApplicationTest {
         String stdinText = String.join(STRING_NEWLINE, "Test line 1.1", "Test line 1.2", "Test line 1.3");
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String directoryName = "nonexistent_file.txt";
-        Path path = Paths.get(EnvironmentUtil.currentDirectory, directoryName);
+        Path path = Path.of(EnvironmentUtil.currentDirectory, directoryName);
         if (Files.notExists(path)) {
             Files.createDirectory(path);
         }
