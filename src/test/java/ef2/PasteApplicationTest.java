@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
@@ -38,7 +37,7 @@ class PasteApplicationTest {
 
     private final OutputStream stdout = new ByteArrayOutputStream();
     private PasteApplication app;
-    private InputStream stdin = System.in;
+    private InputStream stdin;
 
     @BeforeAll
     static void setupBeforeAll() {
@@ -57,16 +56,12 @@ class PasteApplicationTest {
     @BeforeEach
     void setup() {
         app = new PasteApplication();
+        stdin = System.in;
     }
 
     @Test
     public void run_NullOutputStream_ThrowsException() {
         assertThrows(Exception.class, () -> app.run(new String[]{FILE_1, FILE_2}, stdin, null));
-    }
-
-    @Test
-    public void run_NullArgList_ThrowsException() {
-        assertThrows(Exception.class, () -> app.run(null, stdin, stdout));
     }
 
     @Test
@@ -112,6 +107,16 @@ class PasteApplicationTest {
         provideInput(expected);
 
         assertDoesNotThrow(() -> app.run(new String[]{}, stdin, stdout));
+
+        assertEquals(expected, stdout.toString());
+    }
+
+    @Test
+    public void run_NullArgList_ReadFromStdin() {
+        String expected = STD_INPUT;
+        provideInput(expected);
+
+        assertDoesNotThrow(() -> app.run(null, stdin, stdout));
 
         assertEquals(expected, stdout.toString());
     }

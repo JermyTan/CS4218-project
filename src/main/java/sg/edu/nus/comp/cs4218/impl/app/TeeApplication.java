@@ -12,6 +12,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.InputStream;
@@ -23,7 +24,6 @@ import java.util.List;
 import sg.edu.nus.comp.cs4218.app.TeeInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.TeeException;
 import sg.edu.nus.comp.cs4218.impl.parser.TeeArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.TeeResult;
@@ -79,21 +79,17 @@ public class TeeApplication implements TeeInterface {
     private List<String> teeFromInputStream(InputStream inputStream) throws TeeException {
         try {
             return IOUtils.getLinesFromInputStream(inputStream);
-        } catch (ShellException e) {
+        } catch (Exception e) {
             throw new TeeException(e.getMessage(), e);
         }
     }
 
-    private TeeResult teeToFile(boolean isAppend, List<String> content, String fileName) throws TeeException {
-        if (content == null) {
-            throw new TeeException(ERR_NULL_ARGS);
-        }
-
-        if (fileName == null) {
-            throw new TeeException(ERR_INVALID_FILES);
-        }
-
+    private TeeResult teeToFile(boolean isAppend, List<String> content, String fileName) {
         try {
+            if (fileName.isEmpty()) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
+            }
+
             Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
 
             if (Files.isDirectory(filePath)) {
@@ -110,7 +106,7 @@ public class TeeApplication implements TeeInterface {
                 return new TeeResult();
 
             } catch (Exception e) {
-                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND, e);
+                throw new InvalidDirectoryException(fileName, ERR_WRITING_FILE, e);
             }
 
         } catch (Exception e) {

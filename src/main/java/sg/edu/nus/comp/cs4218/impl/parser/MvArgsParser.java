@@ -7,7 +7,7 @@ import java.util.List;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class MvArgsParser extends ArgsParser {
-    private final static char FLAG_IS_NOT_OVERWRITE = 'n';
+    private static final char FLAG_IS_NOT_OVERWRITE = 'n';
 
     public MvArgsParser() {
         super();

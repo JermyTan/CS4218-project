@@ -18,7 +18,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,7 +36,7 @@ import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
 
 public class WcApplicationTest {
     public static final String TEMP = "temp-wc";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
+    public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
     public static String currPathString;
     public static Deque<Path> files = new ArrayDeque<>();
     private OutputStream stderr;
@@ -53,14 +52,14 @@ public class WcApplicationTest {
     }
 
     @BeforeEach
-    void changeDirectory() throws IOException {
+    void changeDirectory() throws Exception {
         currPathString = EnvironmentUtil.currentDirectory;
         Files.createDirectory(TEMP_PATH);
         EnvironmentUtil.setCurrentDirectory(TEMP_PATH.toString());
     }
 
     @AfterEach
-    void deleteFiles() throws IOException {
+    void deleteFiles() throws Exception {
         EnvironmentUtil.setCurrentDirectory(currPathString);
         Files.walk(TEMP_PATH)
                 .sorted(Comparator.reverseOrder())
@@ -89,7 +88,7 @@ public class WcApplicationTest {
             args.add(STRING_STDIN_FLAG + flag);
         }
         for (String file : files) {
-            args.add(Paths.get(file).toString());
+            args.add(Path.of(file).toString());
         }
         return args.toArray(new String[0]);
     }
@@ -264,7 +263,7 @@ public class WcApplicationTest {
     @Test
     void run_InputStreamIsNull_ThrowsException() {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        assertThrows(Exception.class, () -> new WcApplication().run(toArgs(STRING_EMPTY, STRING_EMPTY), null, output));
+        assertThrows(Exception.class, () -> new WcApplication().run(toArgs(STRING_EMPTY), null, output));
     }
 
     @Test

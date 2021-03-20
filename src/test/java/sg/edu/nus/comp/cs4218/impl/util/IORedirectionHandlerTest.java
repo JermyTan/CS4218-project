@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,7 @@ class IORedirectionHandlerTest {
     private static final String FILE_3 = "file3.txt"; // does not exist
     private final String STRING_REDIR_INPUT = String.valueOf(CHAR_REDIR_INPUT);
     private final String STRING_REDIR_OUTPUT = String.valueOf(CHAR_REDIR_OUTPUT);
-    private final Path file3 = Paths.get(TEST_DIR, FILE_3);
+    private final Path file3 = Path.of(TEST_DIR, FILE_3);
 
     private IORedirectionHandler redirHandler;
     private ArgumentResolver argumentResolver;

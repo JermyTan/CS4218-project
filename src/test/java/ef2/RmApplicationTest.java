@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
@@ -44,11 +43,11 @@ class RmApplicationTest {
     private static final String FOLDER_3 = "folder3";
     private static final String EMPTY_FOLDER = "emptyFolder";
 
-    private final Path file1 = Paths.get(TEST_DIR, FILE_1);
-    private final Path file2 = Paths.get(TEST_DIR, FILE_2);
-    private final Path folder1 = Paths.get(TEST_DIR, FOLDER_1);
-    private final Path folder2 = Paths.get(TEST_DIR, FOLDER_2);
-    private final Path emptyFolder = Paths.get(TEST_DIR, EMPTY_FOLDER);
+    private final Path file1 = Path.of(TEST_DIR, FILE_1);
+    private final Path file2 = Path.of(TEST_DIR, FILE_2);
+    private final Path folder1 = Path.of(TEST_DIR, FOLDER_1);
+    private final Path folder2 = Path.of(TEST_DIR, FOLDER_2);
+    private final Path emptyFolder = Path.of(TEST_DIR, EMPTY_FOLDER);
 
     private final List<Path> paths = List.of(file1, file2, folder1, folder2, emptyFolder);
     private final InputStream stdin = mock(InputStream.class);

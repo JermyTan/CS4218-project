@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.CatException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 
 class CatApplicationTest {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
@@ -105,6 +106,19 @@ class CatApplicationTest {
     public void run_NoStdinNoFiles_ThrowsException() {
         Throwable exception = assertThrows(CatException.class, () -> app.run(new String[]{}, null, stdout));
         assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CAT, ERR_NO_INPUT), exception.getMessage());
+    }
+
+    @Test
+    public void run_NoStdinInvalidFiles_ThrowsException() {
+        captureErr();
+
+        assertDoesNotThrow(() -> {
+            app.run(new String[]{STRING_EMPTY}, null, stdout);
+            assertEquals(
+                    new CatException(new InvalidDirectoryException(STRING_EMPTY, ERR_FILE_NOT_FOUND).getMessage()).getMessage() + STRING_NEWLINE,
+                    getErrOutput()
+            );
+        });
     }
 
     @Test
@@ -210,7 +224,7 @@ class CatApplicationTest {
             app.catFiles(false, FILE_3);
 
             assertEquals(new CatException(
-                            String.format(STRING_LABEL_VALUE_PAIR, FILE_3, ERR_FILE_NOT_FOUND)
+                            new InvalidDirectoryException(FILE_3, ERR_FILE_NOT_FOUND).getMessage()
                     ).getMessage() + STRING_NEWLINE,
                     getErrOutput());
         });

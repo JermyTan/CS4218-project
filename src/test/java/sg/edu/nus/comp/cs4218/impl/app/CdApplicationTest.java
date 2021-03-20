@@ -7,6 +7,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_CD;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
@@ -68,19 +69,19 @@ class CdApplicationTest {
     }
 
     @Test
-    public void run_NullArgs_ShouldThrow() {
+    public void run_NullArgs_ThrowsException() {
         Throwable exception = assertThrows(CdException.class, () -> app.run(null, System.in, System.out));
         assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CD, ERR_NULL_ARGS), exception.getMessage());
     }
 
     @Test
-    void run_MissingArgs_ShouldThrow() {
+    void run_MissingArgs_ThrowsException() {
         Throwable exception = assertThrows(CdException.class, () -> app.run(ARGS_2, System.in, System.out));
         assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CD, ERR_MISSING_ARG), exception.getMessage());
     }
 
     @Test
-    void run_MoreThanOneArgs_ShouldThrow() {
+    void run_MoreThanOneArgs_ThrowsException() {
         Throwable exception = assertThrows(CdException.class, () -> app.run(ARGS_3, System.in, System.out));
         assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CD, ERR_TOO_MANY_ARGS), exception.getMessage());
     }
@@ -102,20 +103,20 @@ class CdApplicationTest {
     }
 
     @Test
-    void changeToDirectory_NonExistingFolder_ShouldThrow() {
+    void changeToDirectory_NonExistingFolder_ThrowsException() {
         Throwable exception = assertThrows(CdException.class, () -> app.changeToDirectory(FOLDER_2));
         assertEquals(String.format("%s: %s: %s", APP_CD, FOLDER_2, ERR_FILE_NOT_FOUND), exception.getMessage());
     }
 
     @Test
-    void changeToDirectory_NotADirectory_ShouldThrow() {
+    void changeToDirectory_NotADirectory_ThrowsException() {
         Throwable exception = assertThrows(CdException.class, () -> app.changeToDirectory(FILE));
         assertEquals(String.format("%s: %s: %s", APP_CD, FILE, ERR_IS_NOT_DIR), exception.getMessage());
     }
 
     @Test
-    void changeToDirectory_NoArgs_ShouldThrow() {
+    void changeToDirectory_NoArgs_ThrowsException() {
         Throwable exception = assertThrows(CdException.class, () -> app.changeToDirectory(null));
-        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CD, ERR_MISSING_ARG), exception.getMessage());
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_CD, ERR_NO_FILE_ARGS), exception.getMessage());
     }
 }

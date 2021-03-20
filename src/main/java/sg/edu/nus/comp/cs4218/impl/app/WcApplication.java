@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
@@ -72,11 +71,7 @@ public class WcApplication implements WcInterface {
         boolean isWords = parser.isWords() || isDefault;
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
-        if (stdin == null
-                && (fileNames == null
-                || fileNames.length == 0
-                || Arrays.stream(fileNames).allMatch(StringUtils::isBlank))
-        ) {
+        if (stdin == null && (fileNames == null || fileNames.length == 0)) {
             throw new WcException(ERR_NO_INPUT);
         }
 
@@ -152,12 +147,12 @@ public class WcApplication implements WcInterface {
         }
     }
 
-    private WcResult computeStatisticsFromFile(String fileName) throws WcException {
-        if (fileName == null) {
-            throw new WcException(ERR_INVALID_FILES);
-        }
-
+    private WcResult computeStatisticsFromFile(String fileName) {
         try {
+            if (fileName.isEmpty()) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
+            }
+
             Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
 
             if (Files.notExists(filePath)) {
@@ -179,11 +174,7 @@ public class WcApplication implements WcInterface {
         }
     }
 
-    private WcResult computeStatisticsFromStdin(InputStream stdin) throws WcException {
-        if (stdin == null) {
-            throw new WcException(ERR_NO_ISTREAM);
-        }
-
+    private WcResult computeStatisticsFromStdin(InputStream stdin) {
         try {
             return computeStatisticsFromInputStream(STDIN_LABEL, stdin, null);
         } catch (Exception e) {
@@ -227,15 +218,15 @@ public class WcApplication implements WcInterface {
             throw new WcException(ERR_NULL_ARGS);
         }
 
-        List<WcResult> result = new ArrayList<>();
+        List<WcResult> result = Arrays.stream(fileNames)
+                .map(fileName -> {
+                    WcResult statistics = computeStatisticsFromFile(fileName);
 
-        for (String fileName : fileNames) {
-            WcResult statistics = computeStatisticsFromFile(fileName);
+                    statistics.outputError();
 
-            statistics.outputError();
-
-            result.add(statistics);
-        }
+                    return statistics;
+                })
+                .collect(Collectors.toList());
 
         return formatStatistics(result, isBytes, isLines, isWords);
     }
@@ -286,17 +277,17 @@ public class WcApplication implements WcInterface {
             throw new WcException(ERR_NULL_ARGS);
         }
 
-        List<WcResult> result = new ArrayList<>();
+        List<WcResult> result = Arrays.stream(fileNames)
+                .map(fileName -> {
+                    WcResult statistics = fileName.equals(STRING_STDIN_FLAG)
+                            ? computeStatisticsFromStdin(stdin)
+                            : computeStatisticsFromFile(fileName);
 
-        for (String fileName : fileNames) {
-            WcResult statistics = fileName.equals(STRING_STDIN_FLAG)
-                    ? computeStatisticsFromStdin(stdin)
-                    : computeStatisticsFromFile(fileName);
+                    statistics.outputError();
 
-            statistics.outputError();
-
-            result.add(statistics);
-        }
+                    return statistics;
+                })
+                .collect(Collectors.toList());
 
         return formatStatistics(result, isBytes, isLines, isWords);
     }

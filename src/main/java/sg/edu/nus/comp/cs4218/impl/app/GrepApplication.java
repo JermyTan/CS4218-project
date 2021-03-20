@@ -20,23 +20,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import sg.edu.nus.comp.cs4218.app.GrepInterface;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.GrepArgsParser;
 import sg.edu.nus.comp.cs4218.impl.result.GrepResult;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.GodClass")
 public class GrepApplication implements GrepInterface {
@@ -72,11 +70,7 @@ public class GrepApplication implements GrepInterface {
         String pattern = parser.getPattern();
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
-        if (stdin == null
-                && (fileNames == null
-                || fileNames.length == 0
-                || Arrays.stream(fileNames).allMatch(StringUtils::isBlank))
-        ) {
+        if (stdin == null && (fileNames == null || fileNames.length == 0)) {
             throw new GrepException(ERR_NO_INPUT);
         }
 
@@ -139,7 +133,7 @@ public class GrepApplication implements GrepInterface {
                     .stream()
                     .filter(line -> grepPattern.matcher(line).find())
                     .collect(Collectors.toList());
-        } catch (ShellException e) {
+        } catch (Exception e) {
             throw new GrepException(e.getMessage(), e);
         }
     }
@@ -147,16 +141,12 @@ public class GrepApplication implements GrepInterface {
     private GrepResult computeGrepFromFile(
             Pattern grepPattern,
             String fileName
-    ) throws GrepException {
-        if (grepPattern == null) {
-            throw new GrepException(ERR_NO_REGEX);
-        }
-
-        if (fileName == null) {
-            throw new GrepException(ERR_INVALID_FILES);
-        }
-
+    ) {
         try {
+            if (fileName.isEmpty()) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
+            }
+
             Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
 
             if (Files.notExists(filePath)) {
@@ -179,15 +169,7 @@ public class GrepApplication implements GrepInterface {
         }
     }
 
-    private GrepResult computeGrepFromStdin(Pattern grepPattern, InputStream stdin) throws GrepException {
-        if (grepPattern == null) {
-            throw new GrepException(ERR_NO_REGEX);
-        }
-
-        if (stdin == null) {
-            throw new GrepException(ERR_READ_STREAM);
-        }
-
+    private GrepResult computeGrepFromStdin(Pattern grepPattern, InputStream stdin) {
         try {
             return new GrepResult(STDIN_LABEL, grepFromInputStream(grepPattern, stdin));
         } catch (Exception e) {
@@ -219,19 +201,18 @@ public class GrepApplication implements GrepInterface {
         }
 
         Pattern grepPattern = processRegexPattern(pattern, isCaseInsensitive);
-        List<String> result = new ArrayList<>();
 
-        for (String fileName : fileNames) {
-            GrepResult content = computeGrepFromFile(grepPattern, fileName);
+        List<String> result = Arrays.stream(fileNames)
+                .flatMap(fileName -> {
+                    GrepResult content = computeGrepFromFile(grepPattern, fileName);
 
-            content.outputError();
+                    content.outputError();
 
-            String contentString = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
+                    String contentString = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
 
-            if (!contentString.isEmpty()) {
-                result.add(contentString);
-            }
-        }
+                    return contentString.isEmpty() ? Stream.empty() : Stream.of(contentString);
+                })
+                .collect(Collectors.toList());
 
         return String.join(STRING_NEWLINE, result);
     }
@@ -295,21 +276,20 @@ public class GrepApplication implements GrepInterface {
         }
 
         Pattern grepPattern = processRegexPattern(pattern, isCaseInsensitive);
-        List<String> result = new ArrayList<>();
 
-        for (String fileName : fileNames) {
-            GrepResult content = fileName.equals(STRING_STDIN_FLAG)
-                    ? computeGrepFromStdin(grepPattern, stdin)
-                    : computeGrepFromFile(grepPattern, fileName);
+        List<String> result = Arrays.stream(fileNames)
+                .flatMap(fileName -> {
+                    GrepResult content = fileName.equals(STRING_STDIN_FLAG)
+                            ? computeGrepFromStdin(grepPattern, stdin)
+                            : computeGrepFromFile(grepPattern, fileName);
 
-            content.outputError();
+                    content.outputError();
 
-            String contentString = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
+                    String contentString = content.formatToString(isCountLines, isPrefixFileName || fileNames.length > 1);
 
-            if (!contentString.isEmpty()) {
-                result.add(contentString);
-            }
-        }
+                    return contentString.isEmpty() ? Stream.empty() : Stream.of(contentString);
+                })
+                .collect(Collectors.toList());
 
         return String.join(STRING_NEWLINE, result);
     }

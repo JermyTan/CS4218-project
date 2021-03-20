@@ -59,19 +59,19 @@ class EchoApplicationTest {
 
 
     @Test
-    public void constructResult_Null_ShouldThrow() {
+    public void constructResult_Null_ThrowsException() {
         Throwable error = assertThrows(EchoException.class, () -> app.constructResult(STRING_4));
         assertEquals("echo: " + ERR_NULL_ARGS, error.getMessage());
     }
 
     @Test
-    public void run_NoOutStream_ShouldThrow() {
+    public void run_NoOutStream_ThrowsException() {
         Throwable error = assertThrows(EchoException.class, () -> app.run(STRING_1, System.in, null));
         assertEquals("echo: " + ERR_NO_OSTREAM, error.getMessage());
     }
 
     @Test
-    public void run_RuntimeIOException_ShouldThrow() throws IOException {
+    public void run_RuntimeIOException_ThrowsException() throws IOException {
         try (OutputStream out = new PipedOutputStream()) {
             out.close();
             Throwable error = assertThrows(EchoException.class, () -> app.run(STRING_1, System.in, out));

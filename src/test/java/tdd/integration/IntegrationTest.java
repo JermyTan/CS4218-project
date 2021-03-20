@@ -1,15 +1,14 @@
 package tdd.integration;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 
 import org.junit.jupiter.api.AfterEach;
@@ -25,7 +24,7 @@ import sg.edu.nus.comp.cs4218.impl.ShellImpl;
 @Disabled
 public class IntegrationTest {
     public static final String TEMP = "temp";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
+    public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
 
     @BeforeEach
     void createTemp() throws IOException {
@@ -56,7 +55,7 @@ public class IntegrationTest {
     void testCommandSubstitution_EchoLs_DisplaysLsResult() throws IOException, AbstractApplicationException, ShellException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         createFile("Hello");
-        String commandString = "echo `ls " + TEMP +"`";
+        String commandString = "echo `ls " + TEMP + "`";
         new ShellImpl().parseAndEvaluate(commandString, output);
         assertArrayEquals(("temp: Hello" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }

@@ -19,13 +19,13 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.testutil.ParserTestUtils;
 
 @SuppressWarnings("PMD.ExcessiveMethodLength")
-class TeeArgsParserTest {
-    private static final char FLAG_IS_LINE_NUMBER = 'a';
-    private static final String VALID_OPTION_1 = String.format("%s%s", CHAR_FLAG_PREFIX, FLAG_IS_LINE_NUMBER);
-    private static final String VALID_OPTION_2 = String.format("%s%s", CHAR_FLAG_PREFIX, multiplyChar(FLAG_IS_LINE_NUMBER, 3));
+class PasteArgsParserTest {
+    private static final char FLAG_IS_SERIAL = 's';
+    private static final String VALID_OPTION_1 = String.format("%s%s", CHAR_FLAG_PREFIX, FLAG_IS_SERIAL);
+    private static final String VALID_OPTION_2 = String.format("%s%s", CHAR_FLAG_PREFIX, multiplyChar(FLAG_IS_SERIAL, 3));
     private static final String INVALID_OPTION_1 = multiplyChar(CHAR_FLAG_PREFIX, 2);
-    private static final String INVALID_OPTION_2 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_LINE_NUMBER, CHAR_FLAG_PREFIX);
-    private static final String INVALID_OPTION_3 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_LINE_NUMBER, FLAG_IS_LINE_NUMBER + 1);
+    private static final String INVALID_OPTION_2 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_SERIAL, CHAR_FLAG_PREFIX);
+    private static final String INVALID_OPTION_3 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_SERIAL, FLAG_IS_SERIAL + 1);
     private static final String[] VALID_SINGLE_VALUE_ARGS_1 = new String[]{String.valueOf(CHAR_FLAG_PREFIX)};
     private static final String[] VALID_SINGLE_VALUE_ARGS_2 = new String[]{STRING_SPACE_FILE_TXT};
     private static final String[] VALID_SINGLE_VALUE_ARGS_3 = new String[]{VALID_OPTION_2};
@@ -46,11 +46,11 @@ class TeeArgsParserTest {
             STRING_UNICODE_NAME_FILE};
     private static final String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_UNICODE_NAME_FILE, null};
 
-    private TeeArgsParser parser;
+    private PasteArgsParser parser;
 
     @BeforeEach
     void setUp() {
-        parser = new TeeArgsParser();
+        parser = new PasteArgsParser();
     }
 
     @AfterEach
@@ -76,37 +76,37 @@ class TeeArgsParserTest {
     @Test
     void parse_ValidArgs_Success() {
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_SINGLE_VALUE_ARGS_1);
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_SINGLE_VALUE_ARGS_2);
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_SINGLE_VALUE_ARGS_3);
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_1);
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_2);
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_3);
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_4);
         });
     }
@@ -114,79 +114,79 @@ class TeeArgsParserTest {
     @Test
     void parse_InvalidArgs_ThrowsException() {
         assertThrows(InvalidArgsException.class, () -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(INVALID_ARGS_1);
         });
 
         assertThrows(InvalidArgsException.class, () -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(INVALID_ARGS_2);
         });
 
         assertThrows(InvalidArgsException.class, () -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(INVALID_ARGS_3);
         });
 
         assertThrows(InvalidArgsException.class, () -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(INVALID_ARGS_4);
         });
     }
 
 
     @Test
-    void isAppend_NoAppendOption_ReturnsFalse() {
+    void isLineNumber_NoSerialOption_ReturnsFalse() {
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_SINGLE_VALUE_ARGS_1);
-            assertFalse(parser.isAppend());
+            assertFalse(parser.isSerial());
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_SINGLE_VALUE_ARGS_2);
-            assertFalse(parser.isAppend());
+            assertFalse(parser.isSerial());
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_1);
-            assertFalse(parser.isAppend());
+            assertFalse(parser.isSerial());
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_4);
-            assertFalse(parser.isAppend());
+            assertFalse(parser.isSerial());
         });
     }
 
     @Test
-    void isAppend_WithAppendOption_ReturnsTrue() {
+    void isLineNumber_WithSerialOption_ReturnsTrue() {
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_SINGLE_VALUE_ARGS_3);
-            assertTrue(parser.isAppend());
+            assertTrue(parser.isSerial());
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_2);
-            assertTrue(parser.isAppend());
+            assertTrue(parser.isSerial());
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_3);
-            assertTrue(parser.isAppend());
+            assertTrue(parser.isSerial());
         });
     }
 
     @Test
     void getFileNames_ParsedWithValidArgs_ReturnsFileNamesWithoutOptions() {
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_SINGLE_VALUE_ARGS_1);
             assertEquals(
                     ParserTestUtils.removeOptions(VALID_SINGLE_VALUE_ARGS_1),
@@ -195,7 +195,7 @@ class TeeArgsParserTest {
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_SINGLE_VALUE_ARGS_2);
             assertEquals(
                     ParserTestUtils.removeOptions(VALID_SINGLE_VALUE_ARGS_2),
@@ -204,7 +204,7 @@ class TeeArgsParserTest {
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_SINGLE_VALUE_ARGS_3);
             assertEquals(
                     ParserTestUtils.removeOptions(VALID_SINGLE_VALUE_ARGS_3),
@@ -213,7 +213,7 @@ class TeeArgsParserTest {
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_1);
             assertEquals(
                     ParserTestUtils.removeOptions(VALID_MULTI_VALUES_ARGS_1),
@@ -222,7 +222,7 @@ class TeeArgsParserTest {
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_2);
             assertEquals(
                     ParserTestUtils.removeOptions(VALID_MULTI_VALUES_ARGS_2),
@@ -231,7 +231,7 @@ class TeeArgsParserTest {
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_3);
             assertEquals(
                     ParserTestUtils.removeOptions(VALID_MULTI_VALUES_ARGS_3),
@@ -240,7 +240,7 @@ class TeeArgsParserTest {
         });
 
         assertDoesNotThrow(() -> {
-            parser = new TeeArgsParser();
+            parser = new PasteArgsParser();
             parser.parse(VALID_MULTI_VALUES_ARGS_4);
             assertEquals(
                     ParserTestUtils.removeOptions(VALID_MULTI_VALUES_ARGS_4),

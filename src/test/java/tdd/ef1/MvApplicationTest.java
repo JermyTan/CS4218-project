@@ -1,41 +1,50 @@
 package tdd.ef1;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.io.TempDir;
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.impl.app.MvApplication;
-import sg.edu.nus.comp.cs4218.exception.MvException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.app.MvApplication.constructRenameErrorMsg;
+import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.app.MvApplication.constructRenameErrorMsg;
-import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.MvException;
+import sg.edu.nus.comp.cs4218.impl.app.MvApplication;
 
 @SuppressWarnings({"PMD.LongVariable"})
 class MvApplicationTest {
-    @TempDir
-    File tempDir;
-
-    private MvApplication mvApplication;
-
     static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
-
     static final String FILE1_CONTENTS = "This is file1.txt content";
     static final String FILE2_CONTENTS = "This is another file2.txt content";
     static final String SUBFILE2_CONTENTS = "This is a subfolder1 file2.txt content";
+    @TempDir
+    File tempDir;
+    private MvApplication mvApplication;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() throws Exception {
         mvApplication = new MvApplication();
         EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath());
 
@@ -74,7 +83,7 @@ class MvApplicationTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         // set files and folders to be writable to enable clean up
         File blockedFolder = new File(tempDir, "blocked");
         blockedFolder.setWritable(true);

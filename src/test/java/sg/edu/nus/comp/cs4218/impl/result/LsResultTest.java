@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -26,9 +26,9 @@ class LsResultTest {
     private static final String FILE_NAME_1 = "test.txt";
     private static final String FILE_NAME_2 = "readme.md";
     private static final String FILE_NAME_3 = "unknown";
-    private static final String TEST_FILE_1 = Paths.get(TEST_DIR, FILE_NAME_1).toString();
-    private static final String TEST_FILE_2 = Paths.get(TEST_DIR, FILE_NAME_2).toString();
-    private static final String TEST_FILE_3 = Paths.get(TEST_DIR, FILE_NAME_3).toString();
+    private static final String TEST_FILE_1 = Path.of(TEST_DIR, FILE_NAME_1).toString();
+    private static final String TEST_FILE_2 = Path.of(TEST_DIR, FILE_NAME_2).toString();
+    private static final String TEST_FILE_3 = Path.of(TEST_DIR, FILE_NAME_3).toString();
 
     private OutputStream stderr;
 

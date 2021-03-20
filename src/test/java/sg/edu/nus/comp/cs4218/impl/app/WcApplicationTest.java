@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
@@ -22,7 +23,6 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 
 class WcApplicationTest {
@@ -103,7 +104,7 @@ class WcApplicationTest {
         testInputStream = createInputStream(generateString(0));
         testOutputStream = new ByteArrayOutputStream();
 
-        testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
+        testFolder = Path.of(TEST_DIR, TEST_FOLDER);
         Files.createDirectory(testFolder);
     }
 
@@ -120,6 +121,19 @@ class WcApplicationTest {
     void run_NullArgs_ThrowsException() {
         String[] args = {null};
         assertThrows(WcException.class, () -> wcApp.run(args, testInputStream, testOutputStream));
+    }
+
+    @Test
+    public void run_NoStdinInvalidFiles_ThrowsException() {
+        captureErr();
+
+        assertDoesNotThrow(() -> {
+            wcApp.run(new String[]{STRING_EMPTY}, null, testOutputStream);
+            assertEquals(
+                    new WcException(new InvalidDirectoryException(STRING_EMPTY, ERR_FILE_NOT_FOUND).getMessage()).getMessage() + STRING_NEWLINE,
+                    getErrOutput()
+            );
+        });
     }
 
     @Test

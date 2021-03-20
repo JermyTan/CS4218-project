@@ -25,8 +25,8 @@ class IOUtilsTest {
 
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "IOUtilsTest";
-    private final static String TEST_TXT = "test.txt";
-    private final static String NON_EXISTENT_TEXT = "test" + STRING_FILE_SEP + "test1.txt";
+    private static final String TEST_TXT = "test.txt";
+    private static final String NON_EXISTENT_TEXT = "test" + STRING_FILE_SEP + "test1.txt";
 
     @BeforeAll
     static void setupBeforeAll() {
@@ -179,7 +179,7 @@ class IOUtilsTest {
 
     @Test
     void getLinesFromInputStream_NullStream_ThrowsException() {
-        assertThrows(ShellException.class, () ->
+        assertThrows(Exception.class, () ->
                 IOUtils.getLinesFromInputStream(null)
         );
     }

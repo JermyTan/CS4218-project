@@ -7,11 +7,11 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_OPTIO
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class SplitArgsParser extends ArgsParser {
-    private final static char FLAG_IS_SPLIT_BY_LINES = 'l';
-    private final static char FLAG_IS_SPLIT_BY_BYTES = 'b';
-    private final static int INDEX_OF_LINES_OR_BYTES = 0;
-    private final static int INDEX_FILE = 0;
-    private final static int INDEX_PREFIX = 1;
+    private static final char FLAG_IS_SPLIT_BY_LINES = 'l';
+    private static final char FLAG_IS_SPLIT_BY_BYTES = 'b';
+    private static final int INDEX_OF_LINES_OR_BYTES = 0;
+    private static final int INDEX_FILE = 0;
+    private static final int INDEX_PREFIX = 1;
 
     public SplitArgsParser() {
         super();

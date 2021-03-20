@@ -1,33 +1,41 @@
 package tdd.ef2;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.UniqException;
 import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 
-
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayDeque;
-import java.util.Deque;
-
-@Disabled
 public class UniqApplicationTest {
-    public static final Path CURR_PATH = Paths.get(EnvironmentUtil.currentDirectory);
-    public static Deque<Path> files = new ArrayDeque<>();
+    private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
+    private static final String TEST_DIR = String.join(STRING_FILE_SEP,
+            EnvironmentUtil.currentDirectory,
+            RESOURCES_PATH,
+            "UniqApplicationTest");
+    private static final Path TEST_PATH = Path.of(TEST_DIR);
 
     private static final String testInput = "Hello World" + STRING_NEWLINE +
             "Hello World" + STRING_NEWLINE +
@@ -36,46 +44,61 @@ public class UniqApplicationTest {
             "Bob" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +
             "Bob" + STRING_NEWLINE;
-
     private static final String withoutFlagOutput = "Hello World" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +
             "Bob" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +
             "Bob" + STRING_NEWLINE;
-
     private static final String withCountFlagOutput = "2 Hello World" + STRING_NEWLINE +
             "2 Alice" + STRING_NEWLINE +
             "1 Bob" + STRING_NEWLINE +
             "1 Alice" + STRING_NEWLINE +
             "1 Bob" + STRING_NEWLINE;
-
     private static final String withDuplicateFlagOutput = "Hello World" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE;
-
     private static final String withAllDuplicateFlagOutput = "Hello World" + STRING_NEWLINE +
             "Hello World" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE;
-
     private static final String withCountAndDuplicateFlagsOutput = "2 Hello World" + STRING_NEWLINE +
             "2 Alice" + STRING_NEWLINE;
 
-    private static final String withCountAndAllDuplicateFlagsOutput = "2 Hello World" + STRING_NEWLINE +
-            "2 Hello World" + STRING_NEWLINE +
-            "2 Alice" + STRING_NEWLINE +
-            "2 Alice" + STRING_NEWLINE;
+    @BeforeAll
+    static void setupBeforeAll() throws IOException {
+        if (!Files.exists(TEST_PATH)) {
+            Files.createDirectory(TEST_PATH);
+        }
+
+        EnvironmentUtil.currentDirectory = TEST_DIR;
+    }
+
+    @AfterAll
+    static void tearDownAfterAll() throws IOException {
+        Files.deleteIfExists(TEST_PATH);
+        EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
+    }
 
     @AfterEach
     void deleteTemp() throws IOException {
-        for (Path file : files) {
-            Files.deleteIfExists(file);
-        }
+        Files.list(TEST_PATH).forEach(path -> {
+            try {
+                if (Files.isDirectory(path)) {
+                    Files.walk(path)
+                            .sorted(Comparator.reverseOrder())
+                            .map(Path::toFile)
+                            .forEach(File::delete);
+                } else {
+                    Files.deleteIfExists(path);
+                }
+            } catch (Exception e) {
+                // do nth
+            }
+        });
     }
 
     private Path createFile(String name) throws IOException {
-        Path path = CURR_PATH.resolve(name);
+        Path path = TEST_PATH.resolve(name);
         Files.createFile(path);
-        files.push(path);
         return path;
     }
 
@@ -89,8 +112,8 @@ public class UniqApplicationTest {
         InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> {
-                new UniqApplication().run(args, stdin, outputStream);
-                assertEquals(withoutFlagOutput, outputStream.toString());
+            new UniqApplication().run(args, stdin, outputStream);
+            assertEquals(withoutFlagOutput, outputStream.toString());
         });
     }
 
@@ -150,28 +173,6 @@ public class UniqApplicationTest {
     }
 
     @Test
-    void run_NoFilesWithCountAndAllDuplicateFlags_ReadsFromInputAndDisplaysCountOfRepeatedAdjacentLinesRepeatedly() {
-        String[] args = {"-c", "-D"};
-        InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
-        OutputStream outputStream = new ByteArrayOutputStream();
-        assertDoesNotThrow(() -> {
-            new UniqApplication().run(args, stdin, outputStream);
-            assertEquals(withCountAndAllDuplicateFlagsOutput, outputStream.toString());
-        });
-    }
-
-    @Test
-    void run_NoFilesWithAllFlags_ReadsFromInputAndDisplaysCountOfRepeatedAdjacentLinesRepeatedly() {
-        String[] args = {"-cdD"};
-        InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
-        OutputStream outputStream = new ByteArrayOutputStream();
-        assertDoesNotThrow(() -> {
-            new UniqApplication().run(args, stdin, outputStream);
-            assertEquals(withCountAndAllDuplicateFlagsOutput, outputStream.toString());
-        });
-    }
-
-    @Test
     void run_NoFilesWithUnknownFlag_ThrowsException() {
         String[] args = {"-x"};
         InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
@@ -193,14 +194,14 @@ public class UniqApplicationTest {
     }
 
     @Test
-    void run_EmptyInputFile_ReadsFileAndDisplaysNewline() throws IOException {
+    void run_EmptyInputFile_ReadsFileAndDisplaysEmptyLine() throws IOException {
         createFile("input_file.txt");
         String[] args = {"input_file.txt"};
         InputStream stdin = new ByteArrayInputStream(STRING_EMPTY.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> {
             new UniqApplication().run(args, stdin, outputStream);
-            assertEquals(STRING_NEWLINE, outputStream.toString());
+            assertEquals(STRING_EMPTY, outputStream.toString());
         });
     }
 
@@ -223,13 +224,13 @@ public class UniqApplicationTest {
         OutputStream outputStream = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> {
             new UniqApplication().run(args, stdin, outputStream);
-            assertEquals(STRING_NEWLINE, outputStream.toString());
+            assertEquals(STRING_EMPTY, outputStream.toString());
             assertArrayEquals(withoutFlagOutput.getBytes(), Files.readAllBytes(outputPath));
         });
     }
 
     @Test
-    void run_InputFileToNonexistentOutputFile_DisplaysNewlineAndCreatesOutputFile() throws IOException {
+    void run_InputFileToNonexistentOutputFile_DisplaysEmptyLineAndCreatesOutputFile() throws IOException {
         Path inputPath = createFile("input_file.txt");
         writeToFile(inputPath, testInput);
         String[] args = {"input_file.txt", "output_file.txt"};
@@ -237,8 +238,8 @@ public class UniqApplicationTest {
         OutputStream outputStream = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> {
             new UniqApplication().run(args, stdin, outputStream);
-            assertEquals(STRING_NEWLINE, outputStream.toString());
-            Path outputPath = CURR_PATH.resolve("output_file.txt");
+            assertEquals(STRING_EMPTY, outputStream.toString());
+            Path outputPath = TEST_PATH.resolve("output_file.txt");
             assertTrue(Files.exists(outputPath));
             assertArrayEquals(withoutFlagOutput.getBytes(), Files.readAllBytes(outputPath));
             Files.deleteIfExists(outputPath);

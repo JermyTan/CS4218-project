@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
@@ -23,7 +26,6 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +37,7 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 
 class GrepApplicationTest {
 
@@ -105,7 +108,7 @@ class GrepApplicationTest {
         testFile2 = new File(TEST_DIR + STRING_FILE_SEP + TEST_FILENAME_2);
         testFile2.createNewFile();
         Files.writeString(testFile2.toPath(), TEST_STRING);
-        testFolder = Paths.get(TEST_DIR, TEST_FOLDER);
+        testFolder = Path.of(TEST_DIR, TEST_FOLDER);
         Files.createDirectory(testFolder);
     }
 
@@ -145,6 +148,31 @@ class GrepApplicationTest {
     void run_NullArgs_ThrowsException() {
         String[] args = {null};
         assertThrows(GrepException.class, () -> grepApp.run(args, testInputStream, testOutputStream));
+    }
+
+    @Test
+    void run_NoStdinInvalidFiles_ThrowsException() {
+        captureErr();
+
+        assertDoesNotThrow(() -> {
+            grepApp.run(new String[]{STRING_EMPTY, STRING_EMPTY}, null, testOutputStream);
+            assertEquals(
+                    new GrepException(new InvalidDirectoryException(STRING_EMPTY, ERR_FILE_NOT_FOUND).getMessage()).getMessage() + STRING_NEWLINE,
+                    getErrOutput()
+            );
+        });
+    }
+
+    @Test
+    void run_NoStdinNoInputFiles_ThrowsException() {
+        Throwable exception = assertThrows(GrepException.class, () -> grepApp.run(new String[]{STRING_EMPTY}, null, testOutputStream));
+        assertEquals(new GrepException(ERR_NO_INPUT).getMessage(), exception.getMessage());
+    }
+
+    @Test
+    void run_NoPattern_ThrowsException() {
+        Throwable exception = assertThrows(GrepException.class, () -> grepApp.run(new String[]{}, testInputStream, testOutputStream));
+        assertEquals(new GrepException(ERR_MISSING_ARG).getMessage(), exception.getMessage());
     }
 
     @Test

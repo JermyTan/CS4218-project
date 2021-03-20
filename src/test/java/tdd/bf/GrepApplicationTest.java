@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -36,7 +35,7 @@ public class GrepApplicationTest {
     public static final byte[] BYTES_A = "First line\nSecond line\nThird line\nFourth line\n".getBytes();
     public static final byte[] BYTES_B = "Fifth line\nSixth line\nSeventh line\nEighth line\n".getBytes();
     private static final String TEMP = "temp-grep";
-    public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);
+    public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
     public static Deque<Path> files = new ArrayDeque<>();
     private OutputStream stderr;
 
@@ -94,7 +93,7 @@ public class GrepApplicationTest {
     }
 
     private Path getRelativePath(String name) {
-        return Paths.get(TEMP, name);
+        return Path.of(TEMP, name);
     }
 
     @Test
