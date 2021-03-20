@@ -72,11 +72,7 @@ public class WcApplication implements WcInterface {
         boolean isWords = parser.isWords() || isDefault;
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
-        if (stdin == null
-                && (fileNames == null
-                || fileNames.length == 0
-                || Arrays.stream(fileNames).allMatch(StringUtils::isBlank))
-        ) {
+        if (stdin == null && (fileNames == null || fileNames.length == 0)) {
             throw new WcException(ERR_NO_INPUT);
         }
 
@@ -158,6 +154,10 @@ public class WcApplication implements WcInterface {
         }
 
         try {
+            if (fileName.isEmpty()) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
+            }
+
             Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
 
             if (Files.notExists(filePath)) {

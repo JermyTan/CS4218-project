@@ -72,11 +72,7 @@ public class GrepApplication implements GrepInterface {
         String pattern = parser.getPattern();
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
-        if (stdin == null
-                && (fileNames == null
-                || fileNames.length == 0
-                || Arrays.stream(fileNames).allMatch(StringUtils::isBlank))
-        ) {
+        if (stdin == null && (fileNames == null || fileNames.length == 0)) {
             throw new GrepException(ERR_NO_INPUT);
         }
 
@@ -157,6 +153,10 @@ public class GrepApplication implements GrepInterface {
         }
 
         try {
+            if (fileName.isEmpty()) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
+            }
+
             Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
 
             if (Files.notExists(filePath)) {

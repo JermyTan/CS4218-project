@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
@@ -31,6 +32,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.CatException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 
 class WcApplicationTest {
@@ -120,6 +123,19 @@ class WcApplicationTest {
     void run_NullArgs_ThrowsException() {
         String[] args = {null};
         assertThrows(WcException.class, () -> wcApp.run(args, testInputStream, testOutputStream));
+    }
+
+    @Test
+    public void run_NoStdinInvalidFiles_ThrowsException() {
+        captureErr();
+
+        assertDoesNotThrow(() -> {
+            wcApp.run(new String[]{STRING_EMPTY}, null, testOutputStream);
+            assertEquals(
+                    new WcException(new InvalidDirectoryException(STRING_EMPTY, ERR_FILE_NOT_FOUND).getMessage()).getMessage() + STRING_NEWLINE,
+                    getErrOutput()
+            );
+        });
     }
 
     @Test

@@ -264,7 +264,7 @@ public class WcApplicationTest {
     @Test
     void run_InputStreamIsNull_ThrowsException() {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        assertThrows(Exception.class, () -> new WcApplication().run(toArgs(STRING_EMPTY, STRING_EMPTY), null, output));
+        assertThrows(Exception.class, () -> new WcApplication().run(toArgs(STRING_EMPTY), null, output));
     }
 
     @Test

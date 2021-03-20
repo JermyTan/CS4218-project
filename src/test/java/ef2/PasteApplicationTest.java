@@ -66,7 +66,7 @@ class PasteApplicationTest {
 
     @Test
     public void run_NullArgList_ThrowsException() {
-        assertThrows(Exception.class, () -> app.run(null, stdin, stdout));
+        assertDoesNotThrow(() -> app.run(null, stdin, stdout));
     }
 
     @Test

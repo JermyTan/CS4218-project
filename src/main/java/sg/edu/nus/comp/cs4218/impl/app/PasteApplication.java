@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,7 @@ import sg.edu.nus.comp.cs4218.app.PasteInterface;
 import sg.edu.nus.comp.cs4218.exception.*;
 import sg.edu.nus.comp.cs4218.impl.parser.PasteArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
@@ -19,7 +21,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 @SuppressWarnings("PMD.GodClass")
 public class PasteApplication implements PasteInterface {
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException {
         PasteArgsParser parser = new PasteArgsParser();
 
         try {
@@ -30,6 +32,10 @@ public class PasteApplication implements PasteInterface {
 
         boolean isSerial = parser.isSerial();
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
+
+        if (stdin == null && (fileNames == null || fileNames.length == 0)) {
+            throw new PasteException(ERR_NO_INPUT);
+        }
 
         try {
             List<InputStream> streams = fileNamesToInputStreams(stdin, fileNames);

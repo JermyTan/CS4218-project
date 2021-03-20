@@ -62,11 +62,7 @@ public class CatApplication implements CatInterface {
         boolean isLineNumber = parser.isLineNumber();
         String[] fileNames = parser.getFileNames().toArray(String[]::new);
 
-        if (stdin == null
-                && (fileNames == null
-                || fileNames.length == 0
-                || Arrays.stream(fileNames).allMatch(StringUtils::isBlank))
-        ) {
+        if (stdin == null && (fileNames == null || fileNames.length == 0)) {
             throw new CatException(ERR_NO_INPUT);
         }
 
@@ -102,6 +98,10 @@ public class CatApplication implements CatInterface {
         }
 
         try {
+            if (fileName.isEmpty()) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
+            }
+
             Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
 
             if (Files.notExists(filePath)) {
