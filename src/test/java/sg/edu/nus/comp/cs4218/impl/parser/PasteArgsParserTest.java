@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.testutil.ParserTestUtils;
 
+@SuppressWarnings("PMD.ExcessiveMethodLength")
 class PasteArgsParserTest {
     private final static char FLAG_IS_SERIAL = 's';
     private final static String VALID_OPTION_1 = String.format("%s%s", CHAR_FLAG_PREFIX, FLAG_IS_SERIAL);
