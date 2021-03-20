@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.app.UniqInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
@@ -112,7 +114,13 @@ public class UniqApplication implements UniqInterface {
             }
 
             try {
-                Files.writeString(filePath, content, CREATE, WRITE, TRUNCATE_EXISTING);
+                Files.write(
+                        filePath,
+                        Arrays.stream(content.split(STRING_NEWLINE)).collect(Collectors.toList()),
+                        CREATE,
+                        WRITE,
+                        TRUNCATE_EXISTING
+                );
             } catch (Exception e) {
                 throw new InvalidDirectoryException(fileName, ERR_WRITING_FILE, e);
             }

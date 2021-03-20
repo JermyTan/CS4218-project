@@ -16,8 +16,10 @@ import sg.edu.nus.comp.cs4218.impl.app.ExitApplication;
 import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
 import sg.edu.nus.comp.cs4218.impl.app.LsApplication;
 import sg.edu.nus.comp.cs4218.impl.app.MvApplication;
+import sg.edu.nus.comp.cs4218.impl.app.PasteApplication;
 import sg.edu.nus.comp.cs4218.impl.app.SplitApplication;
 import sg.edu.nus.comp.cs4218.impl.app.TeeApplication;
+import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
 
 
@@ -84,6 +86,12 @@ public class ApplicationRunner {
             break;
         case APP_TEE:
             application = new TeeApplication();
+            break;
+        case APP_PASTE:
+            application = new PasteApplication();
+            break;
+        case APP_UNIQ:
+            application = new UniqApplication();
             break;
         default:
             throw new ShellException(String.format(STRING_LABEL_VALUE_PAIR, app, ERR_INVALID_APP));
