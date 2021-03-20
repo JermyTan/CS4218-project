@@ -5,7 +5,7 @@ import java.util.List;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class CatArgsParser extends ArgsParser {
-    private final static char FLAG_IS_LINE_NUMBER = 'n';
+    private static final char FLAG_IS_LINE_NUMBER = 'n';
 
     public CatArgsParser() {
         super();

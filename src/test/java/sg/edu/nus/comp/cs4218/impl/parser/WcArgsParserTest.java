@@ -20,34 +20,34 @@ import sg.edu.nus.comp.cs4218.testutil.ParserTestUtils;
 
 @SuppressWarnings("PMD.ExcessiveMethodLength")
 class WcArgsParserTest {
-    private final static char FLAG_IS_BYTES = 'c';
-    private final static char FLAG_IS_LINES = 'l';
-    private final static char FLAG_IS_WORDS = 'w';
-    private final static String VALID_OPTION_1 = String.format("%s%s", CHAR_FLAG_PREFIX, FLAG_IS_BYTES);
-    private final static String VALID_OPTION_2 = String.format("%s%s", CHAR_FLAG_PREFIX, multiplyChar(FLAG_IS_LINES, 3));
-    private final static String VALID_OPTION_3 = String.format("%s%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_LINES, FLAG_IS_BYTES, FLAG_IS_WORDS);
-    private final static String INVALID_OPTION_1 = multiplyChar(CHAR_FLAG_PREFIX, 2);
-    private final static String INVALID_OPTION_2 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_BYTES, CHAR_FLAG_PREFIX);
-    private final static String INVALID_OPTION_3 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_LINES, FLAG_IS_WORDS + 1);
-    private final static String[] VALID_SINGLE_VALUE_ARGS_1 = new String[]{String.valueOf(CHAR_FLAG_PREFIX)};
-    private final static String[] VALID_SINGLE_VALUE_ARGS_2 = new String[]{STRING_SPACE_FILE_TXT};
-    private final static String[] VALID_SINGLE_VALUE_ARGS_3 = new String[]{VALID_OPTION_2};
-    private final static String[] VALID_MULTI_VALUES_ARGS_1 = FILE_LIST.toArray(String[]::new);
-    private final static String[] VALID_MULTI_VALUES_ARGS_2 = new String[]{VALID_OPTION_1,
+    private static final char FLAG_IS_BYTES = 'c';
+    private static final char FLAG_IS_LINES = 'l';
+    private static final char FLAG_IS_WORDS = 'w';
+    private static final String VALID_OPTION_1 = String.format("%s%s", CHAR_FLAG_PREFIX, FLAG_IS_BYTES);
+    private static final String VALID_OPTION_2 = String.format("%s%s", CHAR_FLAG_PREFIX, multiplyChar(FLAG_IS_LINES, 3));
+    private static final String VALID_OPTION_3 = String.format("%s%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_LINES, FLAG_IS_BYTES, FLAG_IS_WORDS);
+    private static final String INVALID_OPTION_1 = multiplyChar(CHAR_FLAG_PREFIX, 2);
+    private static final String INVALID_OPTION_2 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_BYTES, CHAR_FLAG_PREFIX);
+    private static final String INVALID_OPTION_3 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_LINES, FLAG_IS_WORDS + 1);
+    private static final String[] VALID_SINGLE_VALUE_ARGS_1 = new String[]{String.valueOf(CHAR_FLAG_PREFIX)};
+    private static final String[] VALID_SINGLE_VALUE_ARGS_2 = new String[]{STRING_SPACE_FILE_TXT};
+    private static final String[] VALID_SINGLE_VALUE_ARGS_3 = new String[]{VALID_OPTION_2};
+    private static final String[] VALID_MULTI_VALUES_ARGS_1 = FILE_LIST.toArray(String[]::new);
+    private static final String[] VALID_MULTI_VALUES_ARGS_2 = new String[]{VALID_OPTION_1,
             STRING_UNICODE_NAME_FILE,
             STRING_SPACE_FILE_TXT};
-    private final static String[] VALID_MULTI_VALUES_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
+    private static final String[] VALID_MULTI_VALUES_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
             VALID_OPTION_3,
             STRING_UNICODE_NAME_FILE,
             VALID_OPTION_2};
-    private final static String[] VALID_MULTI_VALUES_ARGS_4 = new String[]{String.valueOf(CHAR_FLAG_PREFIX),
+    private static final String[] VALID_MULTI_VALUES_ARGS_4 = new String[]{String.valueOf(CHAR_FLAG_PREFIX),
             String.valueOf(CHAR_FLAG_PREFIX)};
-    private final static String[] INVALID_ARGS_1 = new String[]{INVALID_OPTION_1};
-    private final static String[] INVALID_ARGS_2 = new String[]{INVALID_OPTION_2, STRING_UNICODE_NAME_FILE};
-    private final static String[] INVALID_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
+    private static final String[] INVALID_ARGS_1 = new String[]{INVALID_OPTION_1};
+    private static final String[] INVALID_ARGS_2 = new String[]{INVALID_OPTION_2, STRING_UNICODE_NAME_FILE};
+    private static final String[] INVALID_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
             INVALID_OPTION_3,
             STRING_UNICODE_NAME_FILE};
-    private final static String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_UNICODE_NAME_FILE, null};
+    private static final String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_UNICODE_NAME_FILE, null};
 
     private WcArgsParser parser;
 

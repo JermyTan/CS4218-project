@@ -351,18 +351,18 @@ public class UniqApplicationTest {
 
     @Test
     // printing all duplicated lines and repeat counts is meaningless
-    public void uniqFromFile_IsCountAndIsAllRepeated_ShouldThrowException() {
+    public void uniqFromFile_IsCountAndIsAllRepeated_ThrowsExceptionException() {
         assertThrows(Exception.class, () -> app.uniqFromFile(true, false, true, INPUT_FILE_1, OUTPUT_FILE_1));
     }
 
     @Test
     // printing all duplicated lines and repeat counts is meaningless
-    public void uniqFromFile_IsCountAndIsRepeatedIsAllRepeated_ShouldThrowException() {
+    public void uniqFromFile_IsCountAndIsRepeatedIsAllRepeated_ThrowsExceptionException() {
         assertThrows(Exception.class, () -> app.uniqFromFile(true, true, true, INPUT_FILE_1, OUTPUT_FILE_1));
     }
 
     @Test
-    public void uniqFromStdin_NoInputStream_ShouldThrowException() {
+    public void uniqFromStdin_NoInputStream_ThrowsExceptionException() {
         assertThrows(Exception.class, () -> app.uniqFromStdin(true, false, true, null, OUTPUT_FILE_1));
     }
 

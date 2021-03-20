@@ -49,13 +49,13 @@ class CdApplicationTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         cdApplication = new CdApplication();
         EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath());
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         EnvironmentUtil.setCurrentDirectory(ORIGINAL_DIR);
     }
 
@@ -68,6 +68,15 @@ class CdApplicationTest {
         String currDirectory = EnvironmentUtil.currentDirectory;
         assertEquals(finalPath, currDirectory);
     }
+
+    // Cd with blank arg
+    @Test
+    public void run_CdIntoBlankPath_NoChangeToCurrDirectory() throws CdException {
+        String[] argList = new String[]{STRING_EMPTY};
+        cdApplication.run(argList, System.in, System.out);
+        assertEquals(EnvironmentUtil.currentDirectory, tempDir.getAbsolutePath());
+    }
+
 
     @Test
     public void run_CdIntoValidPathNullStreams_Success() throws CdException {
@@ -88,7 +97,7 @@ class CdApplicationTest {
     }
 
     @Test
-    public void run_CdOutFromFolder_Success() throws CdException {
+    public void run_CdOutFromFolder_Success() throws Exception {
         String relativePath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + FOLDER;
         EnvironmentUtil.setCurrentDirectory(relativePath);
         String[] argList = new String[]{"../"};
@@ -98,7 +107,7 @@ class CdApplicationTest {
     }
 
     @Test
-    public void run_CdOutFromNestedFolder_Success() throws CdException {
+    public void run_CdOutFromNestedFolder_Success() throws Exception {
         String relativePath = tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + SUBFOLDER;
         EnvironmentUtil.setCurrentDirectory(relativePath);
         String[] argList = new String[]{"../../"};
@@ -156,7 +165,7 @@ class CdApplicationTest {
 
     // Cd into folder with no permissions
     @Test
-    @DisabledOnOs(WINDOWS)
+    // @DisabledOnOs(WINDOWS)
     public void run_BlockedFolder_ThrowsExeception() {
         String[] argList = new String[]{BLOCKED_FOLDER};
         Exception expectedException = assertThrows(CdException.class, () -> {
@@ -182,16 +191,6 @@ class CdApplicationTest {
     @Test
     public void run_CdWithNoArgs_ThrowsException() {
         String[] argList = new String[]{};
-        Exception expectedException = assertThrows(CdException.class, () -> {
-            cdApplication.run(argList, System.in, System.out);
-        });
-        assertEquals(new CdException(ERR_MISSING_ARG).getMessage(), expectedException.getMessage());
-    }
-
-    // Cd with blank arg
-    @Test
-    public void run_CdIntoBlankPath_ThrowsException() {
-        String[] argList = new String[]{STRING_EMPTY};
         Exception expectedException = assertThrows(CdException.class, () -> {
             cdApplication.run(argList, System.in, System.out);
         });

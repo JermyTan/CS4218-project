@@ -45,7 +45,7 @@ class MvApplicationTest {
     private MvApplication mvApplication;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() throws Exception {
         mvApplication = new MvApplication();
         EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath());
 
@@ -84,7 +84,7 @@ class MvApplicationTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         // set files and folders to be writable to enable clean up
         File blockedFolder = new File(tempDir, "blocked");
         blockedFolder.setWritable(true);

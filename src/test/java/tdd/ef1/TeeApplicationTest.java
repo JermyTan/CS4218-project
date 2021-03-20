@@ -57,7 +57,7 @@ class TeeApplicationTest {
     }
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() throws Exception {
         teeApplication = new TeeApplication();
         stdin = new ByteArrayInputStream(STDIN_STRING.getBytes(StandardCharsets.UTF_8));
         standardOut = System.out;
@@ -83,7 +83,7 @@ class TeeApplicationTest {
     }
 
     @AfterEach
-    public void tearDown() {
+    public void tearDown() throws Exception {
         System.setOut(standardOut);
         for (File file : tempDir.listFiles()) {
             file.delete();

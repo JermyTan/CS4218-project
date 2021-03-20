@@ -5,9 +5,9 @@ import java.util.List;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class WcArgsParser extends ArgsParser {
-    private final static char FLAG_IS_BYTES = 'c';
-    private final static char FLAG_IS_LINES = 'l';
-    private final static char FLAG_IS_WORDS = 'w';
+    private static final char FLAG_IS_BYTES = 'c';
+    private static final char FLAG_IS_LINES = 'l';
+    private static final char FLAG_IS_WORDS = 'w';
 
     public WcArgsParser() {
         super();

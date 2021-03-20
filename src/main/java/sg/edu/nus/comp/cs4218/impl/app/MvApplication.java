@@ -171,7 +171,7 @@ public class MvApplication implements MvInterface {
      * @param srcFiles file paths for files to be moved to the target directory
      * @return srcFiles that do not overwrite existing file in the target directory after mv
      */
-    private String[] filterSrcFiles(String destFile, String... srcFiles) throws ShellException {
+    private String[] filterSrcFiles(String destFile, String... srcFiles) throws Exception {
         Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
 
         return Arrays.stream(srcFiles)
@@ -182,7 +182,7 @@ public class MvApplication implements MvInterface {
                 .toArray(String[]::new);
     }
 
-    private boolean isFormatOne(String destFile) throws ShellException {
+    private boolean isFormatOne(String destFile) throws Exception {
         Path target = IOUtils.resolveAbsoluteFilePath(destFile);
         return Files.notExists(target) || !Files.isDirectory(target);
     }

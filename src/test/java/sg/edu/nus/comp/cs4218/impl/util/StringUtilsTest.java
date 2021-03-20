@@ -31,11 +31,11 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 
 class StringUtilsTest {
-    private final static String TXT_EXT = "txt";
-    private final static String JPG_EXT = "jpg";
-    private final static String MD_EXT = "md";
-    private final static String CUSTOM_EXT = "CusTom";
-    private final static String UNICODE_EXT = "😈🌚";
+    private static final String TXT_EXT = "txt";
+    private static final String JPG_EXT = "jpg";
+    private static final String MD_EXT = "md";
+    private static final String CUSTOM_EXT = "CusTom";
+    private static final String UNICODE_EXT = "😈🌚";
 
     @Test
     void getFileExtension_NullString_ReturnsEmptyString() {

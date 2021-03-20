@@ -22,30 +22,30 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.testutil.ParserTestUtils;
 
 class MvArgsParserTest {
-    private final static char FLAG_IS_NOT_OVERWRITE = 'n';
-    private final static String VALID_OPTION_1 = String.format("%s%s", CHAR_FLAG_PREFIX, FLAG_IS_NOT_OVERWRITE);
-    private final static String VALID_OPTION_2 = String.format("%s%s", CHAR_FLAG_PREFIX, multiplyChar(FLAG_IS_NOT_OVERWRITE, 3));
-    private final static String INVALID_OPTION_1 = multiplyChar(CHAR_FLAG_PREFIX, 2);
-    private final static String INVALID_OPTION_2 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_NOT_OVERWRITE, CHAR_FLAG_PREFIX);
-    private final static String INVALID_OPTION_3 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_NOT_OVERWRITE, FLAG_IS_NOT_OVERWRITE + 1);
-    private final static String[] VALID_MULTI_VALUES_ARGS_1 = FILE_LIST.toArray(String[]::new);
-    private final static String[] VALID_MULTI_VALUES_ARGS_2 = new String[]{VALID_OPTION_1,
+    private static final char FLAG_IS_NOT_OVERWRITE = 'n';
+    private static final String VALID_OPTION_1 = String.format("%s%s", CHAR_FLAG_PREFIX, FLAG_IS_NOT_OVERWRITE);
+    private static final String VALID_OPTION_2 = String.format("%s%s", CHAR_FLAG_PREFIX, multiplyChar(FLAG_IS_NOT_OVERWRITE, 3));
+    private static final String INVALID_OPTION_1 = multiplyChar(CHAR_FLAG_PREFIX, 2);
+    private static final String INVALID_OPTION_2 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_NOT_OVERWRITE, CHAR_FLAG_PREFIX);
+    private static final String INVALID_OPTION_3 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_NOT_OVERWRITE, FLAG_IS_NOT_OVERWRITE + 1);
+    private static final String[] VALID_MULTI_VALUES_ARGS_1 = FILE_LIST.toArray(String[]::new);
+    private static final String[] VALID_MULTI_VALUES_ARGS_2 = new String[]{VALID_OPTION_1,
             STRING_UNICODE_NAME_FILE,
             STRING_SPACE_FILE_TXT};
-    private final static String[] VALID_MULTI_VALUES_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
+    private static final String[] VALID_MULTI_VALUES_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
             VALID_OPTION_1,
             STRING_UNICODE_NAME_FILE,
             VALID_OPTION_2};
-    private final static String[] INVALID_ARGS_1 = new String[]{INVALID_OPTION_1};
-    private final static String[] INVALID_ARGS_2 = new String[]{INVALID_OPTION_2, STRING_UNICODE_NAME_FILE};
-    private final static String[] INVALID_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
+    private static final String[] INVALID_ARGS_1 = new String[]{INVALID_OPTION_1};
+    private static final String[] INVALID_ARGS_2 = new String[]{INVALID_OPTION_2, STRING_UNICODE_NAME_FILE};
+    private static final String[] INVALID_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
             INVALID_OPTION_3,
             STRING_UNICODE_NAME_FILE};
-    private final static String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_UNICODE_NAME_FILE, null};
-    private final static String[] INVALID_ARGS_5 = new String[]{String.valueOf(CHAR_FLAG_PREFIX)};
-    private final static String[] INVALID_ARGS_6 = new String[]{STRING_SPACE_FILE_TXT};
-    private final static String[] INVALID_ARGS_7 = new String[]{VALID_OPTION_2};
-    private final static String[] INVALID_ARGS_8 = new String[]{VALID_OPTION_2, STRING_UNDERSCORE_FILE_TXT};
+    private static final String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_UNICODE_NAME_FILE, null};
+    private static final String[] INVALID_ARGS_5 = new String[]{String.valueOf(CHAR_FLAG_PREFIX)};
+    private static final String[] INVALID_ARGS_6 = new String[]{STRING_SPACE_FILE_TXT};
+    private static final String[] INVALID_ARGS_7 = new String[]{VALID_OPTION_2};
+    private static final String[] INVALID_ARGS_8 = new String[]{VALID_OPTION_2, STRING_UNDERSCORE_FILE_TXT};
 
     private MvArgsParser parser;
 

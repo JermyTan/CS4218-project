@@ -19,7 +19,10 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import sg.edu.nus.comp.cs4218.app.CatInterface;
 import sg.edu.nus.comp.cs4218.exception.CatException;
@@ -90,11 +93,7 @@ public class CatApplication implements CatInterface {
         return catFiles(isLineNumber, fileNames);
     }
 
-    private CatResult computeCatFile(String fileName) throws CatException {
-        if (fileName == null) {
-            throw new CatException(ERR_INVALID_FILES);
-        }
-
+    private CatResult computeCatFile(String fileName) {
         try {
             if (fileName.isEmpty()) {
                 throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
@@ -122,11 +121,7 @@ public class CatApplication implements CatInterface {
         }
     }
 
-    private CatResult computeCatStdin(InputStream stdin) throws CatException {
-        if (stdin == null) {
-            throw new CatException(ERR_NO_ISTREAM);
-        }
-
+    private CatResult computeCatStdin(InputStream stdin) {
         try {
             return new CatResult(IOUtils.getLinesFromInputStream(stdin));
         } catch (Exception e) {
@@ -148,19 +143,17 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_NULL_ARGS);
         }
 
-        List<String> result = new ArrayList<>();
+        List<String> result = Arrays.stream(fileNames)
+                .flatMap(fileName -> {
+                    CatResult content = computeCatFile(fileName);
 
-        for (String fileName : fileNames) {
-            CatResult content = computeCatFile(fileName);
+                    content.outputError();
 
-            content.outputError();
+                    String contentString = content.formatToString(isLineNumber);
 
-            String contentString = content.formatToString(isLineNumber);
-
-            if (!contentString.isEmpty()) {
-                result.add(contentString);
-            }
-        }
+                    return !contentString.isEmpty() ? Stream.of(contentString) : Stream.empty();
+                })
+                .collect(Collectors.toList());
 
         return String.join(STRING_NEWLINE, result);
     }
@@ -200,21 +193,19 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_NULL_ARGS);
         }
 
-        List<String> result = new ArrayList<>();
+        List<String> result = Arrays.stream(fileNames)
+                .flatMap(fileName -> {
+                    CatResult content = fileName.equals(STRING_STDIN_FLAG)
+                            ? computeCatStdin(stdin)
+                            : computeCatFile(fileName);
 
-        for (String fileName : fileNames) {
-            CatResult content = fileName.equals(STRING_STDIN_FLAG)
-                    ? computeCatStdin(stdin)
-                    : computeCatFile(fileName);
+                    content.outputError();
 
-            content.outputError();
+                    String contentString = content.formatToString(isLineNumber);
 
-            String contentString = content.formatToString(isLineNumber);
-
-            if (!contentString.isEmpty()) {
-                result.add(contentString);
-            }
-        }
+                    return !contentString.isEmpty() ? Stream.of(contentString) : Stream.empty();
+                })
+                .collect(Collectors.toList());
 
         return String.join(STRING_NEWLINE, result);
     }

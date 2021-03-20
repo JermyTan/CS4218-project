@@ -22,21 +22,21 @@ import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
 
 
 public class ApplicationRunner {
-    public final static String APP_LS = "ls";
-    public final static String APP_WC = "wc";
-    public final static String APP_ECHO = "echo";
-    public final static String APP_EXIT = "exit";
-    public final static String APP_GREP = "grep";
-    public final static String APP_PASTE = "paste";
-    public final static String APP_CD = "cd";
-    public final static String APP_CAT = "cat";
-    public final static String APP_SPLIT = "split";
-    public final static String APP_MV = "mv";
-    public final static String APP_TEE = "tee";
-    public final static String APP_RM = "rm";
-    public final static String APP_UNIQ = "uniq";
-    public final static String APP_CP = "cp";
-    public final static String SHELL = "shell";
+    public static final String APP_LS = "ls";
+    public static final String APP_WC = "wc";
+    public static final String APP_ECHO = "echo";
+    public static final String APP_EXIT = "exit";
+    public static final String APP_GREP = "grep";
+    public static final String APP_PASTE = "paste";
+    public static final String APP_CD = "cd";
+    public static final String APP_CAT = "cat";
+    public static final String APP_SPLIT = "split";
+    public static final String APP_MV = "mv";
+    public static final String APP_TEE = "tee";
+    public static final String APP_RM = "rm";
+    public static final String APP_UNIQ = "uniq";
+    public static final String APP_CP = "cp";
+    public static final String SHELL = "shell";
 
     /**
      * Run the application as specified by the application command keyword and arguments.

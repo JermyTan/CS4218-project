@@ -47,10 +47,6 @@ public class CdApplication implements CdInterface {
     }
 
     private String getNormalizedAbsolutePath(String pathStr) throws CdException {
-        if (StringUtils.isBlank(pathStr)) {
-            throw new CdException(ERR_MISSING_ARG);
-        }
-
         try {
             Path path = IOUtils.resolveAbsoluteFilePath(pathStr);
 
@@ -68,7 +64,7 @@ public class CdApplication implements CdInterface {
 
             return path.toString();
 
-        } catch (ShellException | InvalidDirectoryException e) {
+        } catch (Exception e) {
             throw new CdException(e.getMessage(), e);
         }
     }

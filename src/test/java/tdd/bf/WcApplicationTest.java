@@ -53,14 +53,14 @@ public class WcApplicationTest {
     }
 
     @BeforeEach
-    void changeDirectory() throws IOException {
+    void changeDirectory() throws Exception {
         currPathString = EnvironmentUtil.currentDirectory;
         Files.createDirectory(TEMP_PATH);
         EnvironmentUtil.setCurrentDirectory(TEMP_PATH.toString());
     }
 
     @AfterEach
-    void deleteFiles() throws IOException {
+    void deleteFiles() throws Exception {
         EnvironmentUtil.setCurrentDirectory(currPathString);
         Files.walk(TEMP_PATH)
                 .sorted(Comparator.reverseOrder())

@@ -5,7 +5,7 @@ import java.util.List;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class PasteArgsParser extends ArgsParser {
-    private final static char FLAG_IS_SERIAL = 's';
+    private static final char FLAG_IS_SERIAL = 's';
 
     public PasteArgsParser() {
         super();

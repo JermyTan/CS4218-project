@@ -85,7 +85,7 @@ class RegexArgumentTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath());
         regexArgument = new RegexArgument();
     }
@@ -204,7 +204,7 @@ class RegexArgumentTest {
 
     // ../*_x
     @Test
-    public void globFiles_UpOneLevelStringAsterisk_ReturnsAll() throws ShellException {
+    public void globFiles_UpOneLevelStringAsterisk_ReturnsAll() throws Exception {
         EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath() + STRING_FILE_SEP + FOLDER_NAME);
         for (char c : (STRING_PARENT_DIR + STRING_FILE_SEP).toCharArray()) {
             regexArgument.append(c);
@@ -221,7 +221,7 @@ class RegexArgumentTest {
 
     // ../../x_*
     @Test
-    public void globFiles_UpTwoLevelStringAsterisk_ReturnsAll() throws ShellException {
+    public void globFiles_UpTwoLevelStringAsterisk_ReturnsAll() throws Exception {
         EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath() + STRING_FILE_SEP + FOLDER_NAME + StringUtils.STRING_FILE_SEP + SUBFOLDER_NAME);
         for (char c : (STRING_PARENT_DIR + STRING_FILE_SEP + STRING_PARENT_DIR + STRING_FILE_SEP + "x_").toCharArray()) {
             regexArgument.append(c);

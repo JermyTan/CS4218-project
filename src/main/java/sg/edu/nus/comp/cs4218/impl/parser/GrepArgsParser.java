@@ -7,11 +7,11 @@ import java.util.List;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class GrepArgsParser extends ArgsParser {
-    private final static char FLAG_IS_CASE_INSENSITIVE = 'i';
-    private final static char FLAG_IS_COUNT_LINES = 'c';
-    private final static char FLAG_IS_PREFIX_FILE_NAME = 'H';
-    private final static int INDEX_PATTERN = 0;
-    private final static int INDEX_FILES = 1;
+    private static final char FLAG_IS_CASE_INSENSITIVE = 'i';
+    private static final char FLAG_IS_COUNT_LINES = 'c';
+    private static final char FLAG_IS_PREFIX_FILE_NAME = 'H';
+    private static final int INDEX_PATTERN = 0;
+    private static final int INDEX_FILES = 1;
 
     public GrepArgsParser() {
         super();

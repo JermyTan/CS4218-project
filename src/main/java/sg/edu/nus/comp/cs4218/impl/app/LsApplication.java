@@ -35,7 +35,7 @@ import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public class LsApplication implements LsInterface {
-    private final static String PATH_CURR_DIR = STRING_CURR_DIR + STRING_FILE_SEP;
+    private static final String PATH_CURR_DIR = STRING_CURR_DIR + STRING_FILE_SEP;
 
     /**
      * Runs the ls application with the specified arguments.
@@ -79,10 +79,6 @@ public class LsApplication implements LsInterface {
     }
 
     private LsResult listFolder(boolean isFoldersOnly, String folderName) throws LsException {
-        if (folderName == null) {
-            throw new LsException(ERR_INVALID_FILES);
-        }
-
         try {
             Path filePath = IOUtils.resolveAbsoluteFilePath(folderName);
 
@@ -118,10 +114,6 @@ public class LsApplication implements LsInterface {
             boolean isRecursive,
             String... folderNames
     ) throws LsException {
-        if (folderNames == null || CollectionUtils.isAnyNull((Object[]) folderNames)) {
-            throw new LsException(ERR_INVALID_FILES);
-        }
-
         List<LsResult> result = new ArrayList<>();
 
         for (String folderName : folderNames) {

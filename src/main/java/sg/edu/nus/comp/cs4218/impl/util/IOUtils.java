@@ -101,16 +101,16 @@ public final class IOUtils {
         }
     }
 
-    public static Path resolveAbsoluteFilePath(String fileName) throws ShellException {
+    public static Path resolveAbsoluteFilePath(String fileName) throws Exception {
         if (fileName == null) {
-            throw new ShellException(ERR_NO_FILE_ARGS);
+            throw new Exception(ERR_NO_FILE_ARGS);
         }
 
         try {
             return Paths.get(EnvironmentUtil.currentDirectory).resolve(fileName).normalize();
 
         } catch (InvalidPathException e) {
-            throw new ShellException(ERR_INVALID_FILES, e);
+            throw new Exception(ERR_INVALID_FILES, e);
         }
     }
 
@@ -118,11 +118,11 @@ public final class IOUtils {
      * Returns a list of lines based on the given InputStream.
      *
      * @param input inputStream containing arguments from System.in or FileInputStream
-     * @throws ShellException if there is error reading from input stream.
+     * @throws Exception if there is error reading from input stream.
      */
-    public static List<String> getLinesFromInputStream(InputStream input) throws ShellException {
+    public static List<String> getLinesFromInputStream(InputStream input) throws Exception {
         if (input == null) {
-            throw new ShellException(ERR_NO_ISTREAM);
+            throw new Exception(ERR_NO_ISTREAM);
         }
 
         List<String> output = new ArrayList<>();
@@ -134,13 +134,13 @@ public final class IOUtils {
                 output.add(line);
             }
         } catch (IOException e) {
-            throw new ShellException(ERR_READ_STREAM, e);
+            throw new Exception(ERR_READ_STREAM, e);
         }
 
         try {
             reader.close();
         } catch (IOException e) {
-            throw new ShellException(ERR_CLOSING_STREAM, e);
+            throw new Exception(ERR_CLOSING_STREAM, e);
         }
 
         return output;

@@ -91,7 +91,7 @@ public class SplitApplicationTest {
     private static OutputStream stdout;
 
     @BeforeAll
-    static void setupAll() throws IOException {
+    static void setupAll() throws Exception {
 
         EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath());
         // create nested folder
@@ -122,7 +122,7 @@ public class SplitApplicationTest {
     }
 
     @AfterAll
-    static void tearDownAll() {
+    static void tearDownAll() throws Exception {
         EnvironmentUtil.setCurrentDirectory(ORIGINAL_DIR);
     }
 
