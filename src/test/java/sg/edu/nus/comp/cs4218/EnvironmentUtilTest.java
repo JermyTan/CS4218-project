@@ -32,7 +32,6 @@ class EnvironmentUtilTest {
             "EnvironmentUtilTest");
     private static final Path TEST_PATH = Path.of(TEST_DIR);
 
-    private Path sampleFile;
     private Path sampleDir;
 
     @BeforeAll
@@ -52,7 +51,7 @@ class EnvironmentUtilTest {
 
     @BeforeEach
     void setup() throws Exception {
-        sampleFile = Files.createFile(IOUtils.resolveAbsoluteFilePath(STRING_FILE_TXT));
+        Files.createFile(IOUtils.resolveAbsoluteFilePath(STRING_FILE_TXT));
         sampleDir = Files.createDirectory(IOUtils.resolveAbsoluteFilePath(STRING_NO_EXT_FILE));
     }
 

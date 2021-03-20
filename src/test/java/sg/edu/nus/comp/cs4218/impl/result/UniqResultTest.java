@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("PMD.ExcessiveMethodLength")
 public class UniqResultTest {
     private OutputStream stderr;
 
