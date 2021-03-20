@@ -1,15 +1,10 @@
 package tdd.ef2;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.UniqException;
-import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
-
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
@@ -24,11 +19,17 @@ import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.UniqException;
+import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
+
 @Disabled
 public class UniqApplicationTest {
     public static final Path CURR_PATH = Paths.get(EnvironmentUtil.currentDirectory);
-    public static Deque<Path> files = new ArrayDeque<>();
-
     private static final String testInput = "Hello World" + STRING_NEWLINE +
             "Hello World" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +
@@ -36,34 +37,29 @@ public class UniqApplicationTest {
             "Bob" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +
             "Bob" + STRING_NEWLINE;
-
     private static final String withoutFlagOutput = "Hello World" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +
             "Bob" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +
             "Bob" + STRING_NEWLINE;
-
     private static final String withCountFlagOutput = "2 Hello World" + STRING_NEWLINE +
             "2 Alice" + STRING_NEWLINE +
             "1 Bob" + STRING_NEWLINE +
             "1 Alice" + STRING_NEWLINE +
             "1 Bob" + STRING_NEWLINE;
-
     private static final String withDuplicateFlagOutput = "Hello World" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE;
-
     private static final String withAllDuplicateFlagOutput = "Hello World" + STRING_NEWLINE +
             "Hello World" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE +
             "Alice" + STRING_NEWLINE;
-
     private static final String withCountAndDuplicateFlagsOutput = "2 Hello World" + STRING_NEWLINE +
             "2 Alice" + STRING_NEWLINE;
-
     private static final String withCountAndAllDuplicateFlagsOutput = "2 Hello World" + STRING_NEWLINE +
             "2 Hello World" + STRING_NEWLINE +
             "2 Alice" + STRING_NEWLINE +
             "2 Alice" + STRING_NEWLINE;
+    public static Deque<Path> files = new ArrayDeque<>();
 
     @AfterEach
     void deleteTemp() throws IOException {
@@ -89,8 +85,8 @@ public class UniqApplicationTest {
         InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> {
-                new UniqApplication().run(args, stdin, outputStream);
-                assertEquals(withoutFlagOutput, outputStream.toString());
+            new UniqApplication().run(args, stdin, outputStream);
+            assertEquals(withoutFlagOutput, outputStream.toString());
         });
     }
 

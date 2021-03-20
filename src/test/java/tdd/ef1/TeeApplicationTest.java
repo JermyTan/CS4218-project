@@ -1,16 +1,13 @@
 package tdd.ef1;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.impl.app.TeeApplication;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.TeeException;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -24,24 +21,29 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.TeeException;
+import sg.edu.nus.comp.cs4218.impl.app.TeeApplication;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 class TeeApplicationTest {
+    static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
+    static final String STDIN_STRING = "Hello world!" + STRING_NEWLINE
+            + "Welcome to CS4218!" + STRING_NEWLINE;
+    static final String TEE_ERR_FORMAT = "tee: %s: %s" + STRING_NEWLINE;
     @TempDir
     static File tempDir;
-
     private static TeeApplication teeApplication;
     private static InputStream stdin;
     private static OutputStream stdout;
     private static PrintStream standardOut;
-    static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
-
-    static final String STDIN_STRING = "Hello world!" + STRING_NEWLINE
-            + "Welcome to CS4218!" + STRING_NEWLINE;
-    static final String TEE_ERR_FORMAT = "tee: %s: %s" + STRING_NEWLINE;
     private OutputStream stderr;
 
     private void captureErr() {
@@ -91,7 +93,7 @@ class TeeApplicationTest {
 
     // tee with single file: write to stdout and file
     @Test
-    public void run_SingleFileNoAppend_WritesToFileAndStdout() throws AbstractApplicationException, TeeException, IOException {
+    public void run_SingleFileNoAppend_WritesToFileAndStdout() throws AbstractApplicationException, IOException {
         String[] argList = new String[]{"tee1.txt"};
         teeApplication.run(argList, stdin, System.out);
         assertEquals(STDIN_STRING, stdout.toString());
@@ -103,7 +105,7 @@ class TeeApplicationTest {
 
     // tee with absolute path: write to stdout and file
     @Test
-    public void run_SingleFileAbsolutePath_WritesToFileAndStdout() throws AbstractApplicationException, TeeException, IOException {
+    public void run_SingleFileAbsolutePath_WritesToFileAndStdout() throws AbstractApplicationException, IOException {
         String[] argList = new String[]{tempDir.getAbsolutePath() + StringUtils.STRING_FILE_SEP + "tee1.txt"};
         teeApplication.run(argList, stdin, System.out);
         assertEquals(STDIN_STRING, stdout.toString());
@@ -115,7 +117,7 @@ class TeeApplicationTest {
 
     // tee with multiple files: write to stdout and files
     @Test
-    public void run_MultipleFileNoAppend_WritesToFileAndStdout() throws AbstractApplicationException, TeeException, IOException {
+    public void run_MultipleFileNoAppend_WritesToFileAndStdout() throws AbstractApplicationException, IOException {
         String[] argList = new String[]{"tee1.txt", "tee2.txt"};
         teeApplication.run(argList, stdin, System.out);
         assertEquals(STDIN_STRING, stdout.toString());
@@ -131,7 +133,7 @@ class TeeApplicationTest {
 
     // tee: write to stdout
     @Test
-    public void run_NoFile_WritesToStdout() throws AbstractApplicationException, TeeException {
+    public void run_NoFile_WritesToStdout() throws AbstractApplicationException {
         String[] argList = new String[]{};
         teeApplication.run(argList, stdin, System.out);
         assertEquals(STDIN_STRING, stdout.toString());
@@ -139,7 +141,7 @@ class TeeApplicationTest {
 
     // tee with unwritable file
     @Test
-    public void run_UnwritableFile_WritesNoPermToStderr() throws AbstractApplicationException, TeeException {
+    public void run_UnwritableFile_WritesNoPermToStderr() throws AbstractApplicationException {
         captureErr();
 
         String[] argList = new String[]{"unwritable.txt"};
@@ -175,7 +177,7 @@ class TeeApplicationTest {
 
     // tee -a with single file: write to stdout and append to file
     @Test
-    public void run_SingleFileAppend_WritesToFileAndStdout() throws AbstractApplicationException, TeeException, IOException {
+    public void run_SingleFileAppend_WritesToFileAndStdout() throws AbstractApplicationException, IOException {
         String[] argList = new String[]{"-a", "existing.txt"};
         teeApplication.run(argList, stdin, System.out);
         assertEquals(STDIN_STRING, stdout.toString());
@@ -187,7 +189,7 @@ class TeeApplicationTest {
 
     // tee -a with multiple files: write to stdout and append to file
     @Test
-    public void run_MultipleFileAppend_WritesToFileAndStdout() throws AbstractApplicationException, TeeException, IOException {
+    public void run_MultipleFileAppend_WritesToFileAndStdout() throws AbstractApplicationException, IOException {
         String[] argList = new String[]{"-a", "existing.txt", "existing2.txt"};
         teeApplication.run(argList, stdin, System.out);
         assertEquals(STDIN_STRING, stdout.toString());
@@ -204,7 +206,7 @@ class TeeApplicationTest {
 
     // tee -a: write to stdout
     @Test
-    public void run_NoFileWithFlag_WritesToStdout() throws AbstractApplicationException, TeeException {
+    public void run_NoFileWithFlag_WritesToStdout() throws AbstractApplicationException {
         String[] argList = new String[]{"-a"};
         teeApplication.run(argList, stdin, System.out);
         assertEquals(STDIN_STRING, stdout.toString());

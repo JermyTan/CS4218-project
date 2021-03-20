@@ -200,7 +200,6 @@ class LsApplicationTest {
             assertTrue(lines.length >= 1);
 
             String folder = lines[0];
-            System.out.println(folder);
             assertTrue(folders.containsKey(folder));
 
             Set<String> expectedFiles = folders.get(folder);

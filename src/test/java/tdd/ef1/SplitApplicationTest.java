@@ -1,15 +1,18 @@
 package tdd.ef1;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.io.TempDir;
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.exception.SplitException;
-import sg.edu.nus.comp.cs4218.impl.app.SplitApplication;
-import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_BYTE_COUNT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_ILLEGAL_LINE_COUNT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_OPTION_REQUIRES_ARGUMENT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,20 +25,24 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.condition.OS.WINDOWS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.io.TempDir;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.SplitException;
+import sg.edu.nus.comp.cs4218.impl.app.SplitApplication;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings({"PMD.LongVariable"})
 public class SplitApplicationTest {
-    @TempDir
-    static File tempDir;
     static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
-
-    private static FileWriter fileWriter;
-    private static SplitApplication splitApplication;
-    private static OutputStream stdout;
     private static final int B_BYTES = 512;
     private static final int K_BYTES = 1024;
     private static final int M_BYTES = 1048576;
@@ -53,8 +60,6 @@ public class SplitApplicationTest {
     private static final String OUTPUT_XZAB = "xzab";
     private static final String OUTPUT_XZZZ = "xzzz";
     private static final String OUTPUT_XZZAA = "xzzaa";
-
-
     private static final String lineOne = "This is the first line" + StringUtils.STRING_NEWLINE;
     private static final String lineTwo = "This is the second line" + StringUtils.STRING_NEWLINE;
     private static final String lineThree = "This is the third line" + StringUtils.STRING_NEWLINE;
@@ -77,12 +82,16 @@ public class SplitApplicationTest {
     private static final String byteEight = "ach, en";
     private static final String byteNine = "ds with";
     private static final String byteTen = "6 byte";
-
     private static final String fileContentByBytes = byteOne + byteTwo + byteThree + byteFour + byteFive
             + byteSix + byteSeven + byteEight + byteNine + byteTen;
+    @TempDir
+    static File tempDir;
+    private static FileWriter fileWriter;
+    private static SplitApplication splitApplication;
+    private static OutputStream stdout;
 
     @BeforeAll
-    static void setupAll() throws IOException{
+    static void setupAll() throws IOException {
 
         EnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath());
         // create nested folder
@@ -194,6 +203,7 @@ public class SplitApplicationTest {
         splitApplication.run(args, System.in, stdout);
         assertArrayEquals(fileContentByBytes.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
     }
+
     // STDIN and [OPTIONS] -b and [FILES] is none
     @Test
     public void run_ByBytesAndStdin_CreateFile() throws Exception {
@@ -308,10 +318,11 @@ public class SplitApplicationTest {
         assertArrayEquals(fourthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAD)));
         assertArrayEquals(fifthFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAE)));
     }
+
     @Test
     public void splitFileByLines_SevenLines_CreateTwoFiles() throws Exception {
         splitApplication.splitFileByLines("test-lines.txt", DEFAULT_PREFIX, 7);
-        String firstFile = lineOne + lineTwo + lineThree + lineFour + lineFive + lineSix + lineSeven ;
+        String firstFile = lineOne + lineTwo + lineThree + lineFour + lineFive + lineSix + lineSeven;
         String secondFile = lineEight + lineNine + lineTen;
         assertArrayEquals(firstFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAA)));
         assertArrayEquals(secondFile.getBytes(StandardCharsets.UTF_8), Files.readAllBytes(IOUtils.resolveAbsoluteFilePath(OUTPUT_XAB)));

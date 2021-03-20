@@ -1,8 +1,8 @@
 package tdd.integration;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,7 +56,7 @@ public class IntegrationTest {
     void testCommandSubstitution_EchoLs_DisplaysLsResult() throws IOException, AbstractApplicationException, ShellException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         createFile("Hello");
-        String commandString = "echo `ls " + TEMP +"`";
+        String commandString = "echo `ls " + TEMP + "`";
         new ShellImpl().parseAndEvaluate(commandString, output);
         assertArrayEquals(("temp: Hello" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }

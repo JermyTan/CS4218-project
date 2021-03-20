@@ -38,9 +38,9 @@ public class CpApplicationTest {
     @AfterEach
     void deleteTemp() throws IOException {
         Files.walk(TEMP_PATH)
-            .sorted(Comparator.reverseOrder())
-            .map(Path::toFile)
-            .forEach(File::delete);
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
     }
 
     private Path createFile(String name) throws IOException {

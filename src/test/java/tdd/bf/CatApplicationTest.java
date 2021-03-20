@@ -90,7 +90,7 @@ public class CatApplicationTest {
     @Test
     void run_SingleStdinNullStdout_ThrowsException() throws AbstractApplicationException {
         ByteArrayOutputStream output = null;
-        String text = String.join(STRING_NEWLINE,"Test line 1", "Test line 2", "Test line 3");
+        String text = String.join(STRING_NEWLINE, "Test line 1", "Test line 2", "Test line 3");
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         assertThrows(CatException.class, () -> new CatApplication().run(toArgs(STRING_EMPTY), inputStream, output));
     }
@@ -113,7 +113,7 @@ public class CatApplicationTest {
     @Test
     void run_SingleStdinNoFlag_DisplaysStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = String.join(STRING_NEWLINE,"Test line 1", "Test line 2", "Test line 3");
+        String text = String.join(STRING_NEWLINE, "Test line 1", "Test line 2", "Test line 3");
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new CatApplication().run(toArgs(STRING_EMPTY), inputStream, output);
         assertEquals(text + STRING_NEWLINE, output.toString());
@@ -122,8 +122,8 @@ public class CatApplicationTest {
     @Test
     void run_SingleStdinFlag_DisplaysNumberedStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = String.join(STRING_NEWLINE,"Test line 1", "Test line 2", "Test line 3");
-        String expectedText = String.join(STRING_NEWLINE,"1 Test line 1", "2 Test line 2", "3 Test line 3", STRING_EMPTY);
+        String text = String.join(STRING_NEWLINE, "Test line 1", "Test line 2", "Test line 3");
+        String expectedText = String.join(STRING_NEWLINE, "1 Test line 1", "2 Test line 2", "3 Test line 3", STRING_EMPTY);
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new CatApplication().run(toArgs("n"), inputStream, output);
         assertEquals(expectedText, output.toString());
@@ -132,7 +132,7 @@ public class CatApplicationTest {
     @Test
     void run_SingleStdinDashNoFlag_DisplaysStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = String.join(STRING_NEWLINE,"Test line 1", "Test line 2", "Test line 3");
+        String text = String.join(STRING_NEWLINE, "Test line 1", "Test line 2", "Test line 3");
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new CatApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG), inputStream, output);
         assertEquals(text + STRING_NEWLINE, output.toString());
@@ -141,8 +141,8 @@ public class CatApplicationTest {
     @Test
     void run_SingleStdinDashFlag_DisplaysNumberedStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = String.join(STRING_NEWLINE,"Test line 1", "Test line 2", "Test line 3");
-        String expectedText = String.join(STRING_NEWLINE,"1 Test line 1", "2 Test line 2", "3 Test line 3", STRING_EMPTY);
+        String text = String.join(STRING_NEWLINE, "Test line 1", "Test line 2", "Test line 3");
+        String expectedText = String.join(STRING_NEWLINE, "1 Test line 1", "2 Test line 2", "3 Test line 3", STRING_EMPTY);
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new CatApplication().run(toArgs("n", STRING_STDIN_FLAG), inputStream, output);
         assertEquals(expectedText, output.toString());
@@ -220,7 +220,7 @@ public class CatApplicationTest {
     void run_SingleFileNoFlag_DisplaysFileContents() throws IOException, AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileA.txt";
-        String text = String.join(STRING_NEWLINE,"Test line 1", "Test line 2", "Test line 3");
+        String text = String.join(STRING_NEWLINE, "Test line 1", "Test line 2", "Test line 3");
         createFile(fileName, text);
         new CatApplication().run(toArgs(STRING_EMPTY, fileName), System.in, output);
         assertEquals(text + STRING_NEWLINE, output.toString());
@@ -230,8 +230,8 @@ public class CatApplicationTest {
     void run_SingleFileFlag_DisplaysNumberedFileContents() throws IOException, AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileB.txt";
-        String text = String.join(STRING_NEWLINE,"Test line 1", "Test line 2", "Test line 3");
-        String expectedText = String.join(STRING_NEWLINE,"1 Test line 1", "2 Test line 2", "3 Test line 3", STRING_EMPTY);
+        String text = String.join(STRING_NEWLINE, "Test line 1", "Test line 2", "Test line 3");
+        String expectedText = String.join(STRING_NEWLINE, "1 Test line 1", "2 Test line 2", "3 Test line 3", STRING_EMPTY);
         createFile(fileName, text);
         new CatApplication().run(toArgs("n", fileName), System.in, output);
         assertEquals(expectedText, output.toString());
@@ -261,7 +261,7 @@ public class CatApplicationTest {
     void run_SingleFileUnknownFlag_ThrowsException() throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileE.txt";
-        String text = String.join(STRING_NEWLINE,"Test line 1", "Test line 2", "Test line 3");
+        String text = String.join(STRING_NEWLINE, "Test line 1", "Test line 2", "Test line 3");
         createFile(fileName, text);
         assertThrows(CatException.class, () -> new CatApplication().run(toArgs("a", fileName), System.in, output));
     }
@@ -271,13 +271,13 @@ public class CatApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileF.txt";
         String fileName2 = "fileG.txt";
-        String text1 = String.join(STRING_NEWLINE,"Test line 1.1", "Test line 1.2", "Test line 1.3");
-        String text2 = String.join(STRING_NEWLINE,"Test line 2.1", "Test line 2.2");
+        String text1 = String.join(STRING_NEWLINE, "Test line 1.1", "Test line 1.2", "Test line 1.3");
+        String text2 = String.join(STRING_NEWLINE, "Test line 2.1", "Test line 2.2");
 
         createFile(fileName1, text1);
         createFile(fileName2, text2);
 
-        String expectedText = String.join(STRING_NEWLINE,text1, text2, STRING_EMPTY);
+        String expectedText = String.join(STRING_NEWLINE, text1, text2, STRING_EMPTY);
 
         new CatApplication().run(toArgs(STRING_EMPTY, fileName1, fileName2), System.in, output);
         assertEquals(expectedText, output.toString());
@@ -288,8 +288,8 @@ public class CatApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileH.txt";
         String fileName2 = "fileI.txt";
-        String text1 = String.join(STRING_NEWLINE,"Test line 1.1", "Test line 1.2", "Test line 1.3");
-        String text2 = String.join(STRING_NEWLINE,"Test line 2.1", "Test line 2.2");
+        String text1 = String.join(STRING_NEWLINE, "Test line 1.1", "Test line 1.2", "Test line 1.3");
+        String text2 = String.join(STRING_NEWLINE, "Test line 2.1", "Test line 2.2");
 
         createFile(fileName1, text1);
         createFile(fileName2, text2);
@@ -342,7 +342,7 @@ public class CatApplicationTest {
         captureErr();
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String stdinText = String.join(STRING_NEWLINE,"Test line 1.1", "Test line 1.2", "Test line 1.3");
+        String stdinText = String.join(STRING_NEWLINE, "Test line 1.1", "Test line 1.2", "Test line 1.3");
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String nonexistentFileName = "nonexistent_file.txt";
         new CatApplication().run(toArgs(STRING_EMPTY, nonexistentFileName), inputStream, output);
@@ -364,7 +364,7 @@ public class CatApplicationTest {
         captureErr();
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String stdinText = String.join(STRING_NEWLINE,"Test line 1.1", "Test line 1.2", "Test line 1.3");
+        String stdinText = String.join(STRING_NEWLINE, "Test line 1.1", "Test line 1.2", "Test line 1.3");
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String directoryName = "nonexistent_file.txt";
         Path path = Paths.get(EnvironmentUtil.currentDirectory, directoryName);
@@ -392,10 +392,10 @@ public class CatApplicationTest {
     void run_SingleStdinDashSingleFileNoFlag_DisplaysCatStdinFileContents() throws IOException,
             AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String stdinText = String.join(STRING_NEWLINE,"Test line 1.1", "Test line 1.2", "Test line 1.3");
+        String stdinText = String.join(STRING_NEWLINE, "Test line 1.1", "Test line 1.2", "Test line 1.3");
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String fileName = "fileN.txt";
-        String fileText = String.join(STRING_NEWLINE,"Test line 2.1", "Test line 2.2");
+        String fileText = String.join(STRING_NEWLINE, "Test line 2.1", "Test line 2.2");
 
         createFile(fileName, fileText);
 
@@ -409,17 +409,17 @@ public class CatApplicationTest {
     void run_SingleFileSingleStdinDashNoFlag_DisplaysCatFileStdinContents() throws IOException,
             AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String fileText = String.join(STRING_NEWLINE,"Test line 1.1", "Test line 1.2", "Test line 1.3");
+        String fileText = String.join(STRING_NEWLINE, "Test line 1.1", "Test line 1.2", "Test line 1.3");
         String fileName = "fileO.txt";
         createFile(fileName, fileText);
 
-        String stdinText = String.join(STRING_NEWLINE,"Test line 2.1", "Test line 2.2");
+        String stdinText = String.join(STRING_NEWLINE, "Test line 2.1", "Test line 2.2");
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
 
         String expectedText = String.join(STRING_NEWLINE, fileText, stdinText, STRING_EMPTY);
 
         new CatApplication().run(toArgs(STRING_EMPTY, fileName, STRING_STDIN_FLAG), inputStream, output);
-        assertEquals(expectedText , output.toString());
+        assertEquals(expectedText, output.toString());
     }
 }
 

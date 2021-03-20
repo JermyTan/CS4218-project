@@ -1,13 +1,9 @@
 package tdd.ef2;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.RmException;
-import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,10 +14,15 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.RmException;
+import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
 
 @Disabled
 public class RmApplicationTest {
@@ -87,7 +88,7 @@ public class RmApplicationTest {
     @Test
     void run_SpaceInName_DeletesFile() throws IOException, AbstractApplicationException {
         Path fileC = createFile("c   c");
-        new RmApplication().run(toArgs(STRING_EMPTY,"c   c"), System.in, System.out);
+        new RmApplication().run(toArgs(STRING_EMPTY, "c   c"), System.in, System.out);
         assertTrue(Files.notExists(fileC));
     }
 
@@ -95,7 +96,7 @@ public class RmApplicationTest {
     void run_MultipleFiles_DeletesFiles() throws IOException, AbstractApplicationException {
         Path fileD = createFile("d.txt");
         Path fileE = createFile("eerie");
-        new RmApplication().run(toArgs(STRING_EMPTY,"d.txt", "eerie"), System.in, System.out);
+        new RmApplication().run(toArgs(STRING_EMPTY, "d.txt", "eerie"), System.in, System.out);
         assertTrue(Files.notExists(fileD));
         assertTrue(Files.notExists(fileE));
     }
@@ -163,7 +164,8 @@ public class RmApplicationTest {
     void run_AbsolutePath_DeletesDirectory() throws IOException, AbstractApplicationException {
         Path directory = createDirectory("directoryAbs");
         createDirectory("innerAbs", directory);
-        new RmApplication().run(new String[]{"-r", TEMP_PATH.resolve("directoryAbs").toString()}, System.in, System.out);
+        new RmApplication().run(new String[]{"-r",
+                TEMP_PATH.resolve("directoryAbs").toString()}, System.in, System.out);
         assertTrue(Files.notExists(directory));
     }
 

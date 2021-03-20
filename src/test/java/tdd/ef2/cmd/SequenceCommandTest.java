@@ -47,7 +47,6 @@ public class SequenceCommandTest {
         commands.add(new CommandStub(CommandStub.Type.TEST_COMMAND));
         commands.add(new CommandStub(CommandStub.Type.SHELL_EXCEPTION));
         new SequenceCommand(commands).evaluate(System.in, output);
-        System.out.println(output.toString());
         assertArrayEquals((TEST_COMMAND_STRING + SHELL_EXCEPTION_STRING).getBytes(), output.toByteArray());
     }
 
@@ -58,7 +57,6 @@ public class SequenceCommandTest {
         commands.add(new CommandStub(CommandStub.Type.SHELL_EXCEPTION));
         commands.add(new CommandStub(CommandStub.Type.SHELL_EXCEPTION));
         new SequenceCommand(commands).evaluate(System.in, output);
-        System.out.println(output.toString());
         assertArrayEquals((SHELL_EXCEPTION_STRING + SHELL_EXCEPTION_STRING).getBytes(), output.toByteArray());
     }
 

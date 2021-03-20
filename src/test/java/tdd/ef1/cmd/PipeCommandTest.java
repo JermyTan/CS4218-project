@@ -1,5 +1,25 @@
 package tdd.ef1.cmd;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static tdd.ef1.cmd.stubs.CallCommandStub.CallCommandResults.FIRST_EXCEPTION;
+import static tdd.ef1.cmd.stubs.CallCommandStub.CallCommandResults.FIRST_SUCCESS;
+import static tdd.ef1.cmd.stubs.CallCommandStub.CallCommandResults.SECOND_EXCEPTION;
+import static tdd.ef1.cmd.stubs.CallCommandStub.CallCommandResults.SECOND_SUCCESS;
+import static tdd.ef1.cmd.stubs.CallCommandStub.FIRST_EXCEPTION_MSG;
+import static tdd.ef1.cmd.stubs.CallCommandStub.SECOND_EXCEPTION_MSG;
+import static tdd.ef1.cmd.stubs.CallCommandStub.SECOND_SUCCESS_MSG;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,16 +30,6 @@ import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import tdd.ef1.cmd.stubs.CallCommandStub;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static tdd.ef1.cmd.stubs.CallCommandStub.CallCommandResults.*;
-import static tdd.ef1.cmd.stubs.CallCommandStub.*;
 
 public class PipeCommandTest {
     private static InputStream inputStream;

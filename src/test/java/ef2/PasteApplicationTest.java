@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
@@ -38,7 +37,7 @@ class PasteApplicationTest {
 
     private final OutputStream stdout = new ByteArrayOutputStream();
     private PasteApplication app;
-    private InputStream stdin = System.in;
+    private InputStream stdin;
 
     @BeforeAll
     static void setupBeforeAll() {
@@ -57,6 +56,7 @@ class PasteApplicationTest {
     @BeforeEach
     void setup() {
         app = new PasteApplication();
+        stdin = System.in;
     }
 
     @Test
@@ -65,7 +65,7 @@ class PasteApplicationTest {
     }
 
     @Test
-    public void run_NullArgList_ThrowsException() {
+    public void run_NullArgList_Success() {
         assertDoesNotThrow(() -> app.run(null, stdin, stdout));
     }
 

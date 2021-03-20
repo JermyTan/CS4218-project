@@ -18,7 +18,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PA
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -225,7 +224,7 @@ class CatApplicationTest {
             app.catFiles(false, FILE_3);
 
             assertEquals(new CatException(
-                    new InvalidDirectoryException(FILE_3, ERR_FILE_NOT_FOUND).getMessage()
+                            new InvalidDirectoryException(FILE_3, ERR_FILE_NOT_FOUND).getMessage()
                     ).getMessage() + STRING_NEWLINE,
                     getErrOutput());
         });

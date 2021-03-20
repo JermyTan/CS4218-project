@@ -25,6 +25,7 @@ public class CallCommandStub extends CallCommand {
     public static final String THIRD_EXCEPTION_MSG = "Third Application Exception";
     private final CallCommandResults resultType;
     private final String result;
+
     public CallCommandStub(
             List<String> argsList,
             ApplicationRunner appRunner,
