@@ -28,7 +28,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
-@Disabled
 public class PasteApplicationTest {
     public static final String TEMP = "temp-paste";
     public static final Path TEMP_PATH = Paths.get(EnvironmentUtil.currentDirectory, TEMP);

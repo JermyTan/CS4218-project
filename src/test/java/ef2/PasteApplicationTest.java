@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.impl.app.PasteApplication;
 
-@Disabled
 class PasteApplicationTest {
 
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
@@ -134,7 +133,7 @@ class PasteApplicationTest {
 
         assertDoesNotThrow(() -> app.run(new String[]{FILE_1, STRING_STDIN_FLAG}, stdin, stdout));
 
-        String expected = "A\tHello word" + STRING_NEWLINE + "B\tCS4218" + STRING_NEWLINE
+        String expected = "A\tHello world" + STRING_NEWLINE + "B\tCS4218" + STRING_NEWLINE
                 + "C" + STRING_NEWLINE + "D" + STRING_NEWLINE;
         assertEquals(expected, stdout.toString());
     }
@@ -149,7 +148,7 @@ class PasteApplicationTest {
 
     @Test
     public void run_SerialFlagTwoFiles_SerialOutput() {
-        assertDoesNotThrow(() -> app.run(new String[]{"-s", FILE_1}, stdin, stdout));
+        assertDoesNotThrow(() -> app.run(new String[]{"-s", FILE_1, FILE_2}, stdin, stdout));
 
         String expected = "A\tB\tC\tD" + STRING_NEWLINE + "1\t2\t3\t4" + STRING_NEWLINE;
         assertEquals(expected, stdout.toString());
@@ -163,8 +162,8 @@ class PasteApplicationTest {
 
     @Test
     public void mergeStdin_ReadFromStdin_ReturnStdinContent() {
-        String expected = STD_INPUT;
-        provideInput(expected);
+        provideInput(STD_INPUT);
+        String expected = "Hello world" + STRING_NEWLINE + "CS4218";
 
         assertDoesNotThrow(() -> {
             String output = app.mergeStdin(false, stdin);
@@ -242,11 +241,11 @@ class PasteApplicationTest {
         String stdinInput = STD_INPUT;
         provideInput(stdinInput);
 
-        String expected = "A\tHello word" + STRING_NEWLINE + "B\tCS4218" + STRING_NEWLINE
-                + "C" + STRING_NEWLINE + "D" + STRING_NEWLINE;
+        String expected = "Hello world\tA" + STRING_NEWLINE + "CS4218\tB" + STRING_NEWLINE
+                + "C" + STRING_NEWLINE + "D";
 
         assertDoesNotThrow(() -> {
-            String output = app.mergeFileAndStdin(false, stdin, STRING_STDIN_FLAG, FILE_1);
+            String output = app.mergeFileAndStdin(false, stdin, FILE_1);
             assertEquals(expected, output);
         });
     }
