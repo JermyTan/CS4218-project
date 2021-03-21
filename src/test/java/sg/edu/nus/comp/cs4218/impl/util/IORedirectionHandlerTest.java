@@ -43,6 +43,10 @@ class IORedirectionHandlerTest {
 
     @BeforeAll
     static void setupBeforeAll() throws Exception {
+        if (Files.notExists(Path.of(TEST_DIR))) {
+            Files.createDirectory(Path.of(TEST_DIR));
+        }
+        
         EnvironmentUtil.currentDirectory = TEST_DIR;
 
         if (Files.notExists(PATH_1)) {
