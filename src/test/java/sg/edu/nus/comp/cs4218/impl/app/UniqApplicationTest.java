@@ -25,9 +25,9 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_MD;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -65,13 +65,13 @@ public class UniqApplicationTest {
             STRING_MULTI_WORDS,
             STRING_SINGLE_WORD,
             STRING_SINGLE_WORD,
-            STRING_UNICODE,
+            STRING_FILE_MD,
             STRING_SINGLE_WORD,
-            STRING_UNICODE);
+            STRING_FILE_MD);
     private static final String INPUT_2 = String.join(STRING_NEWLINE,
             STRING_SINGLE_WORD,
             STRING_MULTI_WORDS,
-            STRING_UNICODE);
+            STRING_FILE_MD);
     private static final String INPUT_3 = String.join(STRING_NEWLINE,
             STRING_SINGLE_WORD,
             STRING_MULTI_WORDS,
@@ -269,15 +269,15 @@ public class UniqApplicationTest {
             String expected1 = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             String result2 = app.uniqFromFile(false, false, false, INPUT_FILE_2, OUTPUT_FILE_2);
             String expected2 = String.join(STRING_NEWLINE,
                     STRING_SINGLE_WORD,
                     STRING_MULTI_WORDS,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             String result3 = app.uniqFromFile(false, false, false, INPUT_FILE_3, OUTPUT_FILE_3);
             String expected3 = String.join(STRING_NEWLINE,
@@ -303,9 +303,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             assertEquals(expected, result);
             assertEquals(expected, stdout.toString());
@@ -320,15 +320,15 @@ public class UniqApplicationTest {
             String expected1 = String.join(STRING_NEWLINE,
                     "2 " + STRING_MULTI_WORDS,
                     "2 " + STRING_SINGLE_WORD,
-                    "1 " + STRING_UNICODE,
+                    "1 " + STRING_FILE_MD,
                     "1 " + STRING_SINGLE_WORD,
-                    "1 " + STRING_UNICODE);
+                    "1 " + STRING_FILE_MD);
 
             String result2 = app.uniqFromFile(true, false, false, INPUT_FILE_2, OUTPUT_FILE_2);
             String expected2 = String.join(STRING_NEWLINE,
                     "1 " + STRING_SINGLE_WORD,
                     "1 " + STRING_MULTI_WORDS,
-                    "1 " + STRING_UNICODE);
+                    "1 " + STRING_FILE_MD);
 
             String result3 = app.uniqFromFile(true, false, false, INPUT_FILE_3, OUTPUT_FILE_3);
             String expected3 = String.join(STRING_NEWLINE,
@@ -556,16 +556,16 @@ public class UniqApplicationTest {
             String expected1 = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             stdin = new ByteArrayInputStream(INPUT_2.getBytes());
             String result2 = app.uniqFromStdin(false, false, false, stdin, OUTPUT_FILE_2);
             String expected2 = String.join(STRING_NEWLINE,
                     STRING_SINGLE_WORD,
                     STRING_MULTI_WORDS,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             stdin = new ByteArrayInputStream(INPUT_3.getBytes());
             String result3 = app.uniqFromStdin(false, false, false, stdin, OUTPUT_FILE_3);
@@ -603,9 +603,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             assertEquals(expected, result);
             assertEquals(expected, stdout);
@@ -621,16 +621,16 @@ public class UniqApplicationTest {
             String expected1 = String.join(STRING_NEWLINE,
                     "2 " + STRING_MULTI_WORDS,
                     "2 " + STRING_SINGLE_WORD,
-                    "1 " + STRING_UNICODE,
+                    "1 " + STRING_FILE_MD,
                     "1 " + STRING_SINGLE_WORD,
-                    "1 " + STRING_UNICODE);
+                    "1 " + STRING_FILE_MD);
 
             stdin = new ByteArrayInputStream(INPUT_2.getBytes());
             String result2 = app.uniqFromStdin(true, false, false, stdin, OUTPUT_FILE_2);
             String expected2 = String.join(STRING_NEWLINE,
                     "1 " + STRING_SINGLE_WORD,
                     "1 " + STRING_MULTI_WORDS,
-                    "1 " + STRING_UNICODE);
+                    "1 " + STRING_FILE_MD);
 
             stdin = new ByteArrayInputStream(INPUT_3.getBytes());
             String result3 = app.uniqFromStdin(true, false, false, stdin, OUTPUT_FILE_3);
@@ -899,9 +899,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             assertNotEquals(expected, stdout.toString());
             assertEquals(expected, readFromFile(out1));
@@ -912,9 +912,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             assertNotEquals(expected, stdout.toString());
             assertEquals(expected, readFromFile(out1));
@@ -925,9 +925,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             assertNotEquals(expected, stdout.toString());
             assertEquals(expected, readFromFile(out1));
@@ -938,9 +938,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             assertNotEquals(expected, stdout.toString());
             assertEquals(expected, readFromFile(out1));
@@ -955,9 +955,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             assertNotEquals(expected, stdout.toString());
             assertEquals(expected, readFromFile(out1));
@@ -969,9 +969,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             assertNotEquals(expected, stdout.toString());
             assertEquals(expected, readFromFile(out1));
@@ -986,9 +986,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_EMPTY);
 
             assertEquals(expected, stdout.toString());
@@ -1001,9 +1001,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_EMPTY);
 
             assertEquals(expected, stdout.toString());
@@ -1016,9 +1016,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_EMPTY);
 
             assertEquals(expected, stdout.toString());
@@ -1031,9 +1031,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_EMPTY);
 
             assertEquals(expected, stdout.toString());
@@ -1047,9 +1047,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     STRING_MULTI_WORDS,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE,
+                    STRING_FILE_MD,
                     STRING_SINGLE_WORD,
-                    STRING_UNICODE);
+                    STRING_FILE_MD);
 
             assertNotEquals(expected, stdout.toString());
             assertEquals(expected, readFromFile(Path.of(TEST_DIR, STRING_STDIN_FLAG)));
@@ -1063,9 +1063,9 @@ public class UniqApplicationTest {
             String expected = String.join(STRING_NEWLINE,
                     "2 " + STRING_MULTI_WORDS,
                     "2 " + STRING_SINGLE_WORD,
-                    "1 " + STRING_UNICODE,
+                    "1 " + STRING_FILE_MD,
                     "1 " + STRING_SINGLE_WORD,
-                    "1 " + STRING_UNICODE,
+                    "1 " + STRING_FILE_MD,
                     STRING_EMPTY);
 
             assertEquals(expected, stdout.toString());

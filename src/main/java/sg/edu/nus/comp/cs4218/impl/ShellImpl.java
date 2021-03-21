@@ -1,10 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl;
 
-import sg.edu.nus.comp.cs4218.*;
-import sg.edu.nus.comp.cs4218.exception.*;
-import sg.edu.nus.comp.cs4218.impl.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 
-import java.io.*;
+import sg.edu.nus.comp.cs4218.Command;
+import sg.edu.nus.comp.cs4218.Shell;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
+import sg.edu.nus.comp.cs4218.impl.util.CommandBuilderUtil;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class ShellImpl implements Shell {
 

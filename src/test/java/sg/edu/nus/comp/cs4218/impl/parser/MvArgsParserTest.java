@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.multiplyChar;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.FILE_LIST;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_MD;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SPACE_FILE_TXT;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNDERSCORE_FILE_TXT;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE_NAME_FILE;
 
 import java.util.List;
 
@@ -30,18 +30,18 @@ class MvArgsParserTest {
     private static final String INVALID_OPTION_3 = String.format("%s%s%s", CHAR_FLAG_PREFIX, FLAG_IS_NOT_OVERWRITE, FLAG_IS_NOT_OVERWRITE + 1);
     private static final String[] VALID_MULTI_VALUES_ARGS_1 = FILE_LIST.toArray(String[]::new);
     private static final String[] VALID_MULTI_VALUES_ARGS_2 = new String[]{VALID_OPTION_1,
-            STRING_UNICODE_NAME_FILE,
+            STRING_FILE_MD,
             STRING_SPACE_FILE_TXT};
     private static final String[] VALID_MULTI_VALUES_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
             VALID_OPTION_1,
-            STRING_UNICODE_NAME_FILE,
+            STRING_FILE_MD,
             VALID_OPTION_2};
     private static final String[] INVALID_ARGS_1 = new String[]{INVALID_OPTION_1};
-    private static final String[] INVALID_ARGS_2 = new String[]{INVALID_OPTION_2, STRING_UNICODE_NAME_FILE};
+    private static final String[] INVALID_ARGS_2 = new String[]{INVALID_OPTION_2, STRING_FILE_MD};
     private static final String[] INVALID_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
             INVALID_OPTION_3,
-            STRING_UNICODE_NAME_FILE};
-    private static final String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_UNICODE_NAME_FILE, null};
+            STRING_FILE_MD};
+    private static final String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_FILE_MD, null};
     private static final String[] INVALID_ARGS_5 = new String[]{String.valueOf(CHAR_FLAG_PREFIX)};
     private static final String[] INVALID_ARGS_6 = new String[]{STRING_SPACE_FILE_TXT};
     private static final String[] INVALID_ARGS_7 = new String[]{VALID_OPTION_2};

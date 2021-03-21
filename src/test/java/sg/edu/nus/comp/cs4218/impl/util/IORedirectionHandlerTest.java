@@ -46,7 +46,7 @@ class IORedirectionHandlerTest {
         if (Files.notExists(Path.of(TEST_DIR))) {
             Files.createDirectory(Path.of(TEST_DIR));
         }
-        
+
         EnvironmentUtil.currentDirectory = TEST_DIR;
 
         if (Files.notExists(PATH_1)) {

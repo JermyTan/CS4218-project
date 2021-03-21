@@ -69,6 +69,9 @@ public class CpApplicationTest {
     }
 
     private void createFileWithContent(Path path, String content) throws IOException {
+        if (Files.exists(path)) {
+            return;
+        }
         Files.createFile(path);
         BufferedWriter outputStream = new BufferedWriter(new FileWriter(path.toFile(), true));//NOPMD
         outputStream.append(content);
@@ -264,7 +267,9 @@ public class CpApplicationTest {
         // Create dir folder1/folder2/
         try {
             Path destPath = Path.of(TEST_DIR, FOLDER_1, FOLDER_2);
-            Files.createDirectory(destPath);
+            if (Files.notExists(destPath)) {
+                Files.createDirectory(destPath);
+            }
         } catch (IOException e) {
             fail(e.getMessage());
         }

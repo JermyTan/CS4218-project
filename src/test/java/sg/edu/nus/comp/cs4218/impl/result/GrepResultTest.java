@@ -6,9 +6,9 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_MD;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -91,7 +91,7 @@ class GrepResultTest {
 
     @Test
     void formatToString_MultiLinesIsLineNumber_ReturnsNumLinesString() {
-        List<String> lines = List.of(STRING_MULTI_WORDS, STRING_UNICODE, STRING_BLANK, STRING_EMPTY);
+        List<String> lines = List.of(STRING_MULTI_WORDS, STRING_FILE_MD, STRING_BLANK, STRING_EMPTY);
 
         assertEquals("4", new GrepResult(STRING_SINGLE_WORD, lines).formatToString(true, false));
         assertEquals(
@@ -102,7 +102,7 @@ class GrepResultTest {
 
     @Test
     void formatToString_MultiLinesNotLineNumber_ReturnsMultiLinesString() {
-        List<String> lines = List.of(STRING_MULTI_WORDS, STRING_UNICODE, STRING_BLANK, STRING_EMPTY);
+        List<String> lines = List.of(STRING_MULTI_WORDS, STRING_FILE_MD, STRING_BLANK, STRING_EMPTY);
 
         assertEquals(
                 String.join(STRING_NEWLINE, lines),

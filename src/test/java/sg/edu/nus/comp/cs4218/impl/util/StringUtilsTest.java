@@ -21,9 +21,6 @@ import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SPACE_FILE_TX
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SPECIAL_CHARS;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_TRAILING_PERIOD_FILE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNDERSCORE_FILE_TXT;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE_EXT_FILE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE_NAME_FILE;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -35,7 +32,6 @@ class StringUtilsTest {
     private static final String JPG_EXT = "jpg";
     private static final String MD_EXT = "md";
     private static final String CUSTOM_EXT = "CusTom";
-    private static final String UNICODE_EXT = "😈🌚";
 
     @Test
     void getFileExtension_NullString_ReturnsEmptyString() {
@@ -58,9 +54,7 @@ class StringUtilsTest {
                 STRING_FILE_JPG,
                 STRING_FILE_MD,
                 STRING_CUSTOM_EXT_FILE,
-                STRING_LEADING_PERIOD_FILE_TXT,
-                STRING_UNICODE_NAME_FILE,
-                STRING_UNICODE_EXT_FILE
+                STRING_LEADING_PERIOD_FILE_TXT
         );
 
         List<String> expectedExts = List.of(
@@ -71,8 +65,7 @@ class StringUtilsTest {
                 MD_EXT,
                 CUSTOM_EXT,
                 TXT_EXT,
-                TXT_EXT,
-                UNICODE_EXT
+                TXT_EXT
         );
 
         IntStream.range(0, stringsWithExt.size())
@@ -104,11 +97,6 @@ class StringUtilsTest {
     @Test
     void isBlank_WithWhitespaces_ReturnsFalse() {
         assertFalse(StringUtils.isBlank(STRING_LEADING_TRAILING_SPACES));
-    }
-
-    @Test
-    void isBlank_Unicode_ReturnsFalse() {
-        assertFalse(StringUtils.isBlank(STRING_UNICODE));
     }
 
     @Test
@@ -164,11 +152,6 @@ class StringUtilsTest {
     @Test
     void tokenize_LeadingTrailingWhitespacesString_ReturnsNonEmptyArray() {
         assertArrayEquals(new String[]{"Test", "string"}, StringUtils.tokenize(STRING_LEADING_TRAILING_SPACES));
-    }
-
-    @Test
-    void tokenize_UnicodeString_ReturnsNonEmptyArray() {
-        assertArrayEquals(new String[]{"Test", "💩🌚😊👍🏻风和日丽"}, StringUtils.tokenize(STRING_UNICODE));
     }
 
     @Test

@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.multiplyChar;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.FILE_LIST;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_MD;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SPACE_FILE_TXT;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE_NAME_FILE;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,20 +34,20 @@ class WcArgsParserTest {
     private static final String[] VALID_SINGLE_VALUE_ARGS_3 = new String[]{VALID_OPTION_2};
     private static final String[] VALID_MULTI_VALUES_ARGS_1 = FILE_LIST.toArray(String[]::new);
     private static final String[] VALID_MULTI_VALUES_ARGS_2 = new String[]{VALID_OPTION_1,
-            STRING_UNICODE_NAME_FILE,
+            STRING_FILE_MD,
             STRING_SPACE_FILE_TXT};
     private static final String[] VALID_MULTI_VALUES_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
             VALID_OPTION_3,
-            STRING_UNICODE_NAME_FILE,
+            STRING_FILE_MD,
             VALID_OPTION_2};
     private static final String[] VALID_MULTI_VALUES_ARGS_4 = new String[]{String.valueOf(CHAR_FLAG_PREFIX),
             String.valueOf(CHAR_FLAG_PREFIX)};
     private static final String[] INVALID_ARGS_1 = new String[]{INVALID_OPTION_1};
-    private static final String[] INVALID_ARGS_2 = new String[]{INVALID_OPTION_2, STRING_UNICODE_NAME_FILE};
+    private static final String[] INVALID_ARGS_2 = new String[]{INVALID_OPTION_2, STRING_FILE_MD};
     private static final String[] INVALID_ARGS_3 = new String[]{STRING_SPACE_FILE_TXT,
             INVALID_OPTION_3,
-            STRING_UNICODE_NAME_FILE};
-    private static final String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_UNICODE_NAME_FILE, null};
+            STRING_FILE_MD};
+    private static final String[] INVALID_ARGS_4 = new String[]{STRING_SPACE_FILE_TXT, STRING_FILE_MD, null};
 
     private WcArgsParser parser;
 

@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_MD;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -95,7 +95,7 @@ class CatResultTest {
 
     @Test
     void formatToString_MultiLines_ReturnsMultiLinesString() {
-        List<String> lines = List.of(STRING_MULTI_WORDS, STRING_UNICODE, STRING_BLANK, STRING_EMPTY);
+        List<String> lines = List.of(STRING_MULTI_WORDS, STRING_FILE_MD, STRING_BLANK, STRING_EMPTY);
 
         assertEquals(
                 String.join(STRING_NEWLINE, lines),

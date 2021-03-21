@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_FILE_MD;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_MULTI_WORDS;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_UNICODE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -101,16 +101,16 @@ public class UniqResultTest {
         List<String> lines = List.of(
                 STRING_MULTI_WORDS,
                 STRING_MULTI_WORDS,
-                STRING_UNICODE,
-                STRING_UNICODE,
-                STRING_UNICODE,
+                STRING_FILE_MD,
+                STRING_FILE_MD,
+                STRING_FILE_MD,
                 STRING_BLANK,
                 STRING_BLANK,
                 STRING_EMPTY
         );
 
         assertEquals(
-                String.join(STRING_NEWLINE, STRING_MULTI_WORDS, STRING_UNICODE, STRING_BLANK, STRING_EMPTY),
+                String.join(STRING_NEWLINE, STRING_MULTI_WORDS, STRING_FILE_MD, STRING_BLANK, STRING_EMPTY),
                 new UniqResult(lines).formatToString(false, false, false)
         );
 
@@ -118,7 +118,7 @@ public class UniqResultTest {
                 String.join(
                         STRING_NEWLINE,
                         "2 " + STRING_MULTI_WORDS,
-                        "3 " + STRING_UNICODE,
+                        "3 " + STRING_FILE_MD,
                         "2 " + STRING_BLANK,
                         "1 " + STRING_EMPTY
                 ),
@@ -129,7 +129,7 @@ public class UniqResultTest {
                 String.join(
                         STRING_NEWLINE,
                         STRING_MULTI_WORDS,
-                        STRING_UNICODE,
+                        STRING_FILE_MD,
                         STRING_BLANK
                 ),
                 new UniqResult(lines).formatToString(false, true, false)
@@ -139,7 +139,7 @@ public class UniqResultTest {
                 String.join(
                         STRING_NEWLINE,
                         "2 " + STRING_MULTI_WORDS,
-                        "3 " + STRING_UNICODE,
+                        "3 " + STRING_FILE_MD,
                         "2 " + STRING_BLANK
                 ),
                 new UniqResult(lines).formatToString(true, true, false)
@@ -149,9 +149,9 @@ public class UniqResultTest {
                 STRING_NEWLINE,
                 STRING_MULTI_WORDS,
                 STRING_MULTI_WORDS,
-                STRING_UNICODE,
-                STRING_UNICODE,
-                STRING_UNICODE,
+                STRING_FILE_MD,
+                STRING_FILE_MD,
+                STRING_FILE_MD,
                 STRING_BLANK,
                 STRING_BLANK
         );
