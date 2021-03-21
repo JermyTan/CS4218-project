@@ -58,7 +58,11 @@ public class IORedirectionHandlerTest {
 
     private Path createFile(String name) throws IOException {
         Path path = TEST_PATH.resolve(name);
-        Files.createFile(path);
+
+        if (Files.notExists(path)) {
+            Files.createFile(path);
+        }
+
         return path;
     }
 
