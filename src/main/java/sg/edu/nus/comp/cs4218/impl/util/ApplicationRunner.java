@@ -1,7 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import sg.edu.nus.comp.cs4218.*;
-import sg.edu.nus.comp.cs4218.exception.*;
 import sg.edu.nus.comp.cs4218.impl.app.*;
 
 import java.io.*;
@@ -9,9 +7,6 @@ import java.io.*;
 import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
-<<<<<<< HEAD
-import sg.edu.nus.comp.cs4218.impl.app.*;
-=======
 import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
 import sg.edu.nus.comp.cs4218.impl.app.CdApplication;
 import sg.edu.nus.comp.cs4218.impl.app.EchoApplication;
@@ -28,8 +23,6 @@ import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
->>>>>>> 1329815fe37a5c941542a81fb320583731f3f976
-
 
 public class ApplicationRunner {
     public static final String APP_LS = "ls";
