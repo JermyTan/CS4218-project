@@ -1,18 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.util.*;
 
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.Shell;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ExitException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.CommandBuilderUtil;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
+import java.io.*;
 
 public class ShellImpl implements Shell {
 
@@ -47,9 +39,6 @@ public class ShellImpl implements Shell {
                 if (!StringUtils.isBlank(commandString)) {
                     shell.parseAndEvaluate(commandString, System.out);
                 }
-
-            } catch (ExitException e) {
-                System.exit(Integer.parseInt(e.getMessage()));
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }

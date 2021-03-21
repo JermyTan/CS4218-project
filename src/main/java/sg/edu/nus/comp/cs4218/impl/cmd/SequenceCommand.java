@@ -1,18 +1,13 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ExitException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 
 /**
  * A Sequence Command is a sub-command consisting of two Commands separated with a semicolon.
@@ -22,14 +17,21 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 public class SequenceCommand implements Command {
     private final List<Command> commands;
 
-    public SequenceCommand(List<Command> commands) {
+    public SequenceCommand(List<Command> commands) throws ShellException {
+        if (
+                commands == null
+                        || commands.stream().anyMatch(Objects::isNull)
+                        || commands.isEmpty()
+        ) {
+            throw new ShellException(ERR_INVALID_ARGS);
+        }
+
         this.commands = commands;
     }
 
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException {
-        ExitException exitException = null;
         List<String> outputLines = new ArrayList<>();
 
         for (Command command : commands) {
@@ -41,9 +43,6 @@ public class SequenceCommand implements Command {
                 if (!outputLine.isEmpty()) {
                     outputLines.add(outputLine);
                 }
-            } catch (ExitException e) {
-                exitException = e;
-
             } catch (AbstractApplicationException | ShellException e) {
                 outputLines.add(e.getMessage() + STRING_NEWLINE);
             }
@@ -55,10 +54,6 @@ public class SequenceCommand implements Command {
             } catch (IOException e) {
                 throw new ShellException(e.getMessage(), e);
             }
-        }
-
-        if (exitException != null) {
-            throw exitException;
         }
     }
 

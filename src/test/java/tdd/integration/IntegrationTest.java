@@ -1,27 +1,17 @@
 package tdd.integration;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.ShellImpl;
-
-@Disabled
 public class IntegrationTest {
     public static final String TEMP = "temp";
     public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
@@ -51,6 +41,7 @@ public class IntegrationTest {
 
     // Command Substitution
 
+    @Disabled
     @Test
     void testCommandSubstitution_EchoLs_DisplaysLsResult() throws IOException, AbstractApplicationException, ShellException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -68,6 +59,7 @@ public class IntegrationTest {
         assertArrayEquals(("hello" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
+    @Disabled
     @Test
     void testCommandSubstitution_WcEcho_DisplaysLinesWordsBytesFilename() throws IOException, AbstractApplicationException, ShellException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();

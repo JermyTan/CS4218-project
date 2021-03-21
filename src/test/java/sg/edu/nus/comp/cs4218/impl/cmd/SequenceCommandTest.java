@@ -1,31 +1,18 @@
-package ef2;
+package sg.edu.nus.comp.cs4218.impl.cmd;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
+import org.junit.jupiter.api.*;
+import org.mockito.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.util.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
-import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
-import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-
-@Disabled
 class SequenceCommandTest {
 
     private final InputStream stdin = mock(InputStream.class);
@@ -61,7 +48,7 @@ class SequenceCommandTest {
             SequenceCommand command = new SequenceCommand(List.of(callCommand));
 
             command.evaluate(stdin, stdout);
-            verify(appRunner).runApp("echo", new String[]{"abc"}, stdin, stdout);
+            verify(appRunner).runApp(eq("echo"), eq(new String[]{"abc"}), eq(stdin), any());
         });
     }
 
@@ -81,7 +68,7 @@ class SequenceCommandTest {
 
             // Both commands are executed
             verify(command1).evaluate(eq(stdin), command1Stdout.capture());
-            verify(command2).evaluate(command2Stdin.capture(), eq(stdout));
+            verify(command2).evaluate(command2Stdin.capture(), any());
 
             List<String> input = IOUtils.getLinesFromInputStream(command2Stdin.getValue());
 
