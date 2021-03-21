@@ -67,7 +67,7 @@ public class PasteApplication implements PasteInterface {
             if (stdin == null) {
                 throw new InvalidArgsException(ERR_NO_ISTREAM);
             }
-            InputStream[] streams = { stdin };
+            InputStream[] streams = {stdin};
             return mergeInputStreams(isSerial, streams);
         } catch (Exception e) {
             throw new PasteException(e.getMessage(), e);

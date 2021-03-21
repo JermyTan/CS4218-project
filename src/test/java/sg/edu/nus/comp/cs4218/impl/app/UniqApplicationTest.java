@@ -1,4 +1,4 @@
-package ef2;
+package sg.edu.nus.comp.cs4218.impl.app;
 
 
 import static java.nio.file.StandardOpenOption.CREATE;
@@ -50,7 +50,6 @@ import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.UniqException;
-import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 
 @SuppressWarnings("PMD.ExcessiveMethodLength")
 public class UniqApplicationTest {

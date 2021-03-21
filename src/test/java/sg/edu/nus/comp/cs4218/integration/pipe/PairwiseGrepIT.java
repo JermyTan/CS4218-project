@@ -1,4 +1,4 @@
-package integration.pipe;
+package sg.edu.nus.comp.cs4218.integration.pipe;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,13 +28,13 @@ import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 
-public class PairwiseCatIT {
+public class PairwiseGrepIT {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "PipePairwiseIT";
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
-    private static final String CAT = "cat";
+    private static final String GREP = "grep";
     private static final String INPUT_STRING = "hello world";
     private final Path file1 = Path.of(TEST_DIR, FILE_1);
     private final Path file2 = Path.of(TEST_DIR, FILE_2);
@@ -74,98 +74,77 @@ public class PairwiseCatIT {
     }
 
     @Test
-    @DisplayName("cat file1.txt | wc")
-    public void evaluate_CatThenWc_CommandExecuted() {
+    @DisplayName("grep hello file1.txt | wc -cl")
+    public void evaluate_GrepThenWc_CommandExecuted() {
         assertDoesNotThrow(() -> {
             String expected = INPUT_STRING;
             Files.writeString(file1, expected);
 
-            CallCommand command1 = new CallCommand(List.of(CAT, FILE_1), appRunner);
-            CallCommand command2 = new CallCommand(List.of("wc", "-c", FILE_2), appRunner);
+            CallCommand command1 = new CallCommand(List.of(GREP, "hello", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("wc", "-cl"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            // stdin is not read
-            // file2.txt is empty
-            assertEquals("0" + CHAR_TAB + FILE_2 + STRING_NEWLINE, stdout.toString());
+            assertEquals("1" + CHAR_TAB + "12" + STRING_NEWLINE, stdout.toString());
         });
     }
 
     @Test
-    @DisplayName("cat -n file1.txt | cat -n -")
-    public void evaluate_CatThenCat_CommandExecuted() {
+    @DisplayName("grep hello file1.txt | grep hello")
+    public void evaluate_GrepThenGrep_CommandExecuted() {
         assertDoesNotThrow(() -> {
             String expected = INPUT_STRING;
             Files.writeString(file1, expected);
 
-            CallCommand command1 = new CallCommand(List.of(CAT, "-n", FILE_1), appRunner);
-            CallCommand command2 = new CallCommand(List.of("cat", "-n", "-"), appRunner);
+            CallCommand command1 = new CallCommand(List.of(GREP, "hello", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of(GREP, "world"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            assertEquals("1 1 " + expected + STRING_NEWLINE, stdout.toString());
+            assertEquals(expected + STRING_NEWLINE, stdout.toString());
         });
     }
 
     @Test
-    @DisplayName("cat file1.txt | grep hello > file2.txt")
-    public void evaluate_CatThenGrep_CommandExecuted() {
-        assertDoesNotThrow(() -> {
-            String expected = INPUT_STRING;
-            Files.writeString(file1, expected);
-
-            CallCommand command1 = new CallCommand(List.of(CAT, FILE_1), appRunner);
-            CallCommand command2 = new CallCommand(List.of("grep", "hello", ">", FILE_2), appRunner);
-
-            buildCommand(List.of(command1, command2));
-
-            command.evaluate(stdin, stdout);
-
-            // Grep output is stored in file2.txt
-            List<String> output = Files.readAllLines(file2);
-            assertEquals(1, output.size());
-            assertEquals(expected, output.get(0));
-        });
-    }
-
-    @Test
-    @DisplayName("cat file1.txt | uniq -d -")
-    public void evaluate_CatThenUniq_CommandExecuted() {
+    @DisplayName("uniq file1.txt | grep hello")
+    public void evaluate_UniqThenGrep_CommandExecuted() {
         assertDoesNotThrow(() -> {
             String expected1 = INPUT_STRING;
             String expected2 = "Alice";
-            Files.writeString(file1, String.join(STRING_NEWLINE, expected1, expected1, expected2, expected2, "Bob", expected2));
-            CallCommand command1 = new CallCommand(List.of(CAT, FILE_1), appRunner);
-            CallCommand command2 = new CallCommand(List.of("uniq", "-dD"), appRunner);
+            Files.writeString(file1, String.join(STRING_NEWLINE, expected1, expected1,
+                    expected2, expected2, "Bob", expected2));
+
+            CallCommand command1 = new CallCommand(List.of("uniq", "-c", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of(GREP, "2"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            assertEquals(String.join(STRING_NEWLINE, expected1, expected1, expected2, expected2) + STRING_NEWLINE, stdout.toString());
+            assertEquals("2 " + expected1 + STRING_NEWLINE + "2 " + expected2 + STRING_NEWLINE, stdout.toString());
         });
     }
 
     @Test
-    @DisplayName("cat | paste file1.txt -")
-    public void evaluate_EchoThenPaste_CommandExecuted() {
-        assertDoesNotThrow(() -> {
-            provideInput(INPUT_STRING);
-            Files.writeString(file1, String.join(STRING_NEWLINE, "A", "B"));
+    @DisplayName("paste - | grep hello")
+    public void evaluate_PasteThenGrep_CommandExecuted() {
+        provideInput(String.join(STRING_NEWLINE, "A", "B", "C", "D"));
 
-            CallCommand command1 = new CallCommand(List.of(CAT), appRunner);
-            CallCommand command2 = new CallCommand(List.of("paste", FILE_1, "-"), appRunner);
+        assertDoesNotThrow(() -> {
+            Files.writeString(file1, String.join(STRING_NEWLINE, "1", "2", "3", "4"));
+
+            CallCommand command1 = new CallCommand(List.of("paste", "-", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of(GREP, "A"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            assertEquals("A" + CHAR_TAB + INPUT_STRING + STRING_NEWLINE
-                    + "B" + STRING_NEWLINE, stdout.toString());
+            assertEquals("A" + CHAR_TAB + "1" + STRING_NEWLINE, stdout.toString());
         });
     }
 }

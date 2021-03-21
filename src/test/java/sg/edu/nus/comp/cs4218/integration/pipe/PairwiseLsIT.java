@@ -1,4 +1,4 @@
-package integration.pipe;
+package sg.edu.nus.comp.cs4218.integration.pipe;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +27,7 @@ import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 
-public class PairwiseWcIT {
+public class PairwiseLsIT {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "PipePairwiseIT";
 
@@ -60,8 +59,6 @@ public class PairwiseWcIT {
     @BeforeEach
     void setUp() throws IOException {
         Files.createFile(file1);
-        Files.writeString(file1, "hello world");
-
         Files.createFile(file2);
     }
 
@@ -72,83 +69,71 @@ public class PairwiseWcIT {
     }
 
     @Test
-    @DisplayName("wc file1.txt | wc")
-    public void evaluate_WcThenWc_CommandExecuted() {
+    @DisplayName("ls | wc -l")
+    public void evaluate_LsThenWc_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
-            CallCommand command2 = new CallCommand(List.of("wc"), appRunner);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("wc", "-l"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            // Note: this is different from the output from Unix shell
-            // `wc file1.txt` output "1\t2\t11 file1.txt\n"
-            // 1 line, 4 words, 17 bytes
-            assertEquals("1" + CHAR_TAB + "4" + CHAR_TAB + "17" + STRING_NEWLINE, stdout.toString());
+            // output 2 as only 2 files are present in the directory
+            assertEquals("2" + STRING_NEWLINE, stdout.toString());
         });
     }
 
     @Test
-    @DisplayName("wc file1.txt | cat - file1.txt")
-    public void evaluate_WcThenCat_CommandExecuted() {
+    @DisplayName("ls | cat -n")
+    public void evaluate_LsThenCat_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
-            CallCommand command2 = new CallCommand(List.of("cat", "-", FILE_1), appRunner);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("cat", "-n"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            // 1 line, 2 words, 11 bytes
-            assertEquals("1" + CHAR_TAB + "2" + CHAR_TAB + "11" + CHAR_TAB + FILE_1 + STRING_NEWLINE
-                    + "hello world" + STRING_NEWLINE, stdout.toString());
+            assertEquals("1 " + FILE_1 + STRING_NEWLINE + "2 " + FILE_2 + STRING_NEWLINE, stdout.toString());
         });
     }
 
     @Test
-    @DisplayName("wc file1.txt | grep 1")
-    public void evaluate_WcThenGrep_CommandExecuted() {
+    @DisplayName("ls | grep file")
+    public void evaluate_LsThenGrep_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
-            CallCommand command2 = new CallCommand(List.of("grep", "1"), appRunner);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("grep", "file"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            assertEquals("1" + CHAR_TAB + "2" + CHAR_TAB + "11" + CHAR_TAB + FILE_1 + STRING_NEWLINE, stdout.toString());
+            assertEquals(FILE_1 + STRING_NEWLINE + FILE_2 + STRING_NEWLINE, stdout.toString());
         });
     }
 
     @Test
-    @DisplayName("wc file1.txt | tee")
-    public void evaluate_WcThenTee_CommandExecuted() {
+    @DisplayName("ls | tee")
+    public void evaluate_LsThenTee_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
-            CallCommand command2 = new CallCommand(List.of("tee", FILE_2), appRunner);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("tee"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            // tee writes to file2
-            String expected = "1" + CHAR_TAB + "2" + CHAR_TAB + "11" + CHAR_TAB + FILE_1;
-            List<String> output = Files.readAllLines(file2);
-            assertEquals(1, output.size());
-            assertEquals(expected, output.get(0));
-
-            // tee writes to stdout as well as well
-            assertEquals(expected + STRING_NEWLINE, stdout.toString());
+            assertEquals(FILE_1 + STRING_NEWLINE + FILE_2 + STRING_NEWLINE, stdout.toString());
         });
     }
 
     @Test
-    @DisplayName("wc file1.txt file2.txt | split -l 1")
-    public void evaluate_WcThenSplit_CommandExecuted() {
+    @DisplayName("ls | split -l 1")
+    public void evaluate_LsThenSplit_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            Files.writeString(file2, "CS4218");
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1, FILE_2), appRunner);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
             CallCommand command2 = new CallCommand(List.of("split", "-l", "1"), appRunner);
 
             buildCommand(List.of(command1, command2));
@@ -158,61 +143,48 @@ public class PairwiseWcIT {
             // Split into file "xaa" and "xab"
             Path outputFile1 = Path.of(TEST_DIR, "xaa");
             Path outputFile2 = Path.of(TEST_DIR, "xab");
-            Path outputFile3 = Path.of(TEST_DIR, "xac");
 
             List<String> output1 = Files.readAllLines(outputFile1);
             assertEquals(1, output1.size());
-            assertEquals("1" + CHAR_TAB + "2" + CHAR_TAB + "11" + CHAR_TAB + FILE_1, output1.get(0));
+            assertEquals(FILE_1, output1.get(0));
 
             List<String> output2 = Files.readAllLines(outputFile2);
             assertEquals(1, output2.size());
-            assertEquals("1" + CHAR_TAB + "1" + CHAR_TAB + "6" + CHAR_TAB + FILE_2, output2.get(0));
-
-            List<String> output3 = Files.readAllLines(outputFile3);
-            assertEquals(1, output3.size());
-            assertEquals("2" + CHAR_TAB + "3" + CHAR_TAB + "17" + CHAR_TAB + "total", output3.get(0));
+            assertEquals(FILE_2, output2.get(0));
 
             Files.delete(outputFile1);
             Files.delete(outputFile2);
-            Files.delete(outputFile3);
         });
     }
 
     @Test
-    @DisplayName("wc file1.txt file2.txt | uniq -d")
-    public void evaluate_WcThenUniq_CommandExecuted() {
+    @DisplayName("ls | uniq -D")
+    public void evaluate_LsThenUniq_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            Files.writeString(file2, "hello world");
-
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1, FILE_2), appRunner);
-            CallCommand command2 = new CallCommand(List.of("uniq", "-d"), appRunner);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("uniq", "-D"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            // Wc stats are unique, hence no duplicate
+            // Expect empty string as all file names are unique
             assertEquals("", stdout.toString());
         });
     }
 
-    // TODO: Enable the test when it is fixed
     @Test
-    @Disabled
-    @DisplayName("wc file1.txt file2.txt | paste")
+    @DisplayName("ls | paste -s")
     public void evaluate_LsThenPaste_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            Files.writeString(file2, "CS4218" + STRING_NEWLINE + "Project");
-
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
-            CallCommand command2 = new CallCommand(List.of("paste", "-", FILE_2), appRunner);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("paste", "-s"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
-            assertEquals("1" + CHAR_TAB + "2" + CHAR_TAB + "11" + CHAR_TAB + FILE_1 + CHAR_TAB + "CS4218" + STRING_NEWLINE
-                    + CHAR_TAB + "Project" + STRING_NEWLINE, stdout.toString());
+            assertEquals(FILE_1 + CHAR_TAB + FILE_2 + STRING_NEWLINE, stdout.toString());
         });
     }
 }

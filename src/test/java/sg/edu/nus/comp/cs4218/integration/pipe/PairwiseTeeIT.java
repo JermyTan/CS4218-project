@@ -1,4 +1,4 @@
-package integration.pipe;
+package sg.edu.nus.comp.cs4218.integration.pipe;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;

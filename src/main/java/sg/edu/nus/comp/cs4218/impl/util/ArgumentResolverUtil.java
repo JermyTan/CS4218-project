@@ -55,30 +55,14 @@ public final class ArgumentResolverUtil {
         ArrayList<RegexArgument> parsedArgsSegment = new ArrayList<>();
         RegexArgument parsedArg = new RegexArgument();
         StringBuilder subCommand = new StringBuilder();
-/*
+
         for (char chr : arg.toCharArray()) {
-            switch (chr) {
-            case CHAR_BACK_QUOTE:
-                if (unmatchedQuotes.isEmpty() || unmatchedQuotes.peek() == CHAR_DOUBLE_QUOTE) {
-                    // start of command substitution
-
-                }
-            case CHAR_SINGLE_QUOTE:
-            case CHAR_DOUBLE_QUOTE:
-            case CHAR_ASTERISK:
-            default:
-            }
-        }
-*/
-        for (int i = 0; i < arg.length(); i++) {
-            char chr = arg.charAt(i);
-
             if (chr == CHAR_BACK_QUOTE) {
                 if (unmatchedQuotes.isEmpty() || unmatchedQuotes.peek() == CHAR_DOUBLE_QUOTE) {
                     // start of command substitution
                     if (!parsedArg.isEmpty()) {
                         appendParsedArgIntoSegment(parsedArgsSegment, parsedArg);
-                        parsedArg = new RegexArgument();
+                        parsedArg = makeRegexArgument();
                     }
 
                     unmatchedQuotes.add(chr);
@@ -95,7 +79,7 @@ public final class ArgumentResolverUtil {
                     if (unmatchedQuotes.isEmpty()) {
                         List<RegexArgument> subOutputSegment = Stream
                                 .of(StringUtils.tokenize(subCommandOutput))
-                                .map(str -> new RegexArgument(str))
+                                .map(str -> makeRegexArgument(str))
                                 .collect(Collectors.toList());
 
                         // append the first token to the previous parsedArg
@@ -105,10 +89,12 @@ public final class ArgumentResolverUtil {
                             RegexArgument firstOutputArg = subOutputSegment.remove(0);
                             appendParsedArgIntoSegment(parsedArgsSegment, firstOutputArg);
                         }
+                        // add remaining tokens to parsedArgsSegment
+                        parsedArgsSegment.addAll(new ArrayList<>(subOutputSegment));
 
                     } else {
                         // don't tokenize subCommand output
-                        appendParsedArgIntoSegment(parsedArgsSegment, new RegexArgument(subCommandOutput));
+                        appendParsedArgIntoSegment(parsedArgsSegment, makeRegexArgument(subCommandOutput));
                     }
                 } else {
                     // ongoing single quote
@@ -123,7 +109,7 @@ public final class ArgumentResolverUtil {
                     unmatchedQuotes.pop();
 
                     // make sure parsedArgsSegment is not empty
-                    appendParsedArgIntoSegment(parsedArgsSegment, new RegexArgument());
+                    appendParsedArgIntoSegment(parsedArgsSegment, makeRegexArgument());
                 } else if (unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
                     // ongoing back quote: add chr to subCommand
                     subCommand.append(chr);
@@ -166,6 +152,14 @@ public final class ArgumentResolverUtil {
                 .collect(Collectors.toList());
     }
 
+    private static RegexArgument makeRegexArgument() {
+        return new RegexArgument();
+    }
+
+    private static RegexArgument makeRegexArgument(String str) {
+        return new RegexArgument(str);
+    }
+
     private static String evaluateSubCommand(String commandString) throws AbstractApplicationException, ShellException {
         if (StringUtils.isBlank(commandString)) {
             return STRING_EMPTY;
@@ -176,7 +170,11 @@ public final class ArgumentResolverUtil {
         command.evaluate(System.in, outputStream);
 
         // replace newlines with spaces
-        return outputStream.toString().replace(STRING_NEWLINE, String.valueOf(CHAR_SPACE));
+        String result = outputStream.toString();
+        if (result.endsWith(STRING_NEWLINE)) {
+            result = result.substring(0, result.length() - STRING_NEWLINE.length());
+        }
+        return result.replace(STRING_NEWLINE, String.valueOf(CHAR_SPACE));
     }
 
     /**

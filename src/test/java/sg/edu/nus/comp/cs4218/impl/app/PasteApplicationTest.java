@@ -1,9 +1,11 @@
-package ef2;
+package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayInputStream;
@@ -17,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.impl.app.PasteApplication;
 
 class PasteApplicationTest {
 
@@ -32,7 +33,7 @@ class PasteApplicationTest {
     private static final String FOLDER_1 = "folder1"; // exists
 
     private static final String STD_INPUT = "Hello world" + STRING_NEWLINE + "CS4218" + STRING_NEWLINE;
-    private static final String STD_INPUT_2 = "1" + STRING_NEWLINE + "2" + STRING_NEWLINE + "3" + STRING_NEWLINE + "4"+ STRING_NEWLINE;
+    private static final String STD_INPUT_2 = "1" + STRING_NEWLINE + "2" + STRING_NEWLINE + "3" + STRING_NEWLINE + "4" + STRING_NEWLINE;
 
     private final OutputStream stdout = new ByteArrayOutputStream();
     private PasteApplication app;

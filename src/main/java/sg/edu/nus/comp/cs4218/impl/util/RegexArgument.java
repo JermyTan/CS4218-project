@@ -16,8 +16,8 @@ import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 
 @SuppressWarnings("PMD.AvoidStringBufferField")
 public final class RegexArgument {
-    private StringBuilder plaintext;
-    private StringBuilder regex;
+    private final StringBuilder plaintext;
+    private final StringBuilder regex;
     private boolean isRegex;
 
     public RegexArgument() {
@@ -51,12 +51,6 @@ public final class RegexArgument {
     public void merge(String str) {
         plaintext.append(str);
         regex.append(Pattern.quote(str));
-    }
-
-    public void clear() {
-        plaintext = new StringBuilder();
-        regex = new StringBuilder();
-        isRegex = false;
     }
 
     public List<String> globFiles() {

@@ -1,4 +1,4 @@
-package integration;
+package sg.edu.nus.comp.cs4218.integration;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
