@@ -61,6 +61,7 @@ public final class ErrorConstants {
 
     // `mv` related
     public static final String ERR_CANNOT_RENAME = "Failed to rename";
+    public static final String ERR_ARE_IDENTICAL = "%s and %s are identical";
 
     // General constants
     public static final String ERR_INVALID_APP = "Invalid app";

@@ -1,33 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import sg.edu.nus.comp.cs4218.app.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.parser.*;
+import sg.edu.nus.comp.cs4218.impl.util.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import sg.edu.nus.comp.cs4218.app.MvInterface;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.exception.MvException;
-import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
-import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import static java.nio.file.StandardCopyOption.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 
 @SuppressWarnings("PMD.GodClass")
 public class MvApplication implements MvInterface {
@@ -159,6 +143,14 @@ public class MvApplication implements MvInterface {
 
         for (String fileName : fileNames) {
             String destFile = destFolder + STRING_FILE_SEP + new File(fileName).getName();
+
+            // Cannot move a file to its current directory
+            Path srcFilePath = IOUtils.resolveAbsoluteFilePath(fileName);
+            Path destFilePath = IOUtils.resolveAbsoluteFilePath(destFile);
+            if (srcFilePath.equals(destFilePath)) {
+                throw new Exception(String.format(ERR_ARE_IDENTICAL, fileName, destFile));
+            }
+
             mvSrcFileToDestFile(isOverwrite, fileName, destFile);
         }
 

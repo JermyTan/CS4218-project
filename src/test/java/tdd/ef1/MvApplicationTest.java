@@ -281,13 +281,14 @@ class MvApplicationTest {
         assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
     }
 
-    // TODO: To enable once implemented
-    @Disabled
     @Test
     public void run_WithoutFlagsSameSrcToCurrFolder_ThrowException() {
-        String[] argList = new String[]{"file1.txt", "."};
+        String srcFile = "file1.txt";
+        String destFolder = ".";
+        String destFile = String.join(STRING_FILE_SEP, destFolder, srcFile);
+        String[] argList = new String[]{srcFile, destFolder};
         Throwable sameFile = assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
-        assertEquals(new MvException("Files are identical").getMessage(), sameFile.getMessage());
+        assertEquals(new MvException(String.format("%s and %s are identical", srcFile, destFile)).getMessage(), sameFile.getMessage());
     }
 
     @Test
