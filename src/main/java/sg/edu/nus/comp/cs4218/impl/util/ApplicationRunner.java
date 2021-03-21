@@ -1,10 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.app.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
@@ -21,6 +21,10 @@ import sg.edu.nus.comp.cs4218.impl.app.SplitApplication;
 import sg.edu.nus.comp.cs4218.impl.app.TeeApplication;
 import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
+import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
+
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 
 
 public class ApplicationRunner {
@@ -86,6 +90,9 @@ public class ApplicationRunner {
             break;
         case APP_TEE:
             application = new TeeApplication();
+            break;
+        case APP_RM:
+            application = new RmApplication();
             break;
         case APP_PASTE:
             application = new PasteApplication();

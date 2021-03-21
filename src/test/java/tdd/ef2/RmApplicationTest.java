@@ -23,7 +23,6 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.RmException;
 import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
 
-@Disabled
 public class RmApplicationTest {
     public static final String TEMP = "temp";
     public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
