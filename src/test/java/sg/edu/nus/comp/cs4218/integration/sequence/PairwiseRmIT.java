@@ -10,10 +10,8 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
@@ -31,7 +29,7 @@ public class PairwiseRmIT {
 
     private final List<Path> paths = List.of(file1, file2, folder1);
 
-    private InputStream stdin = System.in;
+    private final InputStream stdin = System.in;
     private final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     private OutputStream stderr;
     private final ApplicationRunner appRunner = new ApplicationRunner();

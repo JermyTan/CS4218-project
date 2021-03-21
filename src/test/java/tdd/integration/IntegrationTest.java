@@ -41,14 +41,13 @@ public class IntegrationTest {
 
     // Command Substitution
 
-    @Disabled
     @Test
     void testCommandSubstitution_EchoLs_DisplaysLsResult() throws IOException, AbstractApplicationException, ShellException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         createFile("Hello");
         String commandString = "echo `ls " + TEMP + "`";
         new ShellImpl().parseAndEvaluate(commandString, output);
-        assertArrayEquals(("temp: Hello" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals("Hello" + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -59,7 +58,6 @@ public class IntegrationTest {
         assertArrayEquals(("hello" + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
-    @Disabled
     @Test
     void testCommandSubstitution_WcEcho_DisplaysLinesWordsBytesFilename() throws IOException, AbstractApplicationException, ShellException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -67,7 +65,7 @@ public class IntegrationTest {
         Path filePath = createFile(fileName);
         String commandString = "wc `echo " + TEMP + STRING_FILE_SEP + fileName + "`";
         new ShellImpl().parseAndEvaluate(commandString, output);
-        assertArrayEquals(("       0       0       0 " + TEMP + STRING_FILE_SEP + fileName + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertEquals(String.join(String.valueOf(CHAR_TAB), "0", "0", "0") + CHAR_TAB + TEMP + STRING_FILE_SEP + fileName + STRING_NEWLINE, output.toString());
     }
 
     @Test

@@ -11,7 +11,7 @@ import java.nio.file.*;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
@@ -25,6 +25,9 @@ public class SequenceCommandIT {
 
     private final Path file1 = Path.of(TEST_DIR, FILE_1);
     private final Path file2 = Path.of(TEST_DIR, FILE_2);
+
+    private static final String INPUT_STRING = "hello world";
+    private static final String GREP_PATTERN = "hello";
 
     private final InputStream stdin = System.in;
     private final OutputStream stdout = new ByteArrayOutputStream();
@@ -60,10 +63,10 @@ public class SequenceCommandIT {
     @Test
     public void evaluate_TwoCommandsSameType_CommandsExecuted() {
         assertDoesNotThrow(() -> {
-            Files.writeString(file1, "hello world");
+            Files.writeString(file1, INPUT_STRING);
 
             CallCommand command1 = new CallCommand(List.of("mv", FILE_1, FILE_2), appRunner);
-            CallCommand command2 = new CallCommand(List.of("grep", "hello", FILE_2), appRunner);
+            CallCommand command2 = new CallCommand(List.of("grep", GREP_PATTERN, FILE_2), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -72,19 +75,19 @@ public class SequenceCommandIT {
             // Grep output is stored in file2.txt
             List<String> output = Files.readAllLines(file2);
             assertEquals(1, output.size());
-            assertEquals("hello world", output.get(0));
+            assertEquals(INPUT_STRING, output.get(0));
         });
     }
 
     @Test
     public void evaluate_TwoCommandsDifferentTypes_CommandsExecuted() {
         assertDoesNotThrow(() -> {
-            String expected = "hello world";
+            String expected = INPUT_STRING;
 
             PipeCommand command1 = new PipeCommand(List.of(
                     new CallCommand(List.of("echo", expected), appRunner),
                     new CallCommand(List.of("tee", FILE_1), appRunner)));
-            CallCommand command2 = new CallCommand(List.of("grep", "hello", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("grep", GREP_PATTERN, FILE_1), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -100,15 +103,15 @@ public class SequenceCommandIT {
     @Test
     public void evaluate_ExceptionThrownInFirstCommand_ExecutionContinues() {
         assertDoesNotThrow(() -> {
-            Files.writeString(file1, "hello world");
+            Files.writeString(file1, INPUT_STRING);
             CallCommand command1 = new CallCommand(List.of("rm"), appRunner); // No files specified
-            CallCommand command2 = new CallCommand(List.of("echo", "hello"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("echo", INPUT_STRING), appRunner);
             buildCommand(List.of(command1, command2));
 
             command.evaluate(stdin, stdout);
 
             assertEquals(new RmException(ERR_NO_FILE_ARGS).getMessage() + STRING_NEWLINE
-                    + "hello" + STRING_NEWLINE, stdout.toString());
+                    + INPUT_STRING + STRING_NEWLINE, stdout.toString());
         });
 
     }

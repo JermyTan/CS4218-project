@@ -11,7 +11,7 @@ import java.nio.file.*;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
@@ -29,7 +29,7 @@ public class PairwiseCdIT {
 
     private final List<Path> paths = List.of(file1, file2, folder1);
 
-    private InputStream stdin = System.in;
+    private final InputStream stdin = System.in;
     private final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     private final ApplicationRunner appRunner = new ApplicationRunner();
     private SequenceCommand command;
@@ -133,7 +133,7 @@ public class PairwiseCdIT {
     public void evaluate_CdNonExistingDirThenCp_CommandsExecuted() {
         assertDoesNotThrow(() -> {
             CallCommand command1 = new CallCommand(List.of("cd", "folder2"), appRunner);
-            CallCommand command2 = new CallCommand(List.of("mv", "../file1.txt", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("mv", "./../file1.txt", FILE_1), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -149,7 +149,7 @@ public class PairwiseCdIT {
             // Both errors written to output
             assertEquals(String.join(STRING_NEWLINE,
                     new CdException(String.format("%s: %s", "folder2", ERR_FILE_NOT_FOUND)).getMessage(),
-                    new MvException(String.format("%s: %s", "../file1.txt", ERR_FILE_NOT_FOUND)).getMessage()
+                    new MvException(String.format("%s: %s", "./../file1.txt", ERR_FILE_NOT_FOUND)).getMessage()
             ) + STRING_NEWLINE, stdout.toString());
         });
     }
