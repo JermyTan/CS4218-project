@@ -9,6 +9,9 @@ import java.io.*;
 import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
+<<<<<<< HEAD
+import sg.edu.nus.comp.cs4218.impl.app.*;
+=======
 import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
 import sg.edu.nus.comp.cs4218.impl.app.CdApplication;
 import sg.edu.nus.comp.cs4218.impl.app.EchoApplication;
@@ -25,6 +28,7 @@ import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
+>>>>>>> 1329815fe37a5c941542a81fb320583731f3f976
 
 
 public class ApplicationRunner {
@@ -91,11 +95,14 @@ public class ApplicationRunner {
         case APP_TEE:
             application = new TeeApplication();
             break;
-        case APP_RM:
-            application = new RmApplication();
+        case APP_CP:
+            application = new CpApplication();
             break;
         case APP_PASTE:
             application = new PasteApplication();
+            break;
+        case APP_RM:
+            application = new RmApplication();
             break;
         case APP_UNIQ:
             application = new UniqApplication();

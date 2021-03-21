@@ -24,7 +24,6 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CpException;
 import sg.edu.nus.comp.cs4218.impl.app.CpApplication;
 
-@Disabled
 public class CpApplicationTest {
     public static final String TEMP = "temp-cp";
     public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);

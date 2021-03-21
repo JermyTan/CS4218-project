@@ -34,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.impl.app.CpApplication;
 
-@Disabled
 public class CpApplicationTest {
 
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
@@ -134,7 +133,7 @@ public class CpApplicationTest {
         // cp -R folder1 folder2 (Note that folder2 does not exist)
         assertDoesNotThrow(() -> app.run(new String[]{"-R", FOLDER_1, FOLDER_2}, stdin, stdout));
 
-        assertDoesNotThrow(() -> verify(app).cpSrcFileToDestFile(true, FOLDER_1, FOLDER_2));
+        assertDoesNotThrow(() -> verify(app).cpFilesToFolder(true, FOLDER_2, FOLDER_1));
         verifyNoInteractions(stdin);
         verifyNoInteractions(stdout);
 
@@ -184,7 +183,7 @@ public class CpApplicationTest {
     // Assume we do not allow this
     @Test
     public void run_IdenticalFile_ThrowsException() {
-        assertThrows(Exception.class, () -> app.run(new String[]{FILE_1, FILE_2}, stdin, stdout));
+        assertThrows(Exception.class, () -> app.run(new String[]{FILE_1, FILE_1}, stdin, stdout));
     }
 
     // Assume we do not allow this
