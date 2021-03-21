@@ -3,9 +3,7 @@ package ef2;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayInputStream;
@@ -34,6 +32,7 @@ class PasteApplicationTest {
     private static final String FOLDER_1 = "folder1"; // exists
 
     private static final String STD_INPUT = "Hello world" + STRING_NEWLINE + "CS4218" + STRING_NEWLINE;
+    private static final String STD_INPUT_2 = "1" + STRING_NEWLINE + "2" + STRING_NEWLINE + "3" + STRING_NEWLINE + "4"+ STRING_NEWLINE;
 
     private final OutputStream stdout = new ByteArrayOutputStream();
     private PasteApplication app;
@@ -144,6 +143,18 @@ class PasteApplicationTest {
     }
 
     @Test
+    public void run_BothFileAndTwoStdinFlagsPresent_ReturnsMergedContent() {
+        String stdinInput = STD_INPUT_2;
+        provideInput(stdinInput);
+
+        assertDoesNotThrow(() -> app.run(new String[]{STRING_STDIN_FLAG, FILE_1, STRING_STDIN_FLAG}, stdin, stdout));
+
+        String expected = "1\tA\t2" + STRING_NEWLINE + "3\tB\t4" + STRING_NEWLINE
+                + "\tC" + STRING_NEWLINE + "\tD" + STRING_NEWLINE;
+        assertEquals(expected, stdout.toString());
+    }
+
+    @Test
     public void run_SerialFlagOneFile_SerialOutput() {
         assertDoesNotThrow(() -> app.run(new String[]{"-s", FILE_1}, stdin, stdout));
 
@@ -243,11 +254,12 @@ class PasteApplicationTest {
 
     @Test
     public void mergeFileAndStdin_ReadFromBothFileAndStdin_ReturnsMergedContent() {
-        String stdinInput = STD_INPUT;
-        provideInput(stdinInput);
+        provideInput(STD_INPUT);
 
-        String expected = "Hello world\tA" + STRING_NEWLINE + "CS4218\tB" + STRING_NEWLINE
-                + "C" + STRING_NEWLINE + "D";
+        String expected = "Hello world\tA" + STRING_NEWLINE
+                + "CS4218\tB" + STRING_NEWLINE
+                + "\tC" + STRING_NEWLINE
+                + "\tD";
 
         assertDoesNotThrow(() -> {
             String output = app.mergeFileAndStdin(false, stdin, FILE_1);
