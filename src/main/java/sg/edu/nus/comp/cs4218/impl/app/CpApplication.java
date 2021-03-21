@@ -1,22 +1,31 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.*;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.app.CpInterface;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.CpException;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.parser.CpArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 
 public class CpApplication implements CpInterface {
 
@@ -104,7 +113,7 @@ public class CpApplication implements CpInterface {
                 throw new InvalidArgsException(ERR_INVALID_FILES);
             }
 
-            for (String fileName: fileNames) {
+            for (String fileName : fileNames) {
                 if (fileName == null || fileName.length() == 0) {
                     throw new InvalidDirectoryException(fileName, ERR_INVALID_ARGS);
                 }
@@ -137,7 +146,7 @@ public class CpApplication implements CpInterface {
                                 @Override
                                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                                         throws IOException {
-                                    Files.copy(file, destFilePath.resolve(srcFilePath.relativize(file)),  StandardCopyOption.REPLACE_EXISTING);
+                                    Files.copy(file, destFilePath.resolve(srcFilePath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
                                     return FileVisitResult.CONTINUE;
                                 }
                             });

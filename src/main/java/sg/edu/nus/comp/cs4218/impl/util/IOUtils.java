@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.util;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CLOSING_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CREATE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 public final class IOUtils {
@@ -35,7 +37,13 @@ public final class IOUtils {
      */
     public static InputStream openInputStream(String fileName) throws ShellException {
         try {
-            return Files.newInputStream(resolveAbsoluteFilePath(fileName));
+            Path path = resolveAbsoluteFilePath(fileName);
+
+            if (Files.notExists(path)) {
+                throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
+            }
+
+            return Files.newInputStream(path);
         } catch (SecurityException e) {
             throw new ShellException(ERR_NO_PERM, e);
         } catch (IOException e) {

@@ -3,14 +3,6 @@ package sg.edu.nus.comp.cs4218.impl.util;
 import java.io.File;
 
 public final class StringUtils {
-    public static final String STRING_LABEL_VALUE_PAIR = "%s: %s";
-    public static final String STRING_EMPTY = "";
-    public static final String STRING_NEWLINE = System.lineSeparator();
-    public static final String STRING_CURR_DIR = ".";
-    public static final String STRING_PARENT_DIR = "..";
-    public static final String STRING_WHITESPACE = " ";
-    public static final String STRING_STDIN_FLAG = "-";
-    public static final String STRING_FILE_SEP = File.separator;
     public static final char CHAR_FILE_SEP = File.separatorChar;
     public static final char CHAR_TAB = '\t';
     public static final char CHAR_SPACE = ' ';
@@ -23,6 +15,17 @@ public final class StringUtils {
     public static final char CHAR_SEMICOLON = ';';
     public static final char CHAR_ASTERISK = '*';
     public static final char CHAR_FLAG_PREFIX = '-';
+    public static final String STRING_LABEL_VALUE_PAIR = "%s: %s";
+    public static final String STRING_EMPTY = "";
+    public static final String STRING_NEWLINE = System.lineSeparator();
+    public static final String STRING_CURR_DIR = ".";
+    public static final String STRING_PARENT_DIR = "..";
+    public static final String STRING_WHITESPACE = " ";
+    public static final String STRING_STDIN_FLAG = "-";
+    public static final String STRING_FILE_SEP = File.separator;
+    public static final String STRING_REDIR_INPUT = String.valueOf(CHAR_REDIR_INPUT);
+    public static final String STRING_REDIR_OUTPUT = String.valueOf(CHAR_REDIR_OUTPUT);
+
 
     private StringUtils() {
     }

@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.testutil;
 
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public final class TestConstants {
@@ -53,5 +54,5 @@ public final class TestConstants {
 
     public static final Exception EXCEPTION = new Exception(STRING_SINGLE_WORD);
 
-    public static final String RESOURCES_PATH = "src/test/resources";
+    public static final String RESOURCES_PATH = Path.of("src", "test", "resources").toString();
 }

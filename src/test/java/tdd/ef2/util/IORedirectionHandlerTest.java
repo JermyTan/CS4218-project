@@ -1,23 +1,23 @@
 package tdd.ef2.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
@@ -25,42 +25,52 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 
-@Disabled
 public class IORedirectionHandlerTest {
-    public static final Path CURR_PATH = Path.of(EnvironmentUtil.currentDirectory);
-    public static Deque<Path> files = new ArrayDeque<>();
-    public static IORedirectionHandler handler;
+    private static final Path TEST_PATH = Path.of(EnvironmentUtil.currentDirectory, RESOURCES_PATH, "IORedirectionHandlerTest");
+    private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
+    private static final String TEST_DIR = TEST_PATH.toString();
+    private IORedirectionHandler handler;
+
+    @BeforeAll
+    static void setupAll() throws Exception {
+        if (Files.notExists(TEST_PATH)) {
+            Files.createDirectory(TEST_PATH);
+        }
+
+        EnvironmentUtil.currentDirectory = TEST_DIR;
+    }
 
     @AfterAll
-    static void clear() throws IOException {
-        handler = null;
+    static void tearDownAll() {
+        EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        Files.list(TEST_PATH).forEach(path -> {
+            try {
+                Files.deleteIfExists(path);
+            } catch (Exception e) {
+                // do nth
+            }
+        });
     }
 
     private Path createFile(String name) throws IOException {
-        Path path = CURR_PATH.resolve(name);
+        Path path = TEST_PATH.resolve(name);
         Files.createFile(path);
-        files.push(path);
         return path;
+    }
+
+    @Test
+    void constructor_NullArgsList_ThrowsException() throws Exception {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        assertThrows(ShellException.class, () -> new IORedirectionHandler(null, System.in, output));
     }
 
     //extractRedirOptions cases
     @Test
-    void extractRedirOptions_NullArgsList_ThrowsException() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        handler = new IORedirectionHandler(null, System.in, output);
-        assertThrows(ShellException.class, () -> handler.extractRedirOptions());
-    }
-
-    @Test
-    void extractRedirOptions_EmptyArgsList_ThrowsException() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        List<String> argsList = new ArrayList<>();
-        handler = new IORedirectionHandler(argsList, System.in, output);
-        assertThrows(ShellException.class, () -> handler.extractRedirOptions());
-    }
-
-    @Test
-    void extractRedirOptions_ConsecutiveRedirOperators_ThrowsException() {
+    void extractRedirOptions_ConsecutiveRedirOperators_ThrowsException() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("<");
@@ -70,13 +80,30 @@ public class IORedirectionHandlerTest {
     }
 
     @Test
-    void extractRedirOptions_ConsecutiveFileArgs_ThrowsException() {
+    void extractRedirOptions_ConsecutiveFileArgs_ThrowsException() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("<");
         argsList.add("fileA.txt fileB.txt");
         handler = new IORedirectionHandler(argsList, System.in, output);
         assertThrows(ShellException.class, () -> handler.extractRedirOptions());
+    }
+
+    @Test
+    void extractRedirOptions_OneRedirOperatorMultipleArgs_ThrowsException() throws Exception {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        List<String> argsList = new ArrayList<>();
+        argsList.add(">");
+        argsList.add("fileA.txt");
+        argsList.add("fileB.txt");
+        argsList.add("fileC.txt");
+        List<String> expectedList = new ArrayList<>();
+        expectedList.add("fileB.txt");
+        expectedList.add("fileC.txt");
+        handler = new IORedirectionHandler(argsList, System.in, output);
+        Throwable exception = assertThrows(ShellException.class, () -> handler.extractRedirOptions());
+        assertEquals(new ShellException(ERR_SYNTAX).getMessage(), exception.getMessage());
+        handler.getOutputStream().close();
     }
 
     //getNoRedirArgsList cases
@@ -113,32 +140,10 @@ public class IORedirectionHandlerTest {
         handler.extractRedirOptions();
         assertTrue(handler.getNoRedirArgsList().containsAll(expectedList));
         handler.getOutputStream().close();
-        Path path = CURR_PATH.resolve("fileC.txt");
-        Files.delete(path);
     }
 
     @Test
-    void getNoRedirArgsList_OneRedirOperatorMultipleArgs_returnsNoRedirArgsList() throws AbstractApplicationException,
-            ShellException, IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        List<String> argsList = new ArrayList<>();
-        argsList.add(">");
-        argsList.add("fileA.txt");
-        argsList.add("fileB.txt");
-        argsList.add("fileC.txt");
-        List<String> expectedList = new ArrayList<>();
-        expectedList.add("fileB.txt");
-        expectedList.add("fileC.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output);
-        handler.extractRedirOptions();
-        assertTrue(handler.getNoRedirArgsList().containsAll(expectedList));
-        handler.getOutputStream().close();
-        Path path = CURR_PATH.resolve("fileA.txt");
-        Files.delete(path);
-    }
-
-    @Test
-    void getNoRedirArgsList_OneRedirOperatorOneArg_returnsEmptyList() throws AbstractApplicationException,
+    void getNoRedirArgsList_OneRedirOperatorOneArg_Success() throws AbstractApplicationException,
             ShellException, IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
@@ -147,14 +152,13 @@ public class IORedirectionHandlerTest {
         handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertTrue(handler.getNoRedirArgsList().isEmpty());
+        assertTrue(Files.exists(Path.of(TEST_DIR, "fileA.txt")));
         handler.getOutputStream().close();
-        Path path = CURR_PATH.resolve("fileA.txt");
-        Files.delete(path);
     }
 
     //getInputStream cases
     @Test
-    void getInputStream_BeforeExtract_ReturnsDefault() {
+    void getInputStream_BeforeExtract_ReturnsDefault() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
@@ -184,8 +188,6 @@ public class IORedirectionHandlerTest {
         handler.extractRedirOptions();
         assertEquals(handler.getInputStream(), System.in);
         handler.getOutputStream().close();
-        Path path = CURR_PATH.resolve("fileB.txt");
-        Files.delete(path);
     }
 
     @Test
@@ -200,9 +202,8 @@ public class IORedirectionHandlerTest {
         File file = new File(filePath.toString());
         handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
-        assertTrue(handler.getInputStream().getClass() == FileInputStream.class);
+        assertNotEquals(handler.getInputStream(), System.in);
         handler.getInputStream().close();
-        Files.delete(filePath);
     }
 
     //getOutputStream cases
@@ -233,12 +234,11 @@ public class IORedirectionHandlerTest {
         argsList.add("fileA.txt");
         argsList.add("<");
         argsList.add("fileB.txt");
-        Path filePath = createFile("fileB.txt");
+        createFile("fileB.txt");
         handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertEquals(handler.getOutputStream(), output);
         handler.getInputStream().close();
-        Files.delete(filePath);
     }
 
     @Test
@@ -251,9 +251,7 @@ public class IORedirectionHandlerTest {
         argsList.add("fileB.txt");
         handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
-        assertTrue(handler.getOutputStream().getClass() == FileOutputStream.class);
+        assertNotEquals(handler.getOutputStream(), output);
         handler.getOutputStream().close();
-        Path path = CURR_PATH.resolve("fileB.txt");
-        Files.delete(path);
     }
 }

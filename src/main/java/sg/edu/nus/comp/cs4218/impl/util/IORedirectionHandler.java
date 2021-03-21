@@ -2,8 +2,8 @@ package sg.edu.nus.comp.cs4218.impl.util;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MULTIPLE_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_INPUT;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_REDIR_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_REDIR_OUTPUT;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,8 +22,11 @@ public class IORedirectionHandler {
     private InputStream inputStream;
     private OutputStream outputStream;
 
-    public IORedirectionHandler(List<String> argsList, InputStream origInputStream,
-                                OutputStream origOutputStream) {
+    public IORedirectionHandler(List<String> argsList, InputStream origInputStream, OutputStream origOutputStream) throws ShellException {
+        if (CollectionUtils.isAnyNull(argsList, origInputStream, origOutputStream) || argsList.isEmpty()) {
+            throw new ShellException(ERR_SYNTAX);
+        }
+
         this.argsList = argsList;
         this.inputStream = origInputStream;
         this.origInputStream = origInputStream;
@@ -32,10 +35,6 @@ public class IORedirectionHandler {
     }
 
     public void extractRedirOptions() throws AbstractApplicationException, ShellException { //NOPMD
-        if (argsList == null || argsList.isEmpty()) {
-            throw new ShellException(ERR_SYNTAX);
-        }
-
         noRedirArgsList = new ArrayList<>();
 
         // extract redirection operators (with their corresponding files) from argsList
@@ -57,6 +56,7 @@ public class IORedirectionHandler {
             // if current arg is < or >, fast-forward to the next arg to extract the specified file
             String file = argsIterator.next();
 
+            // consecutive redir operator
             if (isRedirOperator(file)) {
                 throw new ShellException(ERR_SYNTAX);
             }
@@ -70,13 +70,13 @@ public class IORedirectionHandler {
             file = fileSegment.get(0);
 
             // replace existing inputStream / outputStream
-            if (arg.equals(String.valueOf(CHAR_REDIR_INPUT))) {
+            if (arg.equals(STRING_REDIR_INPUT)) {
                 IOUtils.closeInputStream(inputStream);
                 if (!inputStream.equals(origInputStream)) { // Already have a stream
                     throw new ShellException(ERR_MULTIPLE_STREAMS);
                 }
                 inputStream = IOUtils.openInputStream(file);
-            } else if (arg.equals(String.valueOf(CHAR_REDIR_OUTPUT))) {
+            } else if (arg.equals(STRING_REDIR_OUTPUT)) {
                 IOUtils.closeOutputStream(outputStream);
                 if (!outputStream.equals(origOutputStream)) { // Already have a stream
                     throw new ShellException(ERR_MULTIPLE_STREAMS);
@@ -109,6 +109,6 @@ public class IORedirectionHandler {
     }
 
     private boolean isRedirOperator(String str) {
-        return str.equals(String.valueOf(CHAR_REDIR_INPUT)) || str.equals(String.valueOf(CHAR_REDIR_OUTPUT));
+        return str.equals(STRING_REDIR_INPUT) || str.equals(STRING_REDIR_OUTPUT);
     }
 }
