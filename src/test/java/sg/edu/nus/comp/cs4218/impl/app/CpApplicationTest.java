@@ -96,8 +96,12 @@ public class CpApplicationTest {
         createFileWithContent(file1, FILE_1);
         createFileWithContent(file3, FILE_3);
 
-        Files.createDirectory(folder1);
-        Files.createDirectory(folder3);
+        if (Files.notExists(folder1)) {
+            Files.createDirectory(folder1);
+        }
+        if (Files.notExists(folder3)) {
+            Files.createDirectory(folder3);
+        }
     }
 
     @AfterEach
@@ -213,7 +217,7 @@ public class CpApplicationTest {
     }
 
     @Test
-    public void cpSrcFileToDestFile_DestFolderDirDoesNotExist_ThrowsException() {
+    public void cpSrcFileToDestFile_DestFolderDirDoesNotExist_ThrowsException() throws Exception {
         String srcFile = FILE_1;
         String destFile = Path.of(FOLDER_2, FILE_1).toString();
 
