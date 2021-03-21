@@ -1,35 +1,18 @@
-package sg.edu.nus.comp.cs4218.impl.cmd;
+package integration;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.cmd.*;
+import sg.edu.nus.comp.cs4218.impl.util.*;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.exception.WcException;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 class CallCommandIT {
 
@@ -105,6 +88,18 @@ class CallCommandIT {
     }
 
     @Test
+    public void evaluate_LsCommandCwd_CommandExecuted() {
+        assertDoesNotThrow(() -> {
+            buildCommand(List.of("ls", "-X", "."));
+
+            command.evaluate(stdin, stdout);
+
+            String output = stdout.toString();
+            assertEquals(FILE_1 + STRING_NEWLINE + FILE_2 + STRING_NEWLINE, output);
+        });
+    }
+
+    @Test
     public void evaluate_CatCommandWithGlobbing_CommandExecuted() {
         assertDoesNotThrow(() -> {
             buildCommand(List.of("cat", "*.txt"));
@@ -117,14 +112,19 @@ class CallCommandIT {
     }
 
     @Test
-    public void evaluate_LsCommandCwd_CommandExecuted() {
+    public void evaluate_UniqCommand_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            buildCommand(List.of("ls", "-X", "."));
+            String expected1 = "Hello World";
+            String expected2 = "Alice";
+            Files.writeString(file1, String.join(STRING_NEWLINE, expected1, expected1,
+                    expected2, expected2));
+
+            buildCommand(List.of("uniq", "-c", FILE_1));
 
             command.evaluate(stdin, stdout);
 
             String output = stdout.toString();
-            assertEquals(FILE_1 + STRING_NEWLINE + FILE_2 + STRING_NEWLINE, output);
+            assertEquals("2 " + expected1 + STRING_NEWLINE + "2 " + expected2 + STRING_NEWLINE, output);
         });
     }
 
