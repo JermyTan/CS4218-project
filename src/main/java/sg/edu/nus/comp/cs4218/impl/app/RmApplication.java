@@ -1,16 +1,27 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.app.*;
-import sg.edu.nus.comp.cs4218.exception.*;
-import sg.edu.nus.comp.cs4218.impl.parser.*;
-import sg.edu.nus.comp.cs4218.impl.util.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.stream.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import sg.edu.nus.comp.cs4218.app.RmInterface;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.RmException;
+import sg.edu.nus.comp.cs4218.impl.parser.RmArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public class RmApplication implements RmInterface {
     @Override

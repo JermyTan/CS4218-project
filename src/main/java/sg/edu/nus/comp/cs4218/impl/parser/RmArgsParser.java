@@ -1,6 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import java.util.*;
+import java.util.List;
 
 public class RmArgsParser extends ArgsParser {
     private final static char FLAG_IS_RECURSIVE = 'r';

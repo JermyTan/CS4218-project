@@ -1,19 +1,31 @@
 package integration.pipe;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.*;
-import sg.edu.nus.comp.cs4218.exception.*;
-import sg.edu.nus.comp.cs4218.impl.cmd.*;
-import sg.edu.nus.comp.cs4218.impl.util.*;
-
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
+import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
+import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 
 public class PairwiseLsIT {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
@@ -28,7 +40,6 @@ public class PairwiseLsIT {
     private final InputStream stdin = System.in;
     private final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     private final ApplicationRunner appRunner = new ApplicationRunner();
-    private final ArgumentResolver argumentResolver = new ArgumentResolver();
     private PipeCommand command;
 
     @BeforeAll
@@ -61,8 +72,8 @@ public class PairwiseLsIT {
     @DisplayName("ls | wc -l")
     public void evaluate_LsThenWc_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("ls"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("wc", "-l"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("wc", "-l"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -77,8 +88,8 @@ public class PairwiseLsIT {
     @DisplayName("ls | cat -n")
     public void evaluate_LsThenCat_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("ls"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("cat", "-n"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("cat", "-n"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -92,8 +103,8 @@ public class PairwiseLsIT {
     @DisplayName("ls | grep file")
     public void evaluate_LsThenGrep_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("ls"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("grep", "file"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("grep", "file"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -107,8 +118,8 @@ public class PairwiseLsIT {
     @DisplayName("ls | tee")
     public void evaluate_LsThenTee_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("ls"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("tee"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("tee"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -122,8 +133,8 @@ public class PairwiseLsIT {
     @DisplayName("ls | split -l 1")
     public void evaluate_LsThenSplit_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("ls"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("split", "-l", "1"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("split", "-l", "1"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -150,8 +161,8 @@ public class PairwiseLsIT {
     @DisplayName("ls | uniq -D")
     public void evaluate_LsThenUniq_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("ls"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("uniq", "-D"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("uniq", "-D"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -166,8 +177,8 @@ public class PairwiseLsIT {
     @DisplayName("ls | paste -s")
     public void evaluate_LsThenPaste_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("ls"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("paste", "-s"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("ls"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("paste", "-s"), appRunner);
 
             buildCommand(List.of(command1, command2));
 

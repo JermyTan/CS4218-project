@@ -1,18 +1,31 @@
 package integration.pipe;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.*;
-import sg.edu.nus.comp.cs4218.exception.*;
-import sg.edu.nus.comp.cs4218.impl.cmd.*;
-import sg.edu.nus.comp.cs4218.impl.util.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
+import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
+import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 
 public class PairwiseEchoIT {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
@@ -20,17 +33,13 @@ public class PairwiseEchoIT {
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
-
-    private final Path file1 = Path.of(TEST_DIR, FILE_1);
-    private final Path file2 = Path.of(TEST_DIR, FILE_2);
-
     private static final String ECHO = "echo";
     private static final String INPUT_STRING = "hello world";
-
+    private final Path file1 = Path.of(TEST_DIR, FILE_1);
+    private final Path file2 = Path.of(TEST_DIR, FILE_2);
     private final InputStream stdin = System.in;
     private final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     private final ApplicationRunner appRunner = new ApplicationRunner();
-    private final ArgumentResolver argumentResolver = new ArgumentResolver();
     private PipeCommand command;
 
     @BeforeAll
@@ -63,8 +72,8 @@ public class PairwiseEchoIT {
     @DisplayName("echo hello world | wc")
     public void evaluate_EchoThenWc_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of(ECHO, "hello", "world"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("wc"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of(ECHO, "hello", "world"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("wc"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -78,8 +87,8 @@ public class PairwiseEchoIT {
     @DisplayName("echo file1.txt | cat")
     public void evaluate_EchoThenCat_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of(ECHO, FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("cat"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of(ECHO, FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("cat"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -93,8 +102,8 @@ public class PairwiseEchoIT {
     @DisplayName("echo hello world | grep hello")
     public void evaluate_EchoThenGrep_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of(ECHO, "hello world"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("grep", "hello"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of(ECHO, "hello world"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("grep", "hello"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -108,8 +117,8 @@ public class PairwiseEchoIT {
     @DisplayName("echo \"hello world\" | tee")
     public void evaluate_EchoThenTee_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of(ECHO, "\"hello world\""), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("tee"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of(ECHO, "\"hello world\""), appRunner);
+            CallCommand command2 = new CallCommand(List.of("tee"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -123,8 +132,8 @@ public class PairwiseEchoIT {
     @DisplayName("echo hello world\ncs4218 | split -l 1")
     public void evaluate_EchoThenSplit_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of(ECHO, "hello world\ncs4218"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("split", "-l", "1"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of(ECHO, "hello world\ncs4218"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("split", "-l", "1"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -155,8 +164,8 @@ public class PairwiseEchoIT {
             String expected2 = "Alice";
             CallCommand command1 = new CallCommand(List.of(ECHO,
                     String.join(STRING_NEWLINE, expected1, expected1, expected2, expected2, "Bob", expected2)),
-                    appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("uniq", "-d", "-"), appRunner, argumentResolver);
+                    appRunner);
+            CallCommand command2 = new CallCommand(List.of("uniq", "-d", "-"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -172,8 +181,8 @@ public class PairwiseEchoIT {
         assertDoesNotThrow(() -> {
             Files.writeString(file1, String.join(STRING_NEWLINE, "A", "B"));
 
-            CallCommand command1 = new CallCommand(List.of(ECHO, "hello\nworld"), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("paste", "-s", FILE_1, "-"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of(ECHO, "hello\nworld"), appRunner);
+            CallCommand command2 = new CallCommand(List.of("paste", "-s", FILE_1, "-"), appRunner);
 
             buildCommand(List.of(command1, command2));
 

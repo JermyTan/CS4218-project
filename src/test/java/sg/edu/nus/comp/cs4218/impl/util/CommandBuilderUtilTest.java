@@ -15,60 +15,60 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 
-class CommandBuilderHelperTest {
+class CommandBuilderUtilTest {
     @Test
     void parseCommand_EmptyString_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            CommandBuilderHelper.parseCommand(STRING_EMPTY, new ApplicationRunner());
+            CommandBuilderUtil.parseCommand(STRING_EMPTY, new ApplicationRunner());
         });
     }
 
     @Test
     void parseCommand_BlankString_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            CommandBuilderHelper.parseCommand(STRING_BLANK, new ApplicationRunner());
+            CommandBuilderUtil.parseCommand(STRING_BLANK, new ApplicationRunner());
         });
     }
 
     @Test
     void parseCommand_SequentialPipes_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            CommandBuilderHelper.parseCommand("||||", new ApplicationRunner());
+            CommandBuilderUtil.parseCommand("||||", new ApplicationRunner());
         });
     }
 
     @Test
     void parseCommand_SemicolonBeforeCommand_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            CommandBuilderHelper.parseCommand(";wc", new ApplicationRunner());
+            CommandBuilderUtil.parseCommand(";wc", new ApplicationRunner());
         });
     }
 
     @Test
     void parseCommand_EmptyInputPipe_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            CommandBuilderHelper.parseCommand("|cat", new ApplicationRunner());
+            CommandBuilderUtil.parseCommand("|cat", new ApplicationRunner());
         });
     }
 
     @Test
     void parseCommand_HasNewline_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            CommandBuilderHelper.parseCommand("ls \n", new ApplicationRunner());
+            CommandBuilderUtil.parseCommand("ls \n", new ApplicationRunner());
         });
     }
 
     @Test
     void parseCommand_IncompleteQuote_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            CommandBuilderHelper.parseCommand("echo \"a ", new ApplicationRunner());
+            CommandBuilderUtil.parseCommand("echo \"a ", new ApplicationRunner());
         });
     }
 
     @Test
     void parseCommand_CallCommandString_CallCommand() {
         assertDoesNotThrow(() -> {
-            Command command = CommandBuilderHelper.parseCommand("  echo hello world", new ApplicationRunner());
+            Command command = CommandBuilderUtil.parseCommand("  echo hello world", new ApplicationRunner());
             assertEquals(CallCommand.class, command.getClass());
             assertEquals(List.of("echo", "hello", "world"), ((CallCommand) command).getArgsList());
         });
@@ -77,7 +77,7 @@ class CommandBuilderHelperTest {
     @Test
     void parseCommand_CallCommandStringWithRedirectIn_CallCommand() {
         assertDoesNotThrow(() -> {
-            Command command = CommandBuilderHelper.parseCommand("cat test > file", new ApplicationRunner());
+            Command command = CommandBuilderUtil.parseCommand("cat test > file", new ApplicationRunner());
             assertEquals(CallCommand.class, command.getClass());
             assertEquals(List.of("cat", "test", ">", "file"), ((CallCommand) command).getArgsList());
         });
@@ -86,7 +86,7 @@ class CommandBuilderHelperTest {
     @Test
     void parseCommand_CallCommandStringWithRedirectOut_CallCommand() {
         assertDoesNotThrow(() -> {
-            Command command = CommandBuilderHelper.parseCommand("grep < file", new ApplicationRunner());
+            Command command = CommandBuilderUtil.parseCommand("grep < file", new ApplicationRunner());
             assertEquals(CallCommand.class, command.getClass());
             assertEquals(List.of("grep", "<", "file"), ((CallCommand) command).getArgsList());
         });
@@ -95,7 +95,7 @@ class CommandBuilderHelperTest {
     @Test
     void parseCommand_PipeCommandString_PipeCommand() {
         assertDoesNotThrow(() -> {
-            Command command = CommandBuilderHelper.parseCommand("echo hello | grep he", new ApplicationRunner());
+            Command command = CommandBuilderUtil.parseCommand("echo hello | grep he", new ApplicationRunner());
             assertEquals(PipeCommand.class, command.getClass());
 
             List<CallCommand> callCommands = ((PipeCommand) command).getCallCommands();

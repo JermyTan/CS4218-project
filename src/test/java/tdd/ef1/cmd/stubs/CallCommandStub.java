@@ -9,7 +9,6 @@ import java.util.List;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public class CallCommandStub extends CallCommand {
@@ -29,10 +28,9 @@ public class CallCommandStub extends CallCommand {
     public CallCommandStub(
             List<String> argsList,
             ApplicationRunner appRunner,
-            ArgumentResolver argumentResolver,
             CallCommandResults resultType
     ) throws ShellException {
-        super(argsList, appRunner, argumentResolver);
+        super(argsList, appRunner);
         this.resultType = resultType;
         result = null;
     }

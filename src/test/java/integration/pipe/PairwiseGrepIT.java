@@ -1,18 +1,32 @@
 package integration.pipe;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.*;
-import sg.edu.nus.comp.cs4218.exception.*;
-import sg.edu.nus.comp.cs4218.impl.cmd.*;
-import sg.edu.nus.comp.cs4218.impl.util.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
+import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
+import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 
 public class PairwiseGrepIT {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
@@ -20,22 +34,14 @@ public class PairwiseGrepIT {
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
-
-    private final Path file1 = Path.of(TEST_DIR, FILE_1);
-    private final Path file2 = Path.of(TEST_DIR, FILE_2);
-
     private static final String GREP = "grep";
     private static final String INPUT_STRING = "hello world";
-
-    private InputStream stdin = System.in;
+    private final Path file1 = Path.of(TEST_DIR, FILE_1);
+    private final Path file2 = Path.of(TEST_DIR, FILE_2);
     private final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     private final ApplicationRunner appRunner = new ApplicationRunner();
-    private final ArgumentResolver argumentResolver = new ArgumentResolver();
+    private InputStream stdin = System.in;
     private PipeCommand command;
-
-    private void provideInput(String input) {
-        stdin = new ByteArrayInputStream(input.getBytes());
-    }
 
     @BeforeAll
     static void setupBeforeAll() {
@@ -45,6 +51,10 @@ public class PairwiseGrepIT {
     @AfterAll
     static void tearDownAfterAll() {
         EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
+    }
+
+    private void provideInput(String input) {
+        stdin = new ByteArrayInputStream(input.getBytes());
     }
 
     private void buildCommand(List<CallCommand> callCommands) throws ShellException {
@@ -70,8 +80,8 @@ public class PairwiseGrepIT {
             String expected = INPUT_STRING;
             Files.writeString(file1, expected);
 
-            CallCommand command1 = new CallCommand(List.of(GREP, "hello", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("wc", "-cl"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of(GREP, "hello", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("wc", "-cl"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -88,8 +98,8 @@ public class PairwiseGrepIT {
             String expected = INPUT_STRING;
             Files.writeString(file1, expected);
 
-            CallCommand command1 = new CallCommand(List.of(GREP, "hello", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of(GREP, "world"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of(GREP, "hello", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of(GREP, "world"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -108,8 +118,8 @@ public class PairwiseGrepIT {
             Files.writeString(file1, String.join(STRING_NEWLINE, expected1, expected1,
                     expected2, expected2, "Bob", expected2));
 
-            CallCommand command1 = new CallCommand(List.of("uniq", "-c", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of(GREP, "2"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("uniq", "-c", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of(GREP, "2"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -127,8 +137,8 @@ public class PairwiseGrepIT {
         assertDoesNotThrow(() -> {
             Files.writeString(file1, String.join(STRING_NEWLINE, "1", "2", "3", "4"));
 
-            CallCommand command1 = new CallCommand(List.of("paste", "-", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of(GREP, "A"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("paste", "-", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of(GREP, "A"), appRunner);
 
             buildCommand(List.of(command1, command2));
 

@@ -16,7 +16,6 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 public class IORedirectionHandler {
     private final List<String> argsList;
-    private final ArgumentResolver argumentResolver;
     private final InputStream origInputStream;
     private final OutputStream origOutputStream;
     private List<String> noRedirArgsList = new ArrayList<>();
@@ -24,13 +23,12 @@ public class IORedirectionHandler {
     private OutputStream outputStream;
 
     public IORedirectionHandler(List<String> argsList, InputStream origInputStream,
-                                OutputStream origOutputStream, ArgumentResolver argumentResolver) {
+                                OutputStream origOutputStream) {
         this.argsList = argsList;
         this.inputStream = origInputStream;
         this.origInputStream = origInputStream;
         this.outputStream = origOutputStream;
         this.origOutputStream = origOutputStream;
-        this.argumentResolver = argumentResolver;
     }
 
     public void extractRedirOptions() throws AbstractApplicationException, ShellException { //NOPMD
@@ -64,7 +62,7 @@ public class IORedirectionHandler {
             }
 
             // handle quoting + globing + command substitution in file arg
-            List<String> fileSegment = argumentResolver.resolveOneArgument(file);
+            List<String> fileSegment = ArgumentResolverUtil.resolveOneArgument(file);
             if (fileSegment.size() > 1) {
                 // ambiguous redirect if file resolves to more than one parsed arg
                 throw new ShellException(ERR_SYNTAX);

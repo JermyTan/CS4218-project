@@ -1,18 +1,29 @@
 package integration.pipe;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.*;
-import sg.edu.nus.comp.cs4218.exception.*;
-import sg.edu.nus.comp.cs4218.impl.cmd.*;
-import sg.edu.nus.comp.cs4218.impl.util.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
+import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
+import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 
 class PipeCommandIT {
 
@@ -28,7 +39,6 @@ class PipeCommandIT {
     private final InputStream stdin = System.in;
     private final OutputStream stdout = System.out;
     private final ApplicationRunner appRunner = new ApplicationRunner();
-    private final ArgumentResolver argumentResolver = new ArgumentResolver();
     private PipeCommand command;
 
     @BeforeAll
@@ -62,8 +72,8 @@ class PipeCommandIT {
         Files.writeString(file1, "hello world");
 
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("cat", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("grep", "hello", ">", FILE_2), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("cat", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("grep", "hello", ">", FILE_2), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -79,9 +89,9 @@ class PipeCommandIT {
     @Test
     public void evaluate_ExceptionOccursInOneCommand_RestTerminated() {
         assertThrows(ShellException.class, () -> {
-            CallCommand command1 = new CallCommand(List.of("echo", "abc", ">", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("lsa"), appRunner, argumentResolver); //Invalid command
-            CallCommand command3 = new CallCommand(List.of("echo", "hello", "world"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("echo", "abc", ">", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("lsa"), appRunner); //Invalid command
+            CallCommand command3 = new CallCommand(List.of("echo", "hello", "world"), appRunner);
 
             buildCommand(List.of(command1, command2, command3));
 

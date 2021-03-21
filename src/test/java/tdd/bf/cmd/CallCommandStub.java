@@ -10,7 +10,6 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 //Stub to simulate CallCommand for PipeCommandTest
@@ -18,9 +17,8 @@ public class CallCommandStub extends CallCommand {
     private final List<String> argsList;
     private final Type type;
 
-    public CallCommandStub(List<String> argsList, ApplicationRunner appRunner, ArgumentResolver argumentResolver,
-                           Type type) throws ShellException {
-        super(argsList, appRunner, argumentResolver);
+    public CallCommandStub(List<String> argsList, ApplicationRunner appRunner, Type type) throws ShellException {
+        super(argsList, appRunner);
         this.argsList = argsList;
         this.type = type;
     }

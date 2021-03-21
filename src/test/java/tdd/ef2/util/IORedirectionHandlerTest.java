@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 
 @Disabled
@@ -47,40 +46,36 @@ public class IORedirectionHandlerTest {
     //extractRedirOptions cases
     @Test
     void extractRedirOptions_NullArgsList_ThrowsException() {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        handler = new IORedirectionHandler(null, System.in, output, resolver);
+        handler = new IORedirectionHandler(null, System.in, output);
         assertThrows(ShellException.class, () -> handler.extractRedirOptions());
     }
 
     @Test
     void extractRedirOptions_EmptyArgsList_ThrowsException() {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         assertThrows(ShellException.class, () -> handler.extractRedirOptions());
     }
 
     @Test
     void extractRedirOptions_ConsecutiveRedirOperators_ThrowsException() {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("<");
         argsList.add("<");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         assertThrows(ShellException.class, () -> handler.extractRedirOptions());
     }
 
     @Test
     void extractRedirOptions_ConsecutiveFileArgs_ThrowsException() {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("<");
         argsList.add("fileA.txt fileB.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         assertThrows(ShellException.class, () -> handler.extractRedirOptions());
     }
 
@@ -88,7 +83,6 @@ public class IORedirectionHandlerTest {
     @Test
     void getNoRedirArgsList_noRedirOperators_returnsNoRedirArgsList() throws AbstractApplicationException,
             ShellException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
@@ -98,7 +92,7 @@ public class IORedirectionHandlerTest {
         expectedList.add("fileA.txt");
         expectedList.add("fileB.txt");
         expectedList.add("fileC.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertTrue(handler.getNoRedirArgsList().containsAll(expectedList));
     }
@@ -106,7 +100,6 @@ public class IORedirectionHandlerTest {
     @Test
     void getNoRedirArgsList_MultipleArgsOneRedirOperator_returnsNoRedirArgsList() throws AbstractApplicationException,
             ShellException, IOException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
@@ -116,7 +109,7 @@ public class IORedirectionHandlerTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add("fileA.txt");
         expectedList.add("fileB.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertTrue(handler.getNoRedirArgsList().containsAll(expectedList));
         handler.getOutputStream().close();
@@ -127,7 +120,6 @@ public class IORedirectionHandlerTest {
     @Test
     void getNoRedirArgsList_OneRedirOperatorMultipleArgs_returnsNoRedirArgsList() throws AbstractApplicationException,
             ShellException, IOException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add(">");
@@ -137,7 +129,7 @@ public class IORedirectionHandlerTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add("fileB.txt");
         expectedList.add("fileC.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertTrue(handler.getNoRedirArgsList().containsAll(expectedList));
         handler.getOutputStream().close();
@@ -148,12 +140,11 @@ public class IORedirectionHandlerTest {
     @Test
     void getNoRedirArgsList_OneRedirOperatorOneArg_returnsEmptyList() throws AbstractApplicationException,
             ShellException, IOException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add(">");
         argsList.add("fileA.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertTrue(handler.getNoRedirArgsList().isEmpty());
         handler.getOutputStream().close();
@@ -163,22 +154,20 @@ public class IORedirectionHandlerTest {
 
     //getInputStream cases
     @Test
-    void getInputStream_BeforeExtract_ReturnsDefault() throws AbstractApplicationException, ShellException {
-        ArgumentResolver resolver = new ArgumentResolver();
+    void getInputStream_BeforeExtract_ReturnsDefault() {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         assertEquals(handler.getInputStream(), System.in);
     }
 
     @Test
     void getInputStream_NoRedir_ReturnsDefault() throws AbstractApplicationException, ShellException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertEquals(handler.getInputStream(), System.in);
     }
@@ -186,13 +175,12 @@ public class IORedirectionHandlerTest {
     @Test
     void getInputStream_OutputRedir_ReturnsDefault() throws AbstractApplicationException, ShellException,
             IOException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
         argsList.add(">");
         argsList.add("fileB.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertEquals(handler.getInputStream(), System.in);
         handler.getOutputStream().close();
@@ -203,7 +191,6 @@ public class IORedirectionHandlerTest {
     @Test
     void getInputStream_InputRedir_ReturnsFileInputStream() throws AbstractApplicationException, ShellException,
             IOException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
@@ -211,7 +198,7 @@ public class IORedirectionHandlerTest {
         argsList.add("fileB.txt");
         Path filePath = createFile("fileB.txt");
         File file = new File(filePath.toString());
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertTrue(handler.getInputStream().getClass() == FileInputStream.class);
         handler.getInputStream().close();
@@ -221,21 +208,19 @@ public class IORedirectionHandlerTest {
     //getOutputStream cases
     @Test
     void getOutputStream_BeforeExtract_ReturnsDefault() throws AbstractApplicationException, ShellException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         assertEquals(handler.getOutputStream(), output);
     }
 
     @Test
     void getOutputStream_NoRedir_ReturnsDefault() throws AbstractApplicationException, ShellException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertEquals(handler.getOutputStream(), output);
     }
@@ -243,14 +228,13 @@ public class IORedirectionHandlerTest {
     @Test
     void getOutputStream_InputRedir_ReturnsDefault() throws AbstractApplicationException, ShellException,
             IOException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
         argsList.add("<");
         argsList.add("fileB.txt");
         Path filePath = createFile("fileB.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertEquals(handler.getOutputStream(), output);
         handler.getInputStream().close();
@@ -260,13 +244,12 @@ public class IORedirectionHandlerTest {
     @Test
     void getOutputStream_OutputRedir_ReturnsFileOutputStream() throws AbstractApplicationException, ShellException,
             IOException {
-        ArgumentResolver resolver = new ArgumentResolver();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         List<String> argsList = new ArrayList<>();
         argsList.add("fileA.txt");
         argsList.add(">");
         argsList.add("fileB.txt");
-        handler = new IORedirectionHandler(argsList, System.in, output, resolver);
+        handler = new IORedirectionHandler(argsList, System.in, output);
         handler.extractRedirOptions();
         assertTrue(handler.getOutputStream().getClass() == FileOutputStream.class);
         handler.getOutputStream().close();

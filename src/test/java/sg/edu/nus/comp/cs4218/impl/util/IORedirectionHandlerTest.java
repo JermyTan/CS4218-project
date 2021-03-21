@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class IORedirectionHandlerTest {
@@ -41,7 +39,6 @@ class IORedirectionHandlerTest {
     private final Path file3 = Path.of(TEST_DIR, FILE_3);
 
     private IORedirectionHandler redirHandler;
-    private ArgumentResolver argumentResolver;
     private InputStream stdin;
     private OutputStream stdout;
 
@@ -56,16 +53,11 @@ class IORedirectionHandlerTest {
     }
 
     private void buildRedirHandler(List<String> argsList) {
-        redirHandler = new IORedirectionHandler(argsList, stdin, stdout, argumentResolver);
+        redirHandler = new IORedirectionHandler(argsList, stdin, stdout);
     }
 
     @BeforeEach
-    void setup() throws AbstractApplicationException, ShellException {
-        argumentResolver = mock(ArgumentResolver.class);
-        when(argumentResolver.resolveOneArgument(FILE_1)).thenReturn(List.of(FILE_1));
-        when(argumentResolver.resolveOneArgument(FILE_2)).thenReturn(List.of(FILE_2));
-        when(argumentResolver.resolveOneArgument(FILE_3)).thenReturn(List.of(FILE_3));
-
+    void setup() {
         stdin = mock(InputStream.class);
         stdout = mock(OutputStream.class);
     }

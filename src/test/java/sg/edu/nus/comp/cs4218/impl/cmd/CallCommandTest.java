@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isA;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_CAT;
 import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_ECHO;
@@ -26,8 +25,6 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
-import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 class CallCommandTest {
 
@@ -53,8 +50,7 @@ class CallCommandTest {
 
     private void buildCommand(List<String> argsList) throws ShellException {
         appRunner = mock(ApplicationRunner.class);
-        ArgumentResolver argumentResolver = spy(ArgumentResolver.class);
-        command = new CallCommand(argsList, appRunner, argumentResolver);
+        command = new CallCommand(argsList, appRunner);
     }
 
     @Test
@@ -65,14 +61,7 @@ class CallCommandTest {
     @Test
     public void initialization_NullAppRunner_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            new CallCommand(List.of(APP_ECHO, STRING_SINGLE_WORD), null, mock(ArgumentResolver.class));
-        });
-    }
-
-    @Test
-    public void initialization_NullArgumentResolver_ThrowsException() {
-        assertThrows(ShellException.class, () -> {
-            new CallCommand(List.of(APP_ECHO, STRING_SINGLE_WORD), mock(ApplicationRunner.class), null);
+            new CallCommand(List.of(APP_ECHO, STRING_SINGLE_WORD), null);
         });
     }
 
@@ -134,9 +123,7 @@ class CallCommandTest {
 
             command.evaluate(stdin, stdout);
 
-            String file1 = IOUtils.resolveAbsoluteFilePath(FILE_1).toString();
-            String file2 = IOUtils.resolveAbsoluteFilePath(FILE_2).toString();
-            verify(appRunner).runApp(APP_ECHO, new String[]{file1, file2}, stdin, stdout);
+            verify(appRunner).runApp(APP_ECHO, new String[]{FILE_1, FILE_2}, stdin, stdout);
         });
     }
 

@@ -12,7 +12,7 @@ import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
+import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolverUtil;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 
@@ -24,11 +24,10 @@ import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 public class CallCommand implements Command {
     private final List<String> argsList;
     private final ApplicationRunner appRunner;
-    private final ArgumentResolver argumentResolver;
 
-    public CallCommand(List<String> argsList, ApplicationRunner appRunner, ArgumentResolver argumentResolver) throws ShellException {
+    public CallCommand(List<String> argsList, ApplicationRunner appRunner) throws ShellException {
         if (
-                CollectionUtils.isAnyNull(argsList, appRunner, argumentResolver)
+                CollectionUtils.isAnyNull(argsList, appRunner)
                         || argsList.stream().anyMatch(Objects::isNull)
                         || argsList.isEmpty()
         ) {
@@ -37,21 +36,20 @@ public class CallCommand implements Command {
 
         this.argsList = new ArrayList<>(argsList);
         this.appRunner = appRunner;
-        this.argumentResolver = argumentResolver;
     }
 
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException {
         // Handle IO redirection
-        IORedirectionHandler redirHandler = new IORedirectionHandler(argsList, stdin, stdout, argumentResolver);
+        IORedirectionHandler redirHandler = new IORedirectionHandler(argsList, stdin, stdout);
         redirHandler.extractRedirOptions();
         List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
         InputStream inputStream = redirHandler.getInputStream();//NOPMD
         OutputStream outputStream = redirHandler.getOutputStream();//NOPMD
 
         // Handle quoting + globing + command substitution
-        List<String> parsedArgsList = argumentResolver.parseArguments(noRedirArgsList);
+        List<String> parsedArgsList = ArgumentResolverUtil.parseArguments(noRedirArgsList);
         if (!parsedArgsList.isEmpty()) {
             String app = parsedArgsList.remove(0);
             appRunner.runApp(app, parsedArgsList.toArray(String[]::new), inputStream, outputStream);

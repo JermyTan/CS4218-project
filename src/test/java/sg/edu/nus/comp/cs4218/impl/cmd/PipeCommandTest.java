@@ -24,7 +24,6 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 class PipeCommandTest {
@@ -62,7 +61,7 @@ class PipeCommandTest {
     @Test
     public void evaluate_TwoCallCommands_CommandsExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = spy(new CallCommand(List.of("echo", STRING_SINGLE_WORD), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command1 = spy(new CallCommand(List.of("echo", STRING_SINGLE_WORD), new ApplicationRunner()));
             CallCommand command2 = mock(CallCommand.class);
 
             PipeCommand command = new PipeCommand(List.of(command1, command2));
@@ -120,7 +119,7 @@ class PipeCommandTest {
     @Test
     public void terminate_BeforeEvaluate_DoesNothing() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = spy(new CallCommand(List.of("echo", STRING_SINGLE_WORD), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command1 = spy(new CallCommand(List.of("echo", STRING_SINGLE_WORD), new ApplicationRunner()));
             CallCommand command2 = mock(CallCommand.class);
 
             PipeCommand command = new PipeCommand(List.of(command1, command2));
@@ -146,7 +145,7 @@ class PipeCommandTest {
     @Test
     public void getCallCommands_NonEmptyCallCommandList_ReturnsNonEmptyCallCommandList() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = spy(new CallCommand(List.of("echo", STRING_SINGLE_WORD), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command1 = spy(new CallCommand(List.of("echo", STRING_SINGLE_WORD), new ApplicationRunner()));
             CallCommand command2 = mock(CallCommand.class);
 
             List<CallCommand> callCommandList = List.of(command1, command2);

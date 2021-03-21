@@ -20,16 +20,8 @@ import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
-public class ArgumentResolver {
-
-    private final ApplicationRunner applicationRunner;
-
-    public ArgumentResolver() {
-        applicationRunner = new ApplicationRunner();
-    }
-
-    public ApplicationRunner getAppRunner() {
-        return applicationRunner;
+public final class ArgumentResolverUtil {
+    private ArgumentResolverUtil() {
     }
 
     /**
@@ -39,7 +31,7 @@ public class ArgumentResolver {
      * @return The list of parsed arguments.
      * @throws ShellException If any of the arguments have an invalid syntax.
      */
-    public List<String> parseArguments(List<String> argsList) throws AbstractApplicationException, ShellException {
+    public static List<String> parseArguments(List<String> argsList) throws AbstractApplicationException, ShellException {
         List<String> parsedArgsList = new ArrayList<>();
         for (String arg : argsList) {
             parsedArgsList.addAll(resolveOneArgument(arg));
@@ -58,12 +50,26 @@ public class ArgumentResolver {
      * @param arg String containing one argument.
      * @return A list containing one or more parsed args, depending on the outcome of the parsing.
      */
-    public List<String> resolveOneArgument(String arg) throws AbstractApplicationException, ShellException { //NOPMD
+    public static List<String> resolveOneArgument(String arg) throws AbstractApplicationException, ShellException { //NOPMD
         Stack<Character> unmatchedQuotes = new Stack<>();
         ArrayList<RegexArgument> parsedArgsSegment = new ArrayList<>();
-        RegexArgument parsedArg = makeRegexArgument();
+        RegexArgument parsedArg = new RegexArgument();
         StringBuilder subCommand = new StringBuilder();
+/*
+        for (char chr : arg.toCharArray()) {
+            switch (chr) {
+            case CHAR_BACK_QUOTE:
+                if (unmatchedQuotes.isEmpty() || unmatchedQuotes.peek() == CHAR_DOUBLE_QUOTE) {
+                    // start of command substitution
 
+                }
+            case CHAR_SINGLE_QUOTE:
+            case CHAR_DOUBLE_QUOTE:
+            case CHAR_ASTERISK:
+            default:
+            }
+        }
+*/
         for (int i = 0; i < arg.length(); i++) {
             char chr = arg.charAt(i);
 
@@ -72,7 +78,7 @@ public class ArgumentResolver {
                     // start of command substitution
                     if (!parsedArg.isEmpty()) {
                         appendParsedArgIntoSegment(parsedArgsSegment, parsedArg);
-                        parsedArg = makeRegexArgument();
+                        parsedArg = new RegexArgument();
                     }
 
                     unmatchedQuotes.add(chr);
@@ -89,7 +95,7 @@ public class ArgumentResolver {
                     if (unmatchedQuotes.isEmpty()) {
                         List<RegexArgument> subOutputSegment = Stream
                                 .of(StringUtils.tokenize(subCommandOutput))
-                                .map(str -> makeRegexArgument(str))
+                                .map(str -> new RegexArgument(str))
                                 .collect(Collectors.toList());
 
                         // append the first token to the previous parsedArg
@@ -102,8 +108,7 @@ public class ArgumentResolver {
 
                     } else {
                         // don't tokenize subCommand output
-                        appendParsedArgIntoSegment(parsedArgsSegment,
-                                makeRegexArgument(subCommandOutput));
+                        appendParsedArgIntoSegment(parsedArgsSegment, new RegexArgument(subCommandOutput));
                     }
                 } else {
                     // ongoing single quote
@@ -118,7 +123,7 @@ public class ArgumentResolver {
                     unmatchedQuotes.pop();
 
                     // make sure parsedArgsSegment is not empty
-                    appendParsedArgIntoSegment(parsedArgsSegment, makeRegexArgument());
+                    appendParsedArgIntoSegment(parsedArgsSegment, new RegexArgument());
                 } else if (unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
                     // ongoing back quote: add chr to subCommand
                     subCommand.append(chr);
@@ -161,21 +166,13 @@ public class ArgumentResolver {
                 .collect(Collectors.toList());
     }
 
-    private RegexArgument makeRegexArgument() {
-        return new RegexArgument();
-    }
-
-    private RegexArgument makeRegexArgument(String str) {
-        return new RegexArgument(str);
-    }
-
-    private String evaluateSubCommand(String commandString) throws AbstractApplicationException, ShellException {
+    private static String evaluateSubCommand(String commandString) throws AbstractApplicationException, ShellException {
         if (StringUtils.isBlank(commandString)) {
             return STRING_EMPTY;
         }
 
         OutputStream outputStream = new ByteArrayOutputStream();
-        Command command = CommandBuilderHelper.parseCommand(commandString, getAppRunner());
+        Command command = CommandBuilderUtil.parseCommand(commandString, new ApplicationRunner());
         command.evaluate(System.in, outputStream);
 
         // replace newlines with spaces
@@ -186,8 +183,8 @@ public class ArgumentResolver {
      * Append current parsedArg to the last parsedArg in parsedArgsSegment.
      * If parsedArgsSegment is empty, then just add current parsedArg.
      */
-    private void appendParsedArgIntoSegment(List<RegexArgument> parsedArgsSegment,
-                                            RegexArgument parsedArg) {
+    private static void appendParsedArgIntoSegment(List<RegexArgument> parsedArgsSegment,
+                                                   RegexArgument parsedArg) {
         if (parsedArgsSegment.isEmpty()) {
             parsedArgsSegment.add(parsedArg);
         } else {

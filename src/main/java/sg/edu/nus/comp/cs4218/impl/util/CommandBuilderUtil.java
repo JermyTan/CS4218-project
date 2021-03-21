@@ -18,7 +18,7 @@ import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 
-public final class CommandBuilderHelper {
+public final class CommandBuilderUtil {
     /**
      * Regular expression for extracting valid arguments from the command string:
      * (NO_QUOTE | SINGLE_QUOTE | NESTED_BACK_QUOTE | DOUBLE_QUOTE | BACK_QUOTE)+
@@ -34,7 +34,7 @@ public final class CommandBuilderHelper {
     private static final Pattern ARGUMENT_REGEX = Pattern
             .compile("([^'\"`|<>;\\s]+|'[^']*'|\"([^\"`]*`.*?`[^\"`]*)+\"|\"[^\"]*\"|`[^`]*`)+");
 
-    private CommandBuilderHelper() {
+    private CommandBuilderUtil() {
     }
 
     private static void handleRedirChar(char redirChar, List<String> tokens) throws ShellException {
@@ -49,7 +49,6 @@ public final class CommandBuilderHelper {
 
     private static void handlePipeChar(
             ApplicationRunner appRunner,
-            ArgumentResolver argumentResolver,
             List<CallCommand> callCmdsForPipe,
             List<String> tokens
     ) throws ShellException {
@@ -58,14 +57,13 @@ public final class CommandBuilderHelper {
             throw new ShellException(ERR_SYNTAX);
         } else {
             // add CallCommand as part of a PipeCommand
-            callCmdsForPipe.add(new CallCommand(tokens, appRunner, argumentResolver));
+            callCmdsForPipe.add(new CallCommand(tokens, appRunner));
             tokens.clear();
         }
     }
 
     private static void handleSemicolon(
             ApplicationRunner appRunner,
-            ArgumentResolver argumentResolver,
             List<Command> cmdsForSequence,
             List<CallCommand> callCmdsForPipe,
             List<String> tokens
@@ -75,11 +73,11 @@ public final class CommandBuilderHelper {
             throw new ShellException(ERR_SYNTAX);
         } else if (callCmdsForPipe.isEmpty()) {
             // add CallCommand as part of a SequenceCommand
-            cmdsForSequence.add(new CallCommand(tokens, appRunner, argumentResolver));
+            cmdsForSequence.add(new CallCommand(tokens, appRunner));
             tokens.clear();
         } else {
             // add CallCommand as part of ongoing PipeCommand
-            callCmdsForPipe.add(new CallCommand(tokens, appRunner, argumentResolver));
+            callCmdsForPipe.add(new CallCommand(tokens, appRunner));
             tokens.clear();
 
             // add PipeCommand as part of a SequenceCommand
@@ -91,7 +89,6 @@ public final class CommandBuilderHelper {
     private static void processSpecialChar(
             char firstChar,
             ApplicationRunner appRunner,
-            ArgumentResolver argumentResolver,
             List<Command> cmdsForSequence,
             List<CallCommand> callCmdsForPipe,
             List<String> tokens
@@ -102,10 +99,10 @@ public final class CommandBuilderHelper {
             handleRedirChar(firstChar, tokens);
             break;
         case CHAR_PIPE:
-            handlePipeChar(appRunner, argumentResolver, callCmdsForPipe, tokens);
+            handlePipeChar(appRunner, callCmdsForPipe, tokens);
             break;
         case CHAR_SEMICOLON:
-            handleSemicolon(appRunner, argumentResolver, cmdsForSequence, callCmdsForPipe, tokens);
+            handleSemicolon(appRunner, cmdsForSequence, callCmdsForPipe, tokens);
             break;
         default:
             // encountered a mismatched quote
@@ -128,7 +125,6 @@ public final class CommandBuilderHelper {
             throw new ShellException(ERR_SYNTAX);
         }
 
-        ArgumentResolver argumentResolver = new ArgumentResolver();
         List<Command> cmdsForSequence = new ArrayList<>();
         List<CallCommand> callCmdsForPipe = new ArrayList<>();
         List<String> tokens = new ArrayList<>();
@@ -154,10 +150,10 @@ public final class CommandBuilderHelper {
             char firstChar = commandSubstring.charAt(0);
             commandSubstring = commandSubstring.substring(1);
 
-            processSpecialChar(firstChar, appRunner, argumentResolver, cmdsForSequence, callCmdsForPipe, tokens);
+            processSpecialChar(firstChar, appRunner, cmdsForSequence, callCmdsForPipe, tokens);
         }
 
-        Command finalCommand = new CallCommand(tokens, appRunner, argumentResolver);
+        Command finalCommand = new CallCommand(tokens, appRunner);
         if (!callCmdsForPipe.isEmpty()) {
             // add CallCommand as part of ongoing PipeCommand
             callCmdsForPipe.add((CallCommand) finalCommand);

@@ -1,18 +1,32 @@
 package integration.pipe;
 
-import org.junit.jupiter.api.*;
-import sg.edu.nus.comp.cs4218.*;
-import sg.edu.nus.comp.cs4218.exception.*;
-import sg.edu.nus.comp.cs4218.impl.cmd.*;
-import sg.edu.nus.comp.cs4218.impl.util.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
+import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
+import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 
 public class PairwiseWcIT {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
@@ -27,7 +41,6 @@ public class PairwiseWcIT {
     private final InputStream stdin = System.in;
     private final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     private final ApplicationRunner appRunner = new ApplicationRunner();
-    private final ArgumentResolver argumentResolver = new ArgumentResolver();
     private PipeCommand command;
 
     @BeforeAll
@@ -62,8 +75,8 @@ public class PairwiseWcIT {
     @DisplayName("wc file1.txt | wc")
     public void evaluate_WcThenWc_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("wc"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("wc"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -80,8 +93,8 @@ public class PairwiseWcIT {
     @DisplayName("wc file1.txt | cat - file1.txt")
     public void evaluate_WcThenCat_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("cat", "-", FILE_1), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("cat", "-", FILE_1), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -97,8 +110,8 @@ public class PairwiseWcIT {
     @DisplayName("wc file1.txt | grep 1")
     public void evaluate_WcThenGrep_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("grep", "1"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("grep", "1"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -112,8 +125,8 @@ public class PairwiseWcIT {
     @DisplayName("wc file1.txt | tee")
     public void evaluate_WcThenTee_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("tee", FILE_2), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("tee", FILE_2), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -135,8 +148,8 @@ public class PairwiseWcIT {
     public void evaluate_WcThenSplit_CommandExecuted() {
         assertDoesNotThrow(() -> {
             Files.writeString(file2, "CS4218");
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1, FILE_2), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("split", "-l", "1"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("wc", FILE_1, FILE_2), appRunner);
+            CallCommand command2 = new CallCommand(List.of("split", "-l", "1"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -171,8 +184,8 @@ public class PairwiseWcIT {
         assertDoesNotThrow(() -> {
             Files.writeString(file2, "hello world");
 
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1, FILE_2), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("uniq", "-d"), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("wc", FILE_1, FILE_2), appRunner);
+            CallCommand command2 = new CallCommand(List.of("uniq", "-d"), appRunner);
 
             buildCommand(List.of(command1, command2));
 
@@ -191,8 +204,8 @@ public class PairwiseWcIT {
         assertDoesNotThrow(() -> {
             Files.writeString(file2, "CS4218" + STRING_NEWLINE + "Project");
 
-            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner, argumentResolver);
-            CallCommand command2 = new CallCommand(List.of("paste", "-", FILE_2), appRunner, argumentResolver);
+            CallCommand command1 = new CallCommand(List.of("wc", FILE_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("paste", "-", FILE_2), appRunner);
 
             buildCommand(List.of(command1, command2));
 

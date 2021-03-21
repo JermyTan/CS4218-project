@@ -28,7 +28,6 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import tdd.ef1.cmd.stubs.CallCommandStub;
 
 public class PipeCommandTest {
@@ -37,7 +36,6 @@ public class PipeCommandTest {
     private static List<CallCommand> callCommands;
     private static List<String> argsList;
     private static ApplicationRunner appRunner;
-    private static ArgumentResolver argumentResolver;
 
     @BeforeEach
     void setUp() {
@@ -46,7 +44,6 @@ public class PipeCommandTest {
         callCommands = new ArrayList<>();
         argsList = new ArrayList<>(List.of("echo", "world"));
         appRunner = new ApplicationRunner();
-        argumentResolver = new ArgumentResolver();
     }
 
     @AfterEach
@@ -57,8 +54,8 @@ public class PipeCommandTest {
 
     @Test
     public void run_testPipeTwoApplications_NoException() throws Exception {
-        callCommands.add(new CallCommandStub(argsList, appRunner, argumentResolver, FIRST_SUCCESS));
-        callCommands.add(new CallCommandStub(argsList, appRunner, argumentResolver, SECOND_SUCCESS));
+        callCommands.add(new CallCommandStub(argsList, appRunner, FIRST_SUCCESS));
+        callCommands.add(new CallCommandStub(argsList, appRunner, SECOND_SUCCESS));
         PipeCommand pipeCommand = new PipeCommand(callCommands);
         pipeCommand.evaluate(inputStream, outputStream);
         assertEquals(SECOND_SUCCESS_MSG, outputStream.toString());
@@ -66,8 +63,8 @@ public class PipeCommandTest {
 
     @Test
     public void run_testPipeTwoApplications_FirstException() throws Exception {
-        callCommands.add(new CallCommandStub(argsList, appRunner, argumentResolver, FIRST_EXCEPTION));
-        callCommands.add(new CallCommandStub(argsList, appRunner, argumentResolver, SECOND_SUCCESS));
+        callCommands.add(new CallCommandStub(argsList, appRunner, FIRST_EXCEPTION));
+        callCommands.add(new CallCommandStub(argsList, appRunner, SECOND_SUCCESS));
         PipeCommand pipeCommand = new PipeCommand(callCommands);
         Exception expectedException = assertThrows(ShellException.class, () -> pipeCommand.evaluate(inputStream, outputStream));
         assertTrue(expectedException.getMessage().contains(FIRST_EXCEPTION_MSG));
@@ -75,8 +72,8 @@ public class PipeCommandTest {
 
     @Test
     public void run_testPipeTwoApplications_SecondException() throws Exception {
-        callCommands.add(new CallCommandStub(argsList, appRunner, argumentResolver, FIRST_SUCCESS));
-        callCommands.add(new CallCommandStub(argsList, appRunner, argumentResolver, SECOND_EXCEPTION));
+        callCommands.add(new CallCommandStub(argsList, appRunner, FIRST_SUCCESS));
+        callCommands.add(new CallCommandStub(argsList, appRunner, SECOND_EXCEPTION));
         PipeCommand pipeCommand = new PipeCommand(callCommands);
         Exception expectedException = assertThrows(ShellException.class, () -> pipeCommand.evaluate(inputStream, outputStream));
         assertTrue(expectedException.getMessage().contains(SECOND_EXCEPTION_MSG));
@@ -84,8 +81,8 @@ public class PipeCommandTest {
 
     @Test
     public void run_testPipeTwoApplications_BothException() throws Exception {
-        callCommands.add(new CallCommandStub(argsList, appRunner, argumentResolver, FIRST_EXCEPTION));
-        callCommands.add(new CallCommandStub(argsList, appRunner, argumentResolver, SECOND_EXCEPTION));
+        callCommands.add(new CallCommandStub(argsList, appRunner, FIRST_EXCEPTION));
+        callCommands.add(new CallCommandStub(argsList, appRunner, SECOND_EXCEPTION));
         PipeCommand pipeCommand = new PipeCommand(callCommands);
         Exception expectedException = assertThrows(ShellException.class, () -> pipeCommand.evaluate(inputStream, outputStream));
         assertTrue(expectedException.getMessage().contains(FIRST_EXCEPTION_MSG));

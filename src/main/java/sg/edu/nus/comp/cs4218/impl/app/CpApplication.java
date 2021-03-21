@@ -83,7 +83,7 @@ public class CpApplication implements CpInterface {
     }
 
     @Override
-    public String cpFilesToFolder(Boolean isRecursive, String destFolder, String... fileNames) throws Exception {
+    public String cpFilesToFolder(Boolean isRecursive, String destFolder, String... fileNames) throws Exception { //NOPMD
         try {
             Path destFolderPath = IOUtils.resolveAbsoluteFilePath(destFolder);
             if (Files.isRegularFile(destFolderPath)) {
@@ -127,8 +127,9 @@ public class CpApplication implements CpInterface {
                                     try {
                                         Files.copy(dir, targetDir, StandardCopyOption.REPLACE_EXISTING);
                                     } catch (FileAlreadyExistsException e) {
-                                        if (!Files.isDirectory(targetDir))
+                                        if (!Files.isDirectory(targetDir)) {
                                             throw e;
+                                        }
                                     }
                                     return FileVisitResult.CONTINUE;
                                 }

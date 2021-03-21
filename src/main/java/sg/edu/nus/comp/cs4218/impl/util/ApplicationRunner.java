@@ -1,28 +1,28 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import sg.edu.nus.comp.cs4218.impl.app.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
 import sg.edu.nus.comp.cs4218.impl.app.CdApplication;
+import sg.edu.nus.comp.cs4218.impl.app.CpApplication;
 import sg.edu.nus.comp.cs4218.impl.app.EchoApplication;
 import sg.edu.nus.comp.cs4218.impl.app.ExitApplication;
 import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
 import sg.edu.nus.comp.cs4218.impl.app.LsApplication;
 import sg.edu.nus.comp.cs4218.impl.app.MvApplication;
 import sg.edu.nus.comp.cs4218.impl.app.PasteApplication;
+import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
 import sg.edu.nus.comp.cs4218.impl.app.SplitApplication;
 import sg.edu.nus.comp.cs4218.impl.app.TeeApplication;
 import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
-import sg.edu.nus.comp.cs4218.impl.app.RmApplication;
-
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
 
 public class ApplicationRunner {
     public static final String APP_LS = "ls";
@@ -53,6 +53,7 @@ public class ApplicationRunner {
      * @throws ShellException               If an unsupported or invalid application command is
      *                                      detected.
      */
+    @SuppressWarnings("PMD.ExcessiveMethodLength")
     public void runApp(String app, String[] argsArray, InputStream inputStream, OutputStream outputStream)
             throws AbstractApplicationException, ShellException {
         Application application;

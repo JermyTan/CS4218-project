@@ -94,7 +94,7 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(1, globbedFiles.size());
-        assertEquals(resolveArg(FILE_3), globbedFiles.get(0));
+        assertEquals(FILE_3, globbedFiles.get(0));
     }
 
     @Test
@@ -106,8 +106,8 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(2, globbedFiles.size());
-        assertEquals(resolveArg(FILE_1), globbedFiles.get(0));
-        assertEquals(resolveArg(FILE_2), globbedFiles.get(1));
+        assertEquals(FILE_1, globbedFiles.get(0));
+        assertEquals(FILE_2, globbedFiles.get(1));
     }
 
     @Test
@@ -120,8 +120,8 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(2, globbedFiles.size());
-        assertEquals(resolveArg(FOLDER_1), globbedFiles.get(0));
-        assertEquals(resolveArg(FOLDER_2), globbedFiles.get(1));
+        assertEquals(FOLDER_1 + STRING_FILE_SEP, globbedFiles.get(0));
+        assertEquals(FOLDER_2 + STRING_FILE_SEP, globbedFiles.get(1));
     }
 
     @Test
@@ -133,10 +133,10 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(4, globbedFiles.size());
-        assertEquals(resolveArg(FILE_1), globbedFiles.get(0));
-        assertEquals(resolveArg(FILE_2), globbedFiles.get(1));
-        assertEquals(resolveArg(FOLDER_1), globbedFiles.get(2));
-        assertEquals(resolveArg(FOLDER_2), globbedFiles.get(3));
+        assertEquals(FILE_1, globbedFiles.get(0));
+        assertEquals(FILE_2, globbedFiles.get(1));
+        assertEquals(FOLDER_1, globbedFiles.get(2));
+        assertEquals(FOLDER_2, globbedFiles.get(3));
     }
 
     @Test
@@ -148,9 +148,9 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(3, globbedFiles.size());
-        assertEquals(resolveArg(FOLDER_1), globbedFiles.get(0));
-        assertEquals(resolveArg(FOLDER_2), globbedFiles.get(1));
-        assertEquals(resolveArg(FOLDER_3), globbedFiles.get(2));
+        assertEquals(FOLDER_1 + STRING_FILE_SEP, globbedFiles.get(0));
+        assertEquals(FOLDER_2 + STRING_FILE_SEP, globbedFiles.get(1));
+        assertEquals(FOLDER_3 + STRING_FILE_SEP, globbedFiles.get(2));
     }
 
     @Test
@@ -176,10 +176,10 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(4, globbedFiles.size());
-        assertEquals(resolveArg(FILE_1), globbedFiles.get(0));
-        assertEquals(resolveArg(FILE_2), globbedFiles.get(1));
-        assertEquals(resolveArg(FOLDER_1), globbedFiles.get(2));
-        assertEquals(resolveArg(FOLDER_2), globbedFiles.get(3));
+        assertEquals(FILE_1, globbedFiles.get(0));
+        assertEquals(FILE_2, globbedFiles.get(1));
+        assertEquals(FOLDER_1, globbedFiles.get(2));
+        assertEquals(FOLDER_2, globbedFiles.get(3));
     }
 
     @Test
@@ -191,8 +191,8 @@ class RegexArgumentTest {
         List<String> globbedFiles = regexArgument.globFiles();
 
         assertEquals(2, globbedFiles.size());
-        assertEquals(resolveArg(FILE_3), globbedFiles.get(0));
-        assertEquals(resolveArg(FOLDER_3), globbedFiles.get(1));
+        assertEquals(FILE_3, globbedFiles.get(0));
+        assertEquals(FOLDER_3, globbedFiles.get(1));
     }
 
     @Test

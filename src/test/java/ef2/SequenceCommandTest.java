@@ -23,7 +23,6 @@ import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 @Disabled
@@ -58,7 +57,7 @@ class SequenceCommandTest {
     public void evaluate_CallCommand_CommandsExecuted() {
         assertDoesNotThrow(() -> {
             ApplicationRunner appRunner = mock(ApplicationRunner.class);
-            CallCommand callCommand = spy(new CallCommand(List.of("echo", "abc"), appRunner, spy(ArgumentResolver.class)));
+            CallCommand callCommand = spy(new CallCommand(List.of("echo", "abc"), appRunner));
             SequenceCommand command = new SequenceCommand(List.of(callCommand));
 
             command.evaluate(stdin, stdout);
@@ -69,7 +68,7 @@ class SequenceCommandTest {
     @Test
     public void evaluate_PipeCommand_CommandsExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = spy(new CallCommand(List.of("echo", "hello"), new ApplicationRunner(), new ArgumentResolver()));
+            CallCommand command1 = spy(new CallCommand(List.of("echo", "hello"), new ApplicationRunner()));
             CallCommand command2 = mock(CallCommand.class);
 
             PipeCommand pipeCommand = new PipeCommand(List.of(command1, command2));
