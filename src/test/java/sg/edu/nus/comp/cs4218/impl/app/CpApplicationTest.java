@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 
@@ -266,6 +268,7 @@ public class CpApplicationTest {
         assertThrows(Exception.class, () -> app.cpFilesToFolder(false, FOLDER_1, FILE_2));
     }
 
+    @DisabledOnOs(WINDOWS)
     @Test
     public void cpFilesToFolder_SrcFolderContainsDestFolder_ThrowsException() {
         // Create dir folder1/folder2/
