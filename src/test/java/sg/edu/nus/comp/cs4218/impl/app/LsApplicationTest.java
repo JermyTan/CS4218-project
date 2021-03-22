@@ -1,39 +1,20 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_LS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.LsException;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 class LsApplicationTest {
 
@@ -52,7 +33,7 @@ class LsApplicationTest {
     private static final String NESTED_FOLDER = "nestedFolder";
 
     private static final String[] FILES = new String[]{
-            FILE_1, FOLDER_1, FOLDER_2, EMPTY_FOLDER, FOLDER_WITH_HIDDEN_FILE, NESTED_FOLDER
+            FILE_1, FOLDER_1, FOLDER_2, FOLDER_WITH_HIDDEN_FILE, NESTED_FOLDER
     };
     private final OutputStream stdout = new ByteArrayOutputStream();
     private final InputStream stdin = mock(InputStream.class);
@@ -117,12 +98,18 @@ class LsApplicationTest {
     }
 
     @Test
-    public void run_EmptyFolder_EmptyOutput() {
+    public void run_EmptyFolder_EmptyOutput() throws IOException {
+        Path folderPath = Path.of(TEST_DIR, EMPTY_FOLDER);
+        Files.createDirectories(folderPath);
+
         assertDoesNotThrow(() -> app.run(new String[]{EMPTY_FOLDER}, stdin, stdout));
         assertEquals(STRING_EMPTY, stdout.toString());
+
+        Files.delete(folderPath);
     }
 
     @Test
+    @EnabledOnOs({OS.MAC})
     public void run_FolderWithHiddenFile_HiddenFileNotListed() {
         assertDoesNotThrow(() -> app.run(new String[]{FOLDER_WITH_HIDDEN_FILE}, stdin, stdout));
         assertEquals(FILE_1 + STRING_NEWLINE, stdout.toString());
