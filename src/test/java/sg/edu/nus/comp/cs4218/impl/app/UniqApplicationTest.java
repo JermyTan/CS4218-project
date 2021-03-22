@@ -2,6 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+
 import sg.edu.nus.comp.cs4218.*;
 import sg.edu.nus.comp.cs4218.exception.*;
 
@@ -104,12 +107,6 @@ public class UniqApplicationTest {
         createFileWithContent(in2, INPUT_2);
         createFileWithContent(in3, INPUT_3);
 
-        if (Files.notExists(out1)) {
-            Files.createFile(out1);
-        }
-        if (Files.notExists(out2)) {
-            Files.createFile(out2);
-        }
         if (Files.notExists(folder1)) {
             Files.createDirectory(folder1);
         }
@@ -220,6 +217,7 @@ public class UniqApplicationTest {
         );
     }
 
+    @DisabledOnOs(OS.WINDOWS)
     @Test
     public void uniqFromFile_OutputFileNotWritable_ThrowsException() {
         out1.toFile().setWritable(false);
@@ -505,6 +503,7 @@ public class UniqApplicationTest {
         );
     }
 
+    @DisabledOnOs(OS.WINDOWS)
     @Test
     public void uniqFromStdin_OutputFileNotWritable_ThrowsException() {
         stdin = new ByteArrayInputStream(INPUT_1.getBytes());
