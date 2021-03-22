@@ -1,35 +1,23 @@
 package sg.edu.nus.comp.cs4218.integration.pipe;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.cmd.*;
+import sg.edu.nus.comp.cs4218.impl.util.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
-import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 public class PairwiseEchoIT {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "PipePairwiseIT";
+    private static final Path TEST_PATH = Path.of(TEST_DIR);
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -43,13 +31,17 @@ public class PairwiseEchoIT {
     private PipeCommand command;
 
     @BeforeAll
-    static void setupBeforeAll() {
+    static void setupBeforeAll() throws IOException {
+        if (Files.notExists(TEST_PATH)) {
+            Files.createDirectory(TEST_PATH);
+        }
         EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
-    static void tearDownAfterAll() {
+    static void tearDownAfterAll() throws IOException {
         EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
+        Files.delete(TEST_PATH);
     }
 
     private void buildCommand(List<CallCommand> callCommands) throws ShellException {

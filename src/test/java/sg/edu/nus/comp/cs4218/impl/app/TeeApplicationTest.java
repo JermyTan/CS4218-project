@@ -19,6 +19,7 @@ class TeeApplicationTest {
 
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "TeeApplicationTest";
+    private static final Path TEST_PATH = Path.of(TEST_DIR);
 
     private static final String INPUT_1 = "hello world";
     private static final String INPUT_2 = "hello world" + STRING_NEWLINE + "How are you";
@@ -48,13 +49,17 @@ class TeeApplicationTest {
     private TeeApplication app;
 
     @BeforeAll
-    static void setupBeforeAll() {
+    static void setupBeforeAll() throws IOException {
+        if (Files.notExists(TEST_PATH)) {
+            Files.createDirectory(TEST_PATH);
+        }
         EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
-    static void tearDownAfterAll() {
+    static void tearDownAfterAll() throws IOException {
         EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
+        Files.delete(TEST_PATH);
     }
 
     private void createFileWithContent(Path path, String content) throws IOException {
