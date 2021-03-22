@@ -1,46 +1,38 @@
 package sg.edu.nus.comp.cs4218.integration.sequence;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.cmd.*;
+import sg.edu.nus.comp.cs4218.impl.util.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.RmException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
-import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
-import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 public class SequenceCommandIT {
 
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "SequenceCommandIT";
 
+    private static final String FOLDER_1 = "folder1";
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
+
     private static final String INPUT_STRING = "hello world";
     private static final String GREP_PATTERN = "hello";
+
+    private final Path folder1 = Path.of(TEST_DIR, FOLDER_1);
     private final Path file1 = Path.of(TEST_DIR, FILE_1);
     private final Path file2 = Path.of(TEST_DIR, FILE_2);
+
+    private final List<Path> paths = List.of(file1, file2, folder1);
+
     private final InputStream stdin = System.in;
     private final OutputStream stdout = new ByteArrayOutputStream();
     private final ApplicationRunner appRunner = new ApplicationRunner();
@@ -64,15 +56,25 @@ public class SequenceCommandIT {
     void setUp() throws IOException {
         Files.createFile(file1);
         Files.createFile(file2);
+        Files.createDirectory(folder1);
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        Files.deleteIfExists(file1);
-        Files.deleteIfExists(file2);
+        for (Path path : paths) {
+            if (Files.isDirectory(path)) {
+                Files.walk(path)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            } else {
+                Files.deleteIfExists(path);
+            }
+        }
     }
 
     @Test
+    @DisplayName("mv file1.txt file2.txt; grep hello file2.txt")
     public void evaluate_TwoCommandsSameType_CommandsExecuted() {
         assertDoesNotThrow(() -> {
             Files.writeString(file1, INPUT_STRING);
@@ -92,6 +94,7 @@ public class SequenceCommandIT {
     }
 
     @Test
+    @DisplayName("echo hello world | tee file1.txt; grep hello file1.txt")
     public void evaluate_TwoCommandsDifferentTypes_CommandsExecuted() {
         assertDoesNotThrow(() -> {
             String expected = INPUT_STRING;
@@ -113,9 +116,30 @@ public class SequenceCommandIT {
     }
 
     @Test
+    @DisplayName("cd folder1; rm ../file1.txt; cd ..")
+    public void evaluate_ThreeCommands_CommandsExecuted() {
+        assertDoesNotThrow(() -> {
+            Files.writeString(file1, INPUT_STRING);
+
+            CallCommand command1 = new CallCommand(List.of("cd", FOLDER_1), appRunner);
+            CallCommand command2 = new CallCommand(List.of("rm", "../file1.txt"), appRunner);
+            CallCommand command3 = new CallCommand(List.of("cd", "./.."), appRunner);
+
+            buildCommand(List.of(command1, command2, command3));
+
+            command.evaluate(stdin, stdout);
+
+            assertTrue(Files.notExists(file1));
+            assertEquals(TEST_DIR, EnvironmentUtil.currentDirectory);
+
+        });
+    }
+
+    @Test
     public void evaluate_ExceptionThrownInFirstCommand_ExecutionContinues() {
         assertDoesNotThrow(() -> {
             Files.writeString(file1, INPUT_STRING);
+
             CallCommand command1 = new CallCommand(List.of("rm"), appRunner); // No files specified
             CallCommand command2 = new CallCommand(List.of("echo", INPUT_STRING), appRunner);
             buildCommand(List.of(command1, command2));
@@ -125,6 +149,5 @@ public class SequenceCommandIT {
             assertEquals(new RmException(ERR_NO_FILE_ARGS).getMessage() + STRING_NEWLINE
                     + INPUT_STRING + STRING_NEWLINE, stdout.toString());
         });
-
     }
 }

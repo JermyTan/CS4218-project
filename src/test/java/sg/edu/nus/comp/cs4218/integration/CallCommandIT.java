@@ -1,35 +1,18 @@
 package sg.edu.nus.comp.cs4218.integration;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.cmd.*;
+import sg.edu.nus.comp.cs4218.impl.util.*;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.exception.WcException;
-import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 class CallCommandIT {
 
@@ -91,6 +74,7 @@ class CallCommandIT {
     }
 
     @Test
+    @DisplayName("echo abc > file1.txt")
     public void evaluate_EchoCommandWithIORedirect_CommandExecuted() {
         assertDoesNotThrow(() -> {
             buildCommand(List.of("echo", "abc", ">", FILE_1));
@@ -104,6 +88,7 @@ class CallCommandIT {
     }
 
     @Test
+    @DisplayName("ls -X .")
     public void evaluate_LsCommandCwd_CommandExecuted() {
         assertDoesNotThrow(() -> {
             buildCommand(List.of("ls", "-X", "."));
@@ -116,6 +101,21 @@ class CallCommandIT {
     }
 
     @Test
+    @DisplayName("wc `echo file1.txt`")
+    public void evaluate_WcCommandWithCommandSub_CommandExecuted() {
+        assertDoesNotThrow(() -> {
+            buildCommand(List.of("wc", "`echo file1.txt`"));
+
+            command.evaluate(stdin, stdout);
+
+            String output = stdout.toString();
+            assertEquals(String.join(String.valueOf(CHAR_TAB),
+                    "1", "1", "9", FILE_1) + STRING_NEWLINE, output);
+        });
+    }
+
+    @Test
+    @DisplayName("cat *.txt")
     public void evaluate_CatCommandWithGlobbing_CommandExecuted() {
         assertDoesNotThrow(() -> {
             buildCommand(List.of("cat", "*.txt"));
@@ -128,6 +128,7 @@ class CallCommandIT {
     }
 
     @Test
+    @DisplayName("uniq -c file1.txt")
     public void evaluate_UniqCommand_CommandExecuted() {
         assertDoesNotThrow(() -> {
             String expected1 = "Hello World";

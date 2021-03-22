@@ -1,24 +1,14 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 class PasteApplicationTest {
 
@@ -61,12 +51,12 @@ class PasteApplicationTest {
 
     @Test
     public void run_NullOutputStream_ThrowsException() {
-        assertThrows(Exception.class, () -> app.run(new String[]{FILE_1, FILE_2}, stdin, null));
+        assertThrows(PasteException.class, () -> app.run(new String[]{FILE_1, FILE_2}, stdin, null));
     }
 
     @Test
     public void run_ArgListContainsNull_ThrowsException() {
-        assertThrows(Exception.class, () -> app.run(new String[]{null}, stdin, stdout));
+        assertThrows(PasteException.class, () -> app.run(new String[]{null}, stdin, stdout));
     }
 
     @Test
@@ -80,7 +70,7 @@ class PasteApplicationTest {
 
     @Test
     public void run_FileDoesNotExist_ThrowsException() {
-        assertThrows(Exception.class, () -> app.run(new String[]{FILE_4}, null, stdout));
+        assertThrows(PasteException.class, () -> app.run(new String[]{FILE_4}, null, stdout));
     }
 
     @Test
@@ -173,8 +163,8 @@ class PasteApplicationTest {
 
     @Test
     public void mergeStdin_NullArgs_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeStdin(null, stdin));
-        assertThrows(Exception.class, () -> app.mergeStdin(false, null));
+        assertThrows(PasteException.class, () -> app.mergeStdin(null, stdin));
+        assertThrows(PasteException.class, () -> app.mergeStdin(false, null));
     }
 
     @Test
@@ -190,17 +180,17 @@ class PasteApplicationTest {
 
     @Test
     public void mergeFile_NullFilenames_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeFile(false, (String[]) null));
+        assertThrows(PasteException.class, () -> app.mergeFile(false, (String[]) null));
     }
 
     @Test
     public void mergeFile_EmptyFilenames_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeFile(false));
+        assertThrows(PasteException.class, () -> app.mergeFile(false));
     }
 
     @Test
     public void mergeFile_FilenamesContainNull_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeFile(false, FILE_1, null));
+        assertThrows(PasteException.class, () -> app.mergeFile(false, FILE_1, null));
     }
 
     @Test
@@ -225,32 +215,42 @@ class PasteApplicationTest {
 
     @Test
     public void mergeFile_FileDoesNotExist_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeFile(false, FILE_4));
+        assertThrows(PasteException.class, () -> app.mergeFile(false, FILE_4));
+    }
+
+    @Test
+    public void mergeFile_NullIsSerial_ThrowsException() {
+        assertThrows(PasteException.class, () -> app.mergeFile(null, FILE_2, FILE_3));
     }
 
     @Test
     public void mergeFile_DirectorySupplied_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeFile(false, FOLDER_1));
+        assertThrows(PasteException.class, () -> app.mergeFile(false, FOLDER_1));
+    }
+
+    @Test
+    public void mergeFileAndStdin_NullIsSerial_ThrowsException() {
+        assertThrows(PasteException.class, () -> app.mergeFileAndStdin(null, stdin, FILE_1));
     }
 
     @Test
     public void mergeFileAndStdin_NullStdin_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeFileAndStdin(false, null, FILE_1));
+        assertThrows(PasteException.class, () -> app.mergeFileAndStdin(false, null, FILE_1));
     }
 
     @Test
     public void mergeFileAndStdin_NullFilenames_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeFileAndStdin(false, stdin, (String[]) null));
+        assertThrows(PasteException.class, () -> app.mergeFileAndStdin(false, stdin, (String[]) null));
     }
 
     @Test
     public void mergeFileAndStdin_EmptyFilenames_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeFileAndStdin(false, stdin));
+        assertThrows(PasteException.class, () -> app.mergeFileAndStdin(false, stdin));
     }
 
     @Test
     public void mergeFileAndStdin_FilenamesContainNull_ThrowsException() {
-        assertThrows(Exception.class, () -> app.mergeFileAndStdin(false, stdin, FILE_1, null));
+        assertThrows(PasteException.class, () -> app.mergeFileAndStdin(false, stdin, FILE_1, null));
     }
 
     @Test

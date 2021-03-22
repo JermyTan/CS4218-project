@@ -1,41 +1,19 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_TEE;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.IOUtils.getLinesFromInputStream;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_LABEL_VALUE_PAIR;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.TeeException;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.IOUtils.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 class TeeApplicationTest {
 
@@ -138,6 +116,11 @@ class TeeApplicationTest {
     @Test
     public void teeFromStdin_FileNamesContainNull_ThrowsException() {
         assertThrows(TeeException.class, () -> app.teeFromStdin(false, inputStream, OUTPUT_FILE_1, null));
+    }
+
+    @Test
+    public void teeFromStdin_FileNamesContainEmptyStr_ThrowsException() {
+        assertThrows(TeeException.class, () -> app.teeFromStdin(false, inputStream, OUTPUT_FILE_1, STRING_EMPTY));
     }
 
     @Test
@@ -268,6 +251,26 @@ class TeeApplicationTest {
         inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
         Throwable error = assertThrows(TeeException.class, () -> app.run(ARGS_1, inputStream, null));
         assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_TEE, ERR_NO_OSTREAM), error.getMessage());
+    }
+
+    @Test
+    public void run_EmptyStdin_NoOutputWritten() {
+        inputStream = new ByteArrayInputStream(new byte[0]);
+        assertDoesNotThrow(() -> app.run(new String[0], inputStream, STD_OUTPUT));
+        assertEquals(STRING_EMPTY, STD_OUTPUT.toString());
+    }
+
+    @Test
+    public void run_NullArgs_Success() {
+        inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
+        assertDoesNotThrow(() -> app.run(null, inputStream, STD_OUTPUT));
+    }
+
+    @Test
+    public void run_ArgsContainNull_ThrowsException() {
+        inputStream = new ByteArrayInputStream(INPUT_1.getBytes());
+        Throwable exception = assertThrows(TeeException.class, () -> app.run(new String[]{null}, inputStream, STD_OUTPUT));
+        assertEquals(String.format(STRING_LABEL_VALUE_PAIR, APP_TEE, ERR_NULL_ARGS), exception.getMessage());
     }
 
     @Test

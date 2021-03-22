@@ -1,30 +1,18 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_CAT;
-import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_ECHO;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_SINGLE_WORD;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.util.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 class CallCommandTest {
 
@@ -90,6 +78,18 @@ class CallCommandTest {
             command.evaluate(stdin, stdout);
 
             verify(appRunner).runApp(APP_ECHO, new String[]{STRING_SINGLE_WORD}, stdin, stdout);
+        });
+    }
+
+    @Test
+    public void evaluate_EmptyParsedArgList_NoAppRun() {
+        assertDoesNotThrow(() -> {
+            buildCommand(List.of("<", FILE_1, ">", FILE_2));
+
+            command.evaluate(stdin, stdout);
+
+            // No app is run
+            verify(appRunner, never()).runApp(any(), any(), eq(stdin), eq(stdout));
         });
     }
 
