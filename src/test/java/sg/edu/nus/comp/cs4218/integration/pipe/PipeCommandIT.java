@@ -18,6 +18,7 @@ class PipeCommandIT {
 
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "PipeCommandIT";
+    private static final Path TEST_PATH = Path.of(TEST_DIR);
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -31,13 +32,17 @@ class PipeCommandIT {
     private PipeCommand command;
 
     @BeforeAll
-    static void setupBeforeAll() {
+    static void setupBeforeAll() throws IOException {
+        if (Files.notExists(TEST_PATH)) {
+            Files.createDirectory(TEST_PATH);
+        }
         EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
-    static void tearDownAfterAll() {
+    static void tearDownAfterAll() throws IOException {
         EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
+        Files.delete(TEST_PATH);
     }
 
     private void buildCommand(List<CallCommand> callCommands) throws ShellException {

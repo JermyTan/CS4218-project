@@ -21,6 +21,7 @@ class MvApplicationTest {
 
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "MvApplicationTest";
+    private static final Path TEST_PATH = Path.of(TEST_DIR);
 
     private static final String FILE_1 = "file1.txt";
     private static final String FILE_2 = "file2.txt";
@@ -44,13 +45,17 @@ class MvApplicationTest {
     private MvApplication app;
 
     @BeforeAll
-    static void setupBeforeAll() {
+    static void setupBeforeAll() throws IOException {
+        if (Files.notExists(TEST_PATH)) {
+            Files.createDirectory(TEST_PATH);
+        }
         EnvironmentUtil.currentDirectory = TEST_DIR;
     }
 
     @AfterAll
-    static void tearDownAfterAll() {
+    static void tearDownAfterAll() throws IOException {
         EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
+        Files.delete(TEST_PATH);
     }
 
     private void createFileWithContent(Path path, String content) throws IOException {
