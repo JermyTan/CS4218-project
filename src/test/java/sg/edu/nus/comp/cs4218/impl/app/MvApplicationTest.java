@@ -1,6 +1,9 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+
 import sg.edu.nus.comp.cs4218.*;
 import sg.edu.nus.comp.cs4218.exception.*;
 
@@ -344,6 +347,7 @@ class MvApplicationTest {
         assertEquals(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARGS), exception.getMessage());
     }
 
+    @DisabledOnOs(OS.WINDOWS)
     @Test
     public void mvSrcFileToDestFile_DestFileNotWritable_ThrowsException() {
         String srcFile = FILE_1;

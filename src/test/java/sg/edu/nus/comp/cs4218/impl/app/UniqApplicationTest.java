@@ -138,9 +138,15 @@ public class UniqApplicationTest {
         createFileWithContent(in2, INPUT_2);
         createFileWithContent(in3, INPUT_3);
 
-        Files.createFile(out1);
-        Files.createFile(out2);
-        Files.createDirectory(folder1);
+        if (Files.notExists(out1)) {
+            Files.createFile(out1);
+        }
+        if (Files.notExists(out2)) {
+            Files.createFile(out2);
+        }
+        if (Files.notExists(folder1)) {
+            Files.createDirectory(folder1);
+        }
 
         stdin = new ByteArrayInputStream(STRING_EMPTY.getBytes());
         stdout = new ByteArrayOutputStream();
