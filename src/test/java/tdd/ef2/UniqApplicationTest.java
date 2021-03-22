@@ -1,33 +1,17 @@
 package tdd.ef2;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.app.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.UniqException;
-import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 public class UniqApplicationTest {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
