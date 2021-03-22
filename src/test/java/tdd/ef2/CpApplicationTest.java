@@ -17,6 +17,8 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
@@ -228,6 +230,7 @@ public class CpApplicationTest {
         assertTrue(Files.notExists(destFile));
     }
 
+    @DisabledOnOs(OS.WINDOWS)
     @Test
     void run_DirectoryToSameDirectoryWithFlag_ThrowsException() throws IOException {
         String sameName = "same_dir";

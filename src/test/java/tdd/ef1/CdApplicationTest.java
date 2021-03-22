@@ -19,6 +19,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
@@ -164,8 +166,8 @@ class CdApplicationTest {
     }
 
     // Cd into folder with no permissions
+    @DisabledOnOs(OS.WINDOWS)
     @Test
-    // @DisabledOnOs(WINDOWS)
     public void run_BlockedFolder_ThrowsExeception() {
         String[] argList = new String[]{BLOCKED_FOLDER};
         Exception expectedException = assertThrows(CdException.class, () -> {

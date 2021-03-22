@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
@@ -147,6 +149,7 @@ class MvApplicationTest {
         assertEquals(0, expectedNewFileContents.size());
     }
 
+    @DisabledOnOs(OS.WINDOWS)
     @Test
     public void run_unwritableDestFolder_ThrowsException() {
         // no permissions to move files into blocked folder
