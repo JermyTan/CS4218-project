@@ -158,7 +158,7 @@ class IOUtilsTest {
                 + "testing 121"
                 + STRING_NEWLINE
                 + STRING_NEWLINE
-                +"This is the end of the test file";
+                + "This is the end of the test file";
         List<String> expected = List.of(
                 "This is the start of the test file",
                 STRING_EMPTY,
