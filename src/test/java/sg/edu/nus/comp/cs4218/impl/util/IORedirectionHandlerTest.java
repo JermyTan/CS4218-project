@@ -21,7 +21,7 @@ class IORedirectionHandlerTest {
     private static final String FILE_1 = "file1.txt"; // exists
     private static final String FILE_2 = "file2.txt"; // exists
     private static final String FILE_3 = "file3.txt"; // does not exist
-    private static final Path PATH_1 = Path.of(TEST_DIR, FILE_2);
+    private static final Path PATH_1 = Path.of(TEST_DIR, FILE_1);
     private static final Path PATH_2 = Path.of(TEST_DIR, FILE_2);
     private static final Path PATH_3 = Path.of(TEST_DIR, FILE_3);
 
@@ -35,16 +35,25 @@ class IORedirectionHandlerTest {
             Files.createDirectory(TEST_PATH);
         }
 
+        if (Files.notExists(PATH_1)) {
+            Files.createFile(PATH_1);
+        }
+
+        if (Files.notExists(PATH_2)) {
+            Files.createFile(PATH_2);
+        }
+
         EnvironmentUtil.currentDirectory = TEST_DIR;
-        Files.createFile(PATH_1);
-        Files.createFile(PATH_2);
     }
 
     @AfterAll
     static void tearDownAfterAll() throws IOException {
         EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
 
-        Files.delete(TEST_PATH);
+        Files.walk(TEST_PATH)
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
     }
 
     private void buildRedirHandler(List<String> argsList) throws Exception {
