@@ -1,41 +1,24 @@
 package sg.edu.nus.comp.cs4218.integration.sequence;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
+import org.junit.jupiter.api.*;
+import sg.edu.nus.comp.cs4218.*;
+import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.impl.cmd.*;
+import sg.edu.nus.comp.cs4218.impl.util.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.List;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.CdException;
-import sg.edu.nus.comp.cs4218.exception.MvException;
-import sg.edu.nus.comp.cs4218.exception.RmException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
-import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
+import static org.junit.jupiter.api.Assertions.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.testutil.TestConstants.*;
 
 public class PairwiseCdIT {
     private static final String ORIGINAL_DIR = EnvironmentUtil.currentDirectory;
     private static final String TEST_DIR = EnvironmentUtil.currentDirectory + STRING_FILE_SEP + RESOURCES_PATH + STRING_FILE_SEP + "SequencePairwiseIT";
+    private static final Path TEST_PATH = Path.of(TEST_DIR);
 
     private static final String FOLDER_1 = "folder1";
     private static final String FILE_1 = "file1.txt";
@@ -52,9 +35,18 @@ public class PairwiseCdIT {
     private final ApplicationRunner appRunner = new ApplicationRunner();
     private SequenceCommand command;
 
+    @BeforeAll
+    static void setupBeforeAll() throws IOException {
+        if (Files.notExists(TEST_PATH)) {
+            Files.createDirectory(TEST_PATH);
+        }
+        EnvironmentUtil.currentDirectory = TEST_DIR;
+    }
+
     @AfterAll
-    static void tearDownAfterAll() {
+    static void tearDownAfterAll() throws IOException {
         EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
+        Files.delete(TEST_PATH);
     }
 
     private void buildCommand(List<Command> commands) throws ShellException {
