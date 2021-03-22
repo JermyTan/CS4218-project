@@ -19,6 +19,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_OPTIONS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
@@ -52,7 +53,7 @@ class SplitApplicationTest {
     private static final String TEST_FILENAME = "test.txt";
     private static final String NON_EXISTENT_FILE = "non-existent.txt";
     private static final String TEST_FOLDER = "folder";
-    private static final String TEST_STRING = "The quick brown fox jumped over the lazy dog.\n"; // 46 bytes
+    private static final String TEST_STRING = "The quick brown fox jumped over the lazy dog." + STRING_NEWLINE; // 46 bytes
     private static final String XAA = "xaa";
     private static final String XAB = "xab";
     private static final String XAC = "xac";

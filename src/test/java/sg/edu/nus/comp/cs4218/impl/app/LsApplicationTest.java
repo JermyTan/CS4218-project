@@ -108,8 +108,8 @@ class LsApplicationTest {
         Files.delete(folderPath);
     }
 
+    @DisabledOnOs(OS.WINDOWS)
     @Test
-    @EnabledOnOs({OS.MAC})
     public void run_FolderWithHiddenFile_HiddenFileNotListed() {
         assertDoesNotThrow(() -> app.run(new String[]{FOLDER_WITH_HIDDEN_FILE}, stdin, stdout));
         assertEquals(FILE_1 + STRING_NEWLINE, stdout.toString());

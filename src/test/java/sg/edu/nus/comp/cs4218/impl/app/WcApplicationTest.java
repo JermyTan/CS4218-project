@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
@@ -49,7 +50,7 @@ class WcApplicationTest {
     private static final String TEST_FILENAME_1 = "test1.txt";
     private static final String TEST_FILENAME_2 = "test2.txt";
     private static final String TEST_FILENAME_3 = "test3.txt";
-    private static final String TEST_STRING = "The quick brown fox jumped over the lazy dog.\n"; // 9 words 46 bytes
+    private static final String TEST_STRING = "The quick brown fox jumped over the lazy dog." + STRING_NEWLINE; // 9 words 46 bytes
     private static final String NON_EXISTENT_FILE = "non-existent.txt";
     private static final String TEST_FOLDER = "folder";
 

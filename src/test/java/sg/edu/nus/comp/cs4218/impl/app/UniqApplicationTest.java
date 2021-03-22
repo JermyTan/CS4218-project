@@ -115,7 +115,6 @@ public class UniqApplicationTest {
 
     @AfterAll
     static void tearDownAfterAll() throws IOException {
-        Files.deleteIfExists(TEST_PATH);
         EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
     }
 
@@ -161,9 +160,9 @@ public class UniqApplicationTest {
                             .sorted(Comparator.reverseOrder())
                             .map(Path::toFile)
                             .forEach(File::delete);
-                } else {
-                    Files.deleteIfExists(path);
                 }
+
+                Files.deleteIfExists(path);
             } catch (Exception e) {
                 // do nth
             }

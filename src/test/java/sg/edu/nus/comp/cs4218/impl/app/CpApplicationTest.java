@@ -194,6 +194,7 @@ public class CpApplicationTest {
     }
 
     // Assume we do not allow this
+    @DisabledOnOs(OS.WINDOWS)
     @Test
     public void run_IdenticalFolder_ThrowsException() {
         assertThrows(Exception.class, () -> app.run(new String[]{"-r", FOLDER_1, FOLDER_1}, stdin, stdout));
@@ -235,6 +236,7 @@ public class CpApplicationTest {
         assertThrows(Exception.class, () -> app.cpSrcFileToDestFile(false, srcFile, destFile));
     }
 
+    @DisabledOnOs(OS.WINDOWS)
     @Test
     public void cpSrcFileToDestFile_DestFileNotWritable_ThrowsException() {
         String srcFile = FILE_1;

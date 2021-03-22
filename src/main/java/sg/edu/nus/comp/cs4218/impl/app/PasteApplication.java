@@ -5,6 +5,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_TAB;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_FLAG;
 
@@ -116,8 +118,8 @@ public class PasteApplication implements PasteInterface {
         if (isSerial) {
             for (InputStream stream : streams) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                String line = reader.lines().collect(Collectors.joining("\t"));
-                stringBuilder.append(line.trim()).append('\n');
+                String line = reader.lines().collect(Collectors.joining(String.valueOf(CHAR_TAB)));
+                stringBuilder.append(line.trim()).append(STRING_NEWLINE);
                 reader.close();
                 stream.close();
             }
@@ -142,7 +144,7 @@ public class PasteApplication implements PasteInterface {
                     line.append('\t');
                 }
                 if (hasData) {
-                    stringBuilder.append(line.toString().stripTrailing()).append('\n');
+                    stringBuilder.append(line.toString().stripTrailing()).append(STRING_NEWLINE);
                 }
             }
             for (InputStream stream : streams) {

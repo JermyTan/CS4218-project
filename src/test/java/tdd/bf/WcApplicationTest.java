@@ -68,7 +68,7 @@ public class WcApplicationTest {
     }
 
     private Path createFile(String name) throws IOException {
-        String content = "First line\nSecond line\nThird line\nFourth line\n";
+        String content = "First line" + STRING_NEWLINE + "Second line" + STRING_NEWLINE + "Third line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE;
         Path path = TEMP_PATH.resolve(name);
         Files.createFile(path);
         Files.write(path, content.getBytes());
@@ -152,7 +152,7 @@ public class WcApplicationTest {
     @Test
     void run_SingleInputNoFileSpecified_DisplaysLinesWordsBytes() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String input = "First line\nSecond line\nThird line\nFourth line\n";
+        String input = "First line" + STRING_NEWLINE + "Second line" + STRING_NEWLINE + "Third line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE;
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long fileSize = input.getBytes().length;
         new WcApplication().run(toArgs(STRING_EMPTY), inputStream, output);
@@ -162,7 +162,7 @@ public class WcApplicationTest {
     @Test
     void run_SingleInputDash_DisplaysLinesWordsBytes() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String input = "First line\nSecond line\nThird line\nFourth line\n";
+        String input = "First line" + STRING_NEWLINE + "Second line" + STRING_NEWLINE + "Third line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE;
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long fileSize = input.getBytes().length;
         new WcApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG), inputStream, output);
@@ -190,7 +190,7 @@ public class WcApplicationTest {
         String fileIName = "fileI.txt";
         Path fileIPath = createFile(fileIName);
         long fileISize = Files.size(fileIPath);
-        String input = "First line\nSecond line\nThird line\nFourth line\n";
+        String input = "First line" + STRING_NEWLINE + "Second line" + STRING_NEWLINE + "Third line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE;
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long inputSize = input.getBytes().length;
         new WcApplication().run(toArgs(STRING_EMPTY, fileIName, STRING_STDIN_FLAG), inputStream, output);
@@ -228,7 +228,7 @@ public class WcApplicationTest {
         captureErr();
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String input = "First line\nSecond line\nThird line\nFourth line\n";
+        String input = "First line" + STRING_NEWLINE + "Second line" + STRING_NEWLINE + "Third line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE;
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         long inputSize = input.getBytes().length;
         String nonexistentFileName = "nonexistent_file.txt";

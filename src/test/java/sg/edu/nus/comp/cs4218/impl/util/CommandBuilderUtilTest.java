@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.STRING_BLANK;
 
 import java.util.List;
@@ -54,7 +55,7 @@ class CommandBuilderUtilTest {
     @Test
     void parseCommand_HasNewline_ThrowsException() {
         assertThrows(ShellException.class, () -> {
-            CommandBuilderUtil.parseCommand("ls \n", new ApplicationRunner());
+            CommandBuilderUtil.parseCommand("ls" + STRING_NEWLINE, new ApplicationRunner());
         });
     }
 

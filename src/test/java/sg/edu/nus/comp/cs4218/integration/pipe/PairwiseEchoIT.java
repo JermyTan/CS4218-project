@@ -69,10 +69,10 @@ public class PairwiseEchoIT {
     }
 
     @Test
-    @DisplayName("echo hello world | wc")
+    @DisplayName("echo byeee world | wc")
     public void evaluate_EchoThenWc_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of(ECHO, "hello", "world"), appRunner);
+            CallCommand command1 = new CallCommand(List.of(ECHO, "byeee", "world"), appRunner);
             CallCommand command2 = new CallCommand(List.of("wc"), appRunner);
 
             buildCommand(List.of(command1, command2));
@@ -132,7 +132,7 @@ public class PairwiseEchoIT {
     @DisplayName("echo hello world\ncs4218 | split -l 1")
     public void evaluate_EchoThenSplit_CommandExecuted() {
         assertDoesNotThrow(() -> {
-            CallCommand command1 = new CallCommand(List.of(ECHO, "hello world\ncs4218"), appRunner);
+            CallCommand command1 = new CallCommand(List.of(ECHO, "hello world" + STRING_NEWLINE + "cs4218"), appRunner);
             CallCommand command2 = new CallCommand(List.of("split", "-l", "1"), appRunner);
 
             buildCommand(List.of(command1, command2));
@@ -181,7 +181,7 @@ public class PairwiseEchoIT {
         assertDoesNotThrow(() -> {
             Files.writeString(file1, String.join(STRING_NEWLINE, "A", "B"));
 
-            CallCommand command1 = new CallCommand(List.of(ECHO, "hello\nworld"), appRunner);
+            CallCommand command1 = new CallCommand(List.of(ECHO, "hello" + STRING_NEWLINE + "world"), appRunner);
             CallCommand command2 = new CallCommand(List.of("paste", "-s", FILE_1, "-"), appRunner);
 
             buildCommand(List.of(command1, command2));

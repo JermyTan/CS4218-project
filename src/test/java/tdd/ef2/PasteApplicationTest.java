@@ -71,7 +71,7 @@ public class PasteApplicationTest {
     @Test
     void run_SingleStdinNullStdout_ThrowsException() throws AbstractApplicationException {
         ByteArrayOutputStream output = null;
-        String text = "Test line 1\nTest line 2\nTest line 3";
+        String text = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE + "Test line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY), inputStream, output));
     }
@@ -94,7 +94,7 @@ public class PasteApplicationTest {
     @Test
     void run_SingleStdinNoFlag_DisplaysStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = "Test line 1\nTest line 2\nTest line 3";
+        String text = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE + "Test line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new PasteApplication().run(toArgs(STRING_EMPTY), inputStream, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
@@ -104,7 +104,7 @@ public class PasteApplicationTest {
     @Test
     void run_SingleStdinFlag_DisplaysNonParallelStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = "Test line 1\nTest line 2\nTest line 3";
+        String text = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE + "Test line 3";
         String expectedText = "Test line 1\tTest line 2\tTest line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new PasteApplication().run(toArgs("s"), inputStream, output);
@@ -114,7 +114,7 @@ public class PasteApplicationTest {
     @Test
     void run_SingleStdinDashNoFlag_DisplaysStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = "Test line 1\nTest line 2\nTest line 3";
+        String text = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE + "Test line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new PasteApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG), inputStream, output);
         assertArrayEquals((text + STRING_NEWLINE).getBytes(), output.toByteArray());
@@ -123,7 +123,7 @@ public class PasteApplicationTest {
     @Test
     void run_SingleStdinDashFlag_DisplaysNonParallelStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String text = "Test line 1\nTest line 2\nTest line 3";
+        String text = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE + "Test line 3";
         String expectedText = "Test line 1\tTest line 2\tTest line 3";
         InputStream inputStream = new ByteArrayInputStream(text.getBytes());
         new PasteApplication().run(toArgs("s", STRING_STDIN_FLAG), inputStream, output);
@@ -172,7 +172,7 @@ public class PasteApplicationTest {
     void run_SingleFileNoFlag_DisplaysFileContents() throws IOException, AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileA.txt";
-        String text = "Test line 1\nTest line 2\nTest line 3";
+        String text = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE + "Test line 3";
         Path filePath = createFile(fileName, text);
         File file = new File(filePath.toString());
         new PasteApplication().run(toArgs(STRING_EMPTY, fileName), System.in, output);
@@ -183,7 +183,7 @@ public class PasteApplicationTest {
     void run_SingleFileFlag_DisplaysNonParallelFileContents() throws IOException, AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileB.txt";
-        String text = "Test line 1\nTest line 2\nTest line 3";
+        String text = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE + "Test line 3";
         String expectedText = "Test line 1\tTest line 2\tTest line 3";
         createFile(fileName, text);
         new PasteApplication().run(toArgs("s", fileName), System.in, output);
@@ -215,7 +215,7 @@ public class PasteApplicationTest {
     void run_SingleFileUnknownFlag_ThrowsException() throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileE.txt";
-        String text = "Test line 1\nTest line 2\nTest line 3";
+        String text = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE + "Test line 3";
         createFile(fileName, text);
         assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs("a", fileName), System.in, output));
     }
@@ -225,9 +225,9 @@ public class PasteApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileF.txt";
         String fileName2 = "fileG.txt";
-        String text1 = "Test line 1.1\nTest line 1.2\nTest line 1.3";
-        String text2 = "Test line 2.1\nTest line 2.2";
-        String expectedText = "Test line 1.1\tTest line 2.1\nTest line 1.2\tTest line 2.2\nTest line 1.3";
+        String text1 = "Test line 1.1" + STRING_NEWLINE + "Test line 1.2" + STRING_NEWLINE + "Test line 1.3";
+        String text2 = "Test line 2.1" + STRING_NEWLINE + "Test line 2.2";
+        String expectedText = "Test line 1.1\tTest line 2.1" + STRING_NEWLINE + "Test line 1.2\tTest line 2.2" + STRING_NEWLINE + "Test line 1.3";
         Path filePath1 = createFile(fileName1, text1);
         File file1 = new File(filePath1.toString());
         Path filePath2 = createFile(fileName2, text2);
@@ -241,9 +241,9 @@ public class PasteApplicationTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileH.txt";
         String fileName2 = "fileI.txt";
-        String text1 = "Test line 1.1\nTest line 1.2\nTest line 1.3";
-        String text2 = "Test line 2.1\nTest line 2.2";
-        String expectedText = "Test line 1.1\tTest line 1.2\tTest line 1.3\nTest line 2.1\tTest line 2.2";
+        String text1 = "Test line 1.1" + STRING_NEWLINE + "Test line 1.2" + STRING_NEWLINE + "Test line 1.3";
+        String text2 = "Test line 2.1" + STRING_NEWLINE + "Test line 2.2";
+        String expectedText = "Test line 1.1\tTest line 1.2\tTest line 1.3" + STRING_NEWLINE + "Test line 2.1\tTest line 2.2";
         Path filePath1 = createFile(fileName1, text1);
         File file1 = new File(filePath1.toString());
         Path filePath2 = createFile(fileName2, text2);
@@ -284,7 +284,7 @@ public class PasteApplicationTest {
     @Test
     void run_SingleStdinNonexistentFileNoFlag_ThrowsException() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String stdinText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
+        String stdinText = "Test line 1.1" + STRING_NEWLINE + "Test line 1.2" + STRING_NEWLINE + "Test line 1.3";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String nonexistentFileName = "nonexistent_file.txt";
         assertThrows(PasteException.class, () -> new PasteApplication().run(toArgs(STRING_EMPTY, nonexistentFileName),
@@ -294,7 +294,7 @@ public class PasteApplicationTest {
     @Test
     void run_SingleStdinDirectoryNoFlag_ThrowsException() throws AbstractApplicationException, IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String stdinText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
+        String stdinText = "Test line 1.1" + STRING_NEWLINE + "Test line 1.2" + STRING_NEWLINE + "Test line 1.3";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String directoryName = "nonexistent_file.txt";
         Path path = Path.of(EnvironmentUtil.currentDirectory, directoryName);
@@ -308,13 +308,13 @@ public class PasteApplicationTest {
     void run_SingleStdinDashSingleFileNoFlag_DisplaysMergedStdinFileContents() throws IOException,
             AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String stdinText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
+        String stdinText = "Test line 1.1" + STRING_NEWLINE + "Test line 1.2" + STRING_NEWLINE + "Test line 1.3";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
         String fileName = "fileN.txt";
-        String fileText = "Test line 2.1\nTest line 2.2";
+        String fileText = "Test line 2.1" + STRING_NEWLINE + "Test line 2.2";
         Path filePath = createFile(fileName, fileText);
         File file = new File(filePath.toString());
-        String expectedText = "Test line 1.1\tTest line 2.1\nTest line 1.2\tTest line 2.2\nTest line 1.3";
+        String expectedText = "Test line 1.1\tTest line 2.1" + STRING_NEWLINE + "Test line 1.2\tTest line 2.2" + STRING_NEWLINE + "Test line 1.3";
         new PasteApplication().run(toArgs(STRING_EMPTY, STRING_STDIN_FLAG, fileName), inputStream, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
@@ -323,13 +323,13 @@ public class PasteApplicationTest {
     void run_SingleFileSingleStdinDashNoFlag_DisplaysNonParallelMergedFileStdinContents() throws IOException,
             AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String fileText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
+        String fileText = "Test line 1.1" + STRING_NEWLINE + "Test line 1.2" + STRING_NEWLINE + "Test line 1.3";
         String fileName = "fileO.txt";
         Path filePath = createFile(fileName, fileText);
         File file = new File(filePath.toString());
-        String stdinText = "Test line 2.1\nTest line 2.2";
+        String stdinText = "Test line 2.1" + STRING_NEWLINE + "Test line 2.2";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes());
-        String expectedText = "Test line 1.1\tTest line 2.1\nTest line 1.2\tTest line 2.2\nTest line 1.3";
+        String expectedText = "Test line 1.1\tTest line 2.1" + STRING_NEWLINE + "Test line 1.2\tTest line 2.2" + STRING_NEWLINE + "Test line 1.3";
         new PasteApplication().run(toArgs(STRING_EMPTY, fileName, STRING_STDIN_FLAG), inputStream, output);
         assertArrayEquals((expectedText + STRING_NEWLINE).getBytes(), output.toByteArray());
     }

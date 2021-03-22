@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
 import java.io.FileInputStream;
@@ -149,7 +150,15 @@ class IOUtilsTest {
 
     @Test
     void getLinesFromInputStream_ValidStream_ReturnsLinesFromStream() {
-        String testString = "This is the start of the test file\n\ntesting 123     21212    12 12  .\ntesting 121\n\nThis is the end of the test file";
+        String testString = "This is the start of the test file"
+                + STRING_NEWLINE
+                + STRING_NEWLINE
+                + "testing 123     21212    12 12  ."
+                + STRING_NEWLINE
+                + "testing 121"
+                + STRING_NEWLINE
+                + STRING_NEWLINE
+                +"This is the end of the test file";
         List<String> expected = List.of(
                 "This is the start of the test file",
                 STRING_EMPTY,

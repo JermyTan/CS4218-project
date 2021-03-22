@@ -32,8 +32,8 @@ import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
 
 public class GrepApplicationTest {
-    public static final byte[] BYTES_A = "First line\nSecond line\nThird line\nFourth line\n".getBytes();
-    public static final byte[] BYTES_B = "Fifth line\nSixth line\nSeventh line\nEighth line\n".getBytes();
+    public static final byte[] BYTES_A = ("First line" + STRING_NEWLINE + "Second line" + STRING_NEWLINE + "Third line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE).getBytes();
+    public static final byte[] BYTES_B = ("Fifth line" + STRING_NEWLINE + "Sixth line" + STRING_NEWLINE + "Seventh line" + STRING_NEWLINE + "Eighth line" + STRING_NEWLINE).getBytes();
     private static final String TEMP = "temp-grep";
     public static final Path TEMP_PATH = Path.of(EnvironmentUtil.currentDirectory, TEMP);
     public static Deque<Path> files = new ArrayDeque<>();
