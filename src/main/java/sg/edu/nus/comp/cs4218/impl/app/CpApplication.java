@@ -1,10 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +21,13 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.impl.parser.CpArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 
 public class CpApplication implements CpInterface {
 
@@ -96,14 +98,14 @@ public class CpApplication implements CpInterface {
         try {
             Path destFolderPath = IOUtils.resolveAbsoluteFilePath(destFolder);
             if (Files.isRegularFile(destFolderPath)) {
-                throw new InvalidDirectoryException(destFolder, ERR_INVALID_FILES);
+                throw new InvalidDirectoryException(destFolder, ERR_IS_NOT_DIR);
             }
             boolean destExisted = false;
             if (Files.notExists(destFolderPath)) {
                 if (isRecursive) {
                     Files.createDirectories(destFolderPath);
                 } else {
-                    throw new InvalidDirectoryException(destFolder, ERR_INVALID_FILES);
+                    throw new InvalidDirectoryException(destFolder, ERR_IS_NOT_DIR);
                 }
             } else {
                 destExisted = true;
@@ -113,6 +115,7 @@ public class CpApplication implements CpInterface {
                 throw new InvalidArgsException(ERR_INVALID_FILES);
             }
 
+            Exception toBeThrown = null;
             for (String fileName : fileNames) {
                 if (fileName == null || fileName.length() == 0) {
                     throw new InvalidDirectoryException(fileName, ERR_INVALID_ARGS);
@@ -121,7 +124,9 @@ public class CpApplication implements CpInterface {
                 if (Files.notExists(srcFilePath)) {
                     throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
                 }
-
+                if (Files.isDirectory(srcFilePath) && !isRecursive) {
+                    toBeThrown = new InvalidDirectoryException(fileName, ERR_IS_DIR);
+                }
                 Path destFilePath = destExisted ? destFolderPath.resolve(srcFilePath.getFileName()) : destFolderPath;
                 if (Files.isRegularFile(srcFilePath) || isRecursive) {
                     Files.copy(srcFilePath, destFilePath, StandardCopyOption.REPLACE_EXISTING);
@@ -151,6 +156,9 @@ public class CpApplication implements CpInterface {
                                 }
                             });
                 }
+            }
+            if (toBeThrown != null) {
+                throw toBeThrown;
             }
             return null;
         } catch (Exception e) {

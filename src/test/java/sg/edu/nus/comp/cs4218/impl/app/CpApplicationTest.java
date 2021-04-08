@@ -157,12 +157,8 @@ public class CpApplicationTest {
 
     @Test
     public void run_CopyFilesNonRecursive_FolderSkipped() {
-        assertDoesNotThrow(() -> app.run(new String[]{FOLDER_1, FILE_3, FOLDER_3}, stdin, stdout));
-
         // cp folder1 file3.txt folder3
-        assertDoesNotThrow(() -> verify(app).cpFilesToFolder(false, FOLDER_3, FOLDER_1, FILE_3));
-        verifyNoInteractions(stdin);
-        verifyNoInteractions(stdout);
+        assertThrows(Exception.class, () -> app.run(new String[]{FOLDER_1, FILE_3, FOLDER_3}, stdin, stdout));
 
         // Dir not copied
         Path destPath1 = Path.of(TEST_DIR, FOLDER_3, FOLDER_1);
@@ -273,6 +269,11 @@ public class CpApplicationTest {
     @Test
     public void cpFilesToFolder_SrcFileDoesNotExist_ThrowsException() {
         assertThrows(Exception.class, () -> app.cpFilesToFolder(false, FOLDER_1, FILE_2));
+    }
+
+    @Test
+    public void cpFilesToFolder_SrcFolderNotRecursive_ThrowsException() {
+        assertThrows(Exception.class, () -> app.cpFilesToFolder(false, FOLDER_3, FOLDER_1, FILE_3));
     }
 
     @DisabledOnOs(OS.WINDOWS)
