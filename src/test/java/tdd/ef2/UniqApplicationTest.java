@@ -75,6 +75,8 @@ public class UniqApplicationTest {
     @AfterAll
     static void tearDownAfterAll() throws IOException {
         EnvironmentUtil.currentDirectory = ORIGINAL_DIR;
+
+        Files.delete(TEST_PATH);
     }
 
     @AfterEach

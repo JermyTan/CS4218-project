@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_DIR_NOT_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
@@ -16,9 +17,7 @@ import java.util.Comparator;
 import java.util.stream.Stream;
 
 import sg.edu.nus.comp.cs4218.app.RmInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.exception.RmException;
+import sg.edu.nus.comp.cs4218.exception.*;
 import sg.edu.nus.comp.cs4218.impl.parser.RmArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
@@ -40,6 +39,8 @@ public class RmApplication implements RmInterface {
 
         try {
             remove(isRemoveEmptyDir, isRecursive, fileNames);
+        } catch (RmException e) {
+            throw e;
         } catch (Exception e) {
             throw new RmException(e.getMessage(), e);
         }
@@ -47,39 +48,51 @@ public class RmApplication implements RmInterface {
     }
 
     @Override
-    public void remove(Boolean isEmptyFolder, Boolean isRecursive, String... fileNames) throws Exception {
+    public void remove(Boolean isEmptyFolder, Boolean isRecursive, String... fileNames) throws RmException {
         if (CollectionUtils.isAnyNull(isEmptyFolder, isRecursive)) {
-            throw new Exception(ERR_NULL_ARGS);
+            throw new RmException(ERR_NULL_ARGS);
         }
 
         if (fileNames == null || fileNames.length == 0) {
-            throw new Exception(ERR_NO_FILE_ARGS);
+            throw new RmException(ERR_NO_FILE_ARGS);
         }
 
         if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
-            throw new Exception(ERR_INVALID_FILES);
+            throw new RmException(ERR_INVALID_FILES);
         }
 
         for (String fileName : fileNames) {
-            Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
-            if (Files.notExists(filePath)) {
-                throw new Exception(ERR_FILE_NOT_FOUND);
+            try {
+                removeFile(isEmptyFolder, isRecursive, fileName);
+            } catch (Exception e) {
+                throw new RmException(e.getMessage(), e);
             }
+        }
+    }
 
-            if (Files.isDirectory(filePath)) {
-                if (isRecursive) {
-                    Files.walk(filePath)
-                            .sorted(Comparator.reverseOrder())
-                            .map(Path::toFile)
-                            .forEach(File::delete);
-                } else if (isEmptyFolder && isEmptyDir(filePath)) {
+    private void removeFile(boolean isEmptyFolder, boolean isRecursive, String fileName) throws Exception {
+        Path filePath = IOUtils.resolveAbsoluteFilePath(fileName);
+        if (Files.notExists(filePath)) {
+            throw new InvalidDirectoryException(fileName, ERR_FILE_NOT_FOUND);
+        }
+
+        if (Files.isDirectory(filePath)) {
+            if (isRecursive) {
+                Files.walk(filePath)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            } else if (isEmptyFolder) {
+                if (isEmptyDir(filePath)) {
                     Files.delete(filePath);
                 } else {
-                    throw new Exception(ERR_IS_DIR);
+                    throw new InvalidDirectoryException(fileName, ERR_DIR_NOT_EMPTY);
                 }
             } else {
-                Files.delete(filePath);
+                throw new InvalidDirectoryException(fileName, ERR_IS_DIR);
             }
+        } else {
+            Files.delete(filePath);
         }
     }
 

@@ -28,9 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.CatException;
-import sg.edu.nus.comp.cs4218.exception.RmException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.exception.*;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
@@ -132,6 +130,7 @@ public class PairwiseRmIT {
 
             buildCommand(List.of(command1, command2));
 
+            captureErr();
             command.evaluate(stdin, stdout);
 
             // file1.txt is renamed to file2.txt
@@ -139,7 +138,7 @@ public class PairwiseRmIT {
             assertTrue(Files.exists(file2));
 
             // Failed to remove file1.txt as it is renamed to file2.txt
-            assertEquals(new RmException(ERR_FILE_NOT_FOUND).getMessage() + STRING_NEWLINE, stdout.toString());
+            assertEquals(new RmException(new InvalidDirectoryException(FILE_1, ERR_FILE_NOT_FOUND).getMessage()).getMessage() + STRING_NEWLINE, getErrOutput());
         });
     }
 

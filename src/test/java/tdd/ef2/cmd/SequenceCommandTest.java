@@ -1,9 +1,10 @@
 package tdd.ef2.cmd;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,17 @@ import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 public class SequenceCommandTest {
     public static final String TEST_COMMAND_STRING = "Test command executed" + STRING_NEWLINE;
     public static final String SHELL_EXCEPTION_STRING = "shell: ShellException" + STRING_NEWLINE;
+    private OutputStream stderr;
+
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
+    }
 
     @Test
     void evaluate_TwoCommands_DisplaysBothResults() throws AbstractApplicationException, ShellException {
@@ -34,8 +46,11 @@ public class SequenceCommandTest {
         List<Command> commands = new ArrayList<>();
         commands.add(new CommandStub(CommandStub.Type.SHELL_EXCEPTION));
         commands.add(new CommandStub(CommandStub.Type.TEST_COMMAND));
+
+        captureErr();
         new SequenceCommand(commands).evaluate(System.in, output);
-        assertArrayEquals((SHELL_EXCEPTION_STRING + TEST_COMMAND_STRING).getBytes(), output.toByteArray());
+        assertArrayEquals(TEST_COMMAND_STRING.getBytes(), output.toByteArray());
+        assertEquals(SHELL_EXCEPTION_STRING, getErrOutput());
     }
 
     @Test
@@ -44,8 +59,11 @@ public class SequenceCommandTest {
         List<Command> commands = new ArrayList<>();
         commands.add(new CommandStub(CommandStub.Type.TEST_COMMAND));
         commands.add(new CommandStub(CommandStub.Type.SHELL_EXCEPTION));
+
+        captureErr();
         new SequenceCommand(commands).evaluate(System.in, output);
-        assertArrayEquals((TEST_COMMAND_STRING + SHELL_EXCEPTION_STRING).getBytes(), output.toByteArray());
+        assertArrayEquals(TEST_COMMAND_STRING.getBytes(), output.toByteArray());
+        assertEquals(SHELL_EXCEPTION_STRING, getErrOutput());
     }
 
     @Test
@@ -54,8 +72,10 @@ public class SequenceCommandTest {
         List<Command> commands = new ArrayList<>();
         commands.add(new CommandStub(CommandStub.Type.SHELL_EXCEPTION));
         commands.add(new CommandStub(CommandStub.Type.SHELL_EXCEPTION));
+
+        captureErr();
         new SequenceCommand(commands).evaluate(System.in, output);
-        assertArrayEquals((SHELL_EXCEPTION_STRING + SHELL_EXCEPTION_STRING).getBytes(), output.toByteArray());
+        assertEquals(SHELL_EXCEPTION_STRING + SHELL_EXCEPTION_STRING, getErrOutput());
     }
 
     @Test

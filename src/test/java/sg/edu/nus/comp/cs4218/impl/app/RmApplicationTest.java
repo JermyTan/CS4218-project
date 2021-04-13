@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_DIR_NOT_EMPTY;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
@@ -15,10 +16,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -31,7 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.RmException;
+import sg.edu.nus.comp.cs4218.exception.*;
 
 class RmApplicationTest {
 
@@ -123,32 +121,23 @@ class RmApplicationTest {
     @Test
     public void run_FileDoesNotExist_ThrowsException() {
         Throwable exception = assertThrows(RmException.class, () -> app.run(new String[]{FILE_3}, stdin, stdout));
-        assertEquals(new RmException(ERR_FILE_NOT_FOUND).getMessage(), exception.getMessage());
+        assertEquals(new RmException(new InvalidDirectoryException(FILE_3, ERR_FILE_NOT_FOUND).getMessage()).getMessage(), exception.getMessage());
     }
 
     @Test
     public void run_FolderDoesNotExistWithoutFlags_ThrowsException() {
         Throwable exception = assertThrows(RmException.class, () -> app.run(new String[]{FOLDER_3}, stdin, stdout));
-        assertEquals(new RmException(ERR_FILE_NOT_FOUND).getMessage(), exception.getMessage());
+        assertEquals(new RmException(new InvalidDirectoryException(FOLDER_3, ERR_FILE_NOT_FOUND).getMessage()).getMessage(), exception.getMessage());
     }
 
     @Test
     public void run_FolderDoesNotExistWithFlags_ThrowsException() {
         Throwable exception = assertThrows(RmException.class, () -> app.run(new String[]{"-d",
                 FOLDER_3}, stdin, stdout));
-        assertEquals(new RmException(ERR_FILE_NOT_FOUND).getMessage(), exception.getMessage());
+        assertEquals(new RmException(new InvalidDirectoryException(FOLDER_3, ERR_FILE_NOT_FOUND).getMessage()).getMessage(), exception.getMessage());
         exception = assertThrows(Exception.class, () -> app.run(new String[]{"-r", FOLDER_3}, stdin, stdout));
-        assertEquals(new RmException(ERR_FILE_NOT_FOUND).getMessage(), exception.getMessage());
+        assertEquals(new RmException(new InvalidDirectoryException(FOLDER_3, ERR_FILE_NOT_FOUND).getMessage()).getMessage(), exception.getMessage());
     }
-
-    // Commented out this test because this test is testing for permission,
-    // but its behavior is OS dependent
-//    @Test
-//    public void run_FileNotWritable_ThrowsException() {
-//        file1.toFile().setWritable(false);
-//
-//        assertThrows(Exception.class, () -> app.run(new String[]{FILE_1}, stdin, stdout));
-//    }
 
     @Test
     public void run_RemoveSingleFile_FileRemoved() {
@@ -176,7 +165,8 @@ class RmApplicationTest {
         Throwable exception = assertThrows(RmException.class, () -> app.run(new String[]{FILE_1,
                 EMPTY_FOLDER,
                 FILE_2}, stdin, stdout));
-        assertEquals(new RmException(ERR_IS_DIR).getMessage(), exception.getMessage());
+        assertEquals(new RmException(new InvalidDirectoryException(EMPTY_FOLDER, ERR_IS_DIR).getMessage()).getMessage(),
+                exception.getMessage());
 
         // Only file1 removed
         assertTrue(Files.notExists(file1));
@@ -205,7 +195,8 @@ class RmApplicationTest {
 
         Throwable exception = assertThrows(RmException.class, () -> app.run(new String[]{"-d",
                 FOLDER_1}, stdin, stdout));
-        assertEquals(new RmException(ERR_IS_DIR).getMessage(), exception.getMessage());
+        assertEquals(new RmException(new InvalidDirectoryException(FOLDER_1, ERR_DIR_NOT_EMPTY).getMessage()).getMessage(),
+                exception.getMessage());
 
         // folder1 not removed
         assertTrue(Files.exists(folder1));
@@ -312,23 +303,23 @@ class RmApplicationTest {
 
     @Test
     public void remove_NullArgs_ThrowsException() {
-        Throwable exception = assertThrows(Exception.class, () -> app.remove(null, false, FILE_1));
-        assertEquals(new Exception(ERR_NULL_ARGS).getMessage(), exception.getMessage());
-        exception = assertThrows(Exception.class, () -> app.remove(false, null, FILE_1));
-        assertEquals(new Exception(ERR_NULL_ARGS).getMessage(), exception.getMessage());
+        Throwable exception = assertThrows(RmException.class, () -> app.remove(null, false, FILE_1));
+        assertEquals(new RmException(ERR_NULL_ARGS).getMessage(), exception.getMessage());
+        exception = assertThrows(RmException.class, () -> app.remove(false, null, FILE_1));
+        assertEquals(new RmException(ERR_NULL_ARGS).getMessage(), exception.getMessage());
     }
 
     @Test
     public void remove_NoFilenames_ThrowsException() {
-        Throwable exception = assertThrows(Exception.class, () -> app.remove(false, false));
-        assertEquals(new Exception(ERR_NO_FILE_ARGS).getMessage(), exception.getMessage());
+        Throwable exception = assertThrows(RmException.class, () -> app.remove(false, false));
+        assertEquals(new RmException(ERR_NO_FILE_ARGS).getMessage(), exception.getMessage());
         exception = assertThrows(Exception.class, () -> app.remove(false, false, (String[]) null));
-        assertEquals(new Exception(ERR_NO_FILE_ARGS).getMessage(), exception.getMessage());
+        assertEquals(new RmException(ERR_NO_FILE_ARGS).getMessage(), exception.getMessage());
     }
 
     @Test
     public void remove_InvalidFilenames_ThrowsException() {
-        Throwable exception = assertThrows(Exception.class, () -> app.remove(false, false, null, FILE_1));
-        assertEquals(new Exception(ERR_INVALID_FILES).getMessage(), exception.getMessage());
+        Throwable exception = assertThrows(RmException.class, () -> app.remove(false, false, null, FILE_1));
+        assertEquals(new RmException(ERR_INVALID_FILES).getMessage(), exception.getMessage());
     }
 }

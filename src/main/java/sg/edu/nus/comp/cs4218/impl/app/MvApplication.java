@@ -6,7 +6,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CANNOT_RENAME;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FILE_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
@@ -20,12 +19,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 import sg.edu.nus.comp.cs4218.app.MvInterface;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
-import sg.edu.nus.comp.cs4218.exception.MvException;
+import sg.edu.nus.comp.cs4218.exception.*;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
@@ -64,134 +60,138 @@ public class MvApplication implements MvInterface {
                 mvFilesToFolder(isOverwrite, destFile, srcFiles);
             }
 
+        } catch (MvException e) {
+            throw e;
         } catch (Exception e) {
             throw new MvException(e.getMessage(), e);
         }
     }
 
     @Override
-    public String mvSrcFileToDestFile(Boolean isOverwrite, String srcFile, String destFile) throws Exception { //NOPMD
+    public String mvSrcFileToDestFile(Boolean isOverwrite, String srcFile, String destFile) throws MvException {
         if (CollectionUtils.isAnyNull(isOverwrite, srcFile, destFile)) {
-            throw new Exception(ERR_NULL_ARGS);
+            throw new MvException(ERR_NULL_ARGS);
         }
 
-        Path srcPath = IOUtils.resolveAbsoluteFilePath(srcFile);
-        Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
-
-        // srcFile must exist
-        if (Files.notExists(srcPath)) {
-            throw new InvalidDirectoryException(srcFile, ERR_FILE_NOT_FOUND);
-        }
-
-        // Cannot rename a file/folder to a existing directory
-        if (Files.isDirectory(destPath)) {
-            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_IS_DIR));
-        }
-
-        // When renaming a file, destFile must belong to a existing directory
-        if (srcPath.toFile().isFile() && Files.notExists(destPath.toAbsolutePath().getParent())) {
-            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND));
-        }
-
-
-        if (Files.isDirectory(srcPath)) {
-            // Cannot rename a folder to an existing file
-            if (destPath.toFile().isFile()) {
-                throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_IS_NOT_DIR));
-            }
-
-            // When renaming a folder, destFolder must not contain srcFile
-            if (destPath.toAbsolutePath().startsWith(srcPath.toAbsolutePath())) {
-                throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARGS));
-            }
-        }
-
-        if (!isOverwrite && Files.exists(destPath)) {
-            return null;
-        }
-
-        if (Files.exists(destPath) && !Files.isWritable(destPath)) {
-            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_NO_PERM));
-        }
-
-        try {
-            Files.move(srcPath, destPath, REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new Exception(constructRenameErrorMsg(srcFile, destFile, ERR_CANNOT_RENAME), e);
-        }
+        renameFile(isOverwrite, srcFile, destFile);
 
         return null;
     }
 
     @Override
-    public String mvFilesToFolder(Boolean isOverwrite, String destFolder, String... fileNames) throws Exception {
+    public String mvFilesToFolder(Boolean isOverwrite, String destFolder, String... fileNames) throws MvException {
         if (isOverwrite == null || destFolder == null) {
-            throw new Exception(ERR_NULL_ARGS);
+            throw new MvException(ERR_NULL_ARGS);
         }
 
         if (fileNames == null || fileNames.length == 0) {
-            throw new Exception(ERR_NO_FILE_ARGS);
+            throw new MvException(ERR_NO_FILE_ARGS);
         }
 
         if (CollectionUtils.isAnyNull((Object[]) fileNames)) {
-            throw new Exception(ERR_INVALID_FILES);
+            throw new MvException(ERR_INVALID_FILES);
         }
 
-        if (!isOverwrite) {
-            fileNames = filterSrcFiles(destFolder, fileNames);
-
-            // Return if fileNames becomes empty after filtering
-            if (fileNames.length == 0) {
-                return null;
-            }
+        if (fileNames.length == 0) {
+            return null;
         }
 
-        Path destPath = IOUtils.resolveAbsoluteFilePath(destFolder);
+        try {
+            Path destPath = IOUtils.resolveAbsoluteFilePath(destFolder);
 
-        // `destFolder` must exist
-        if (Files.notExists(destPath)) {
-            throw new Exception(ERR_FILE_NOT_FOUND);
-        }
-
-        // `destFolder` must be a directory
-        if (!Files.isDirectory(destPath)) {
-            throw new Exception(ERR_IS_NOT_DIR);
-        }
-
-        for (String fileName : fileNames) {
-            String destFile = destFolder + STRING_FILE_SEP + new File(fileName).getName();
-
-            // Cannot move a file to its current directory
-            Path srcFilePath = IOUtils.resolveAbsoluteFilePath(fileName);
-            Path destFilePath = IOUtils.resolveAbsoluteFilePath(destFile);
-            if (srcFilePath.equals(destFilePath)) {
-                throw new Exception(String.format(ERR_ARE_IDENTICAL, fileName, destFile));
+            // `destFolder` must exist
+            if (Files.notExists(destPath)) {
+                throw new MvException(ERR_FILE_NOT_FOUND);
             }
 
-            mvSrcFileToDestFile(isOverwrite, fileName, destFile);
+            // `destFolder` must be a directory
+            if (!Files.isDirectory(destPath)) {
+                throw new MvException(ERR_IS_NOT_DIR);
+            }
+
+            for (String fileName : fileNames) {
+                moveFile(isOverwrite, destFolder, fileName);
+            }
+        } catch (MvException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MvException(e.getMessage(), e);
         }
 
         return null;
     }
 
-    /**
-     * @param destFile target file
-     * @param srcFiles file paths for files to be moved to the target directory
-     * @return srcFiles that do not overwrite existing file in the target directory after mv
-     */
-    private String[] filterSrcFiles(String destFile, String... srcFiles) throws Exception {
-        Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
-
-        return Arrays.stream(srcFiles)
-                .filter(srcFile -> {
-                    String fileName = new File(srcFile).getName();
-                    return Files.notExists(destPath.resolve(fileName));
-                })
-                .toArray(String[]::new);
-    }
-
     private boolean isFormatOne(String destFile) throws Exception {
         Path target = IOUtils.resolveAbsoluteFilePath(destFile);
         return Files.notExists(target) || !Files.isDirectory(target);
+    }
+
+    private void renameFile(boolean isOverwrite, String srcFile, String destFile) throws MvException {
+        try {
+            Path srcPath = IOUtils.resolveAbsoluteFilePath(srcFile);
+            Path destPath = IOUtils.resolveAbsoluteFilePath(destFile);
+
+            // srcFile must exist
+            if (Files.notExists(srcPath)) {
+                throw new MvException(new InvalidDirectoryException(srcFile, ERR_FILE_NOT_FOUND).getMessage());
+            }
+
+            // When renaming a file, destFile must belong to a existing directory
+            if (srcPath.toFile().isFile() && Files.notExists(destPath.toAbsolutePath().getParent())) {
+                throw new MvException(constructRenameErrorMsg(srcFile, destFile, ERR_FILE_NOT_FOUND));
+            }
+
+            if (Files.isDirectory(srcPath)) {
+                // Cannot rename a folder to an existing file
+                if (destPath.toFile().isFile()) {
+                    throw new MvException(constructRenameErrorMsg(srcFile, destFile, ERR_IS_NOT_DIR));
+                }
+
+                // When renaming a folder, destFolder must not contain srcFile
+                if (destPath.toAbsolutePath().startsWith(srcPath.toAbsolutePath())) {
+                    throw new MvException(constructRenameErrorMsg(srcFile, destFile, ERR_INVALID_ARGS));
+                }
+            }
+
+            if (!isOverwrite && Files.exists(destPath)) {
+                return;
+            }
+
+            if (Files.exists(destPath) && !Files.isWritable(destPath)) {
+                throw new MvException(constructRenameErrorMsg(srcFile, destFile, ERR_NO_PERM));
+            }
+
+            try {
+                Files.move(srcPath, destPath, REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new MvException(constructRenameErrorMsg(srcFile, destFile, ERR_CANNOT_RENAME), e);
+            }
+
+        } catch (MvException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MvException(e.getMessage(), e);
+        }
+    }
+
+    private void moveFile(boolean isOverwrite, String destFolder, String fileName) throws MvException {
+        try {
+            String destFile = destFolder + STRING_FILE_SEP + new File(fileName).getName();
+
+            Path srcFilePath = IOUtils.resolveAbsoluteFilePath(fileName);
+            Path destFilePath = IOUtils.resolveAbsoluteFilePath(destFile);
+
+            // Cannot move a file to its current directory
+            if (srcFilePath.equals(destFilePath)) {
+                throw new MvException(String.format(ERR_ARE_IDENTICAL, fileName, destFile));
+            }
+
+            renameFile(isOverwrite, fileName, destFile);
+
+        } catch (MvException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MvException(e.getMessage(), e);
+        }
     }
 }

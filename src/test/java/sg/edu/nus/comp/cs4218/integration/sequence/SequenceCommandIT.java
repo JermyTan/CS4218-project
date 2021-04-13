@@ -8,11 +8,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -56,6 +52,7 @@ public class SequenceCommandIT {
     private final InputStream stdin = System.in;
     private final OutputStream stdout = new ByteArrayOutputStream();
     private final ApplicationRunner appRunner = new ApplicationRunner();
+    private OutputStream stderr;
     private SequenceCommand command;
 
     @BeforeAll
@@ -74,6 +71,16 @@ public class SequenceCommandIT {
 
     private void buildCommand(List<Command> commands) throws ShellException {
         command = new SequenceCommand(commands);
+    }
+
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
     }
 
     @BeforeEach
@@ -95,6 +102,22 @@ public class SequenceCommandIT {
                 Files.deleteIfExists(path);
             }
         }
+    }
+
+    @Test
+    @DisplayName("echo hello world;")
+    public void evaluate_OneCommand_CommandExecuted() {
+        assertDoesNotThrow(() -> {
+            String expected = INPUT_STRING;
+
+            CallCommand command1 = new CallCommand(List.of("echo", expected), appRunner);
+
+            buildCommand(List.of(command1));
+
+            command.evaluate(stdin, stdout);
+
+            assertEquals(INPUT_STRING + STRING_NEWLINE, stdout.toString());
+        });
     }
 
     @Test
@@ -168,10 +191,11 @@ public class SequenceCommandIT {
             CallCommand command2 = new CallCommand(List.of("echo", INPUT_STRING), appRunner);
             buildCommand(List.of(command1, command2));
 
+            captureErr();
             command.evaluate(stdin, stdout);
 
-            assertEquals(new RmException(ERR_NO_FILE_ARGS).getMessage() + STRING_NEWLINE
-                    + INPUT_STRING + STRING_NEWLINE, stdout.toString());
+            assertEquals(INPUT_STRING + STRING_NEWLINE, stdout.toString());
+            assertEquals(new RmException(ERR_NO_FILE_ARGS).getMessage() + STRING_NEWLINE, getErrOutput());
         });
     }
 }

@@ -8,10 +8,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.testutil.TestConstants.RESOURCES_PATH;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
@@ -26,10 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.EnvironmentUtil;
-import sg.edu.nus.comp.cs4218.exception.CdException;
-import sg.edu.nus.comp.cs4218.exception.MvException;
-import sg.edu.nus.comp.cs4218.exception.RmException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.exception.*;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
@@ -52,6 +46,7 @@ public class PairwiseCdIT {
     private final InputStream stdin = System.in;
     private final ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     private final ApplicationRunner appRunner = new ApplicationRunner();
+    private OutputStream stderr;
     private SequenceCommand command;
 
     @BeforeAll
@@ -70,6 +65,16 @@ public class PairwiseCdIT {
 
     private void buildCommand(List<Command> commands) throws ShellException {
         command = new SequenceCommand(commands);
+    }
+
+    private void captureErr() {
+        stderr = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(stderr));
+    }
+
+    private String getErrOutput() {
+        System.setErr(System.err);
+        return stderr.toString();
     }
 
     @BeforeEach
@@ -166,6 +171,7 @@ public class PairwiseCdIT {
 
             buildCommand(List.of(command1, command2));
 
+            captureErr();
             command.evaluate(stdin, stdout);
 
             // file1.txt is not moved to folder1/ as the cd command fails
@@ -177,9 +183,9 @@ public class PairwiseCdIT {
 
             // Both errors written to output
             assertEquals(String.join(STRING_NEWLINE,
-                    new CdException(String.format("%s: %s", "folder2", ERR_FILE_NOT_FOUND)).getMessage(),
-                    new MvException(String.format("%s: %s", "./../file1.txt", ERR_FILE_NOT_FOUND)).getMessage()
-            ) + STRING_NEWLINE, stdout.toString());
+                    new CdException(new InvalidDirectoryException("folder2", ERR_FILE_NOT_FOUND).getMessage()).getMessage(),
+                    new MvException(new InvalidDirectoryException("./../file1.txt", ERR_FILE_NOT_FOUND).getMessage()).getMessage()
+            ) + STRING_NEWLINE, stderr.toString());
         });
     }
 
@@ -217,12 +223,13 @@ public class PairwiseCdIT {
 
             buildCommand(List.of(command1, command2));
 
+            captureErr();
             command.evaluate(stdin, stdout);
 
             // file1.txt at current dir still remains
             assertTrue(Files.exists(file1));
 
-            assertEquals(new RmException(ERR_FILE_NOT_FOUND).getMessage() + STRING_NEWLINE, stdout.toString());
+            assertEquals(new RmException(new InvalidDirectoryException(FILE_1, ERR_FILE_NOT_FOUND).getMessage()).getMessage() + STRING_NEWLINE, getErrOutput());
 
             // Check current directory
             assertEquals(folder1.toString(), EnvironmentUtil.currentDirectory);

@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,7 +49,7 @@ public class SequenceCommand implements Command {
                     outputLines.add(outputLine);
                 }
             } catch (AbstractApplicationException | ShellException e) {
-                outputLines.add(e.getMessage() + STRING_NEWLINE);
+                System.err.println(e.getMessage());
             }
         }
 
