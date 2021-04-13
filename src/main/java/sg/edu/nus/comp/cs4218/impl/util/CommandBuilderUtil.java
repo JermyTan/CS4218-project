@@ -134,6 +134,10 @@ public final class CommandBuilderUtil {
             commandSubstring = commandSubstring.trim();
             Matcher matcher = ARGUMENT_REGEX.matcher(commandSubstring);
 
+            if (commandSubstring.equals(String.valueOf(CHAR_SEMICOLON))) {
+                break;
+            }
+
             // no valid arguments found
             if (!matcher.find()) {
                 throw new ShellException(ERR_SYNTAX);

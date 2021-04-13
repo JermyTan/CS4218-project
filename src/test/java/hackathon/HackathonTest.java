@@ -154,8 +154,6 @@ public class HackathonTest {
         assertTrue(Files.exists(file2));
     }
 
-    // Not fixed yet
-    @Disabled
     @Test
     @DisplayName("Bug #3 from team 18")
     void parseAndEvaluate_Echo_CommandExecuted() {
