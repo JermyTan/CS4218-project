@@ -119,7 +119,7 @@ public final class CommandBuilderUtil {
      * @return Final command to be evaluated.
      * @throws ShellException If the provided command string has an invalid syntax.
      */
-    public static Command parseCommand(String commandString, ApplicationRunner appRunner)
+    public static Command parseCommand(String commandString, ApplicationRunner appRunner) //NOPMD
             throws ShellException {
         if (StringUtils.isBlank(commandString) || commandString.contains(STRING_NEWLINE)) {
             throw new ShellException(ERR_SYNTAX);

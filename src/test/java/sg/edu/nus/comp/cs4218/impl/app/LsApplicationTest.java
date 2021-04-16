@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner.APP_LS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FILES;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_EMPTY;
@@ -282,16 +281,9 @@ class LsApplicationTest {
     }
 
     @Test
-    public void listFolderContent_FileSupplied_WritesErrToStderr() {
-        captureErr();
-
+    public void listFolderContent_NonFolderFile_OutputsFileName() {
         assertDoesNotThrow(() -> {
-            app.listFolderContent(false, false, false, FILE_1);
-
-            assertEquals(new LsException(
-                            String.format(STRING_LABEL_VALUE_PAIR, FILE_1, ERR_IS_NOT_DIR)
-                    ).getMessage() + STRING_NEWLINE,
-                    getErrOutput());
+            assertEquals(FILE_1, app.listFolderContent(false, false, false, FILE_1));
         });
     }
 }
