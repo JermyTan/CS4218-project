@@ -225,7 +225,7 @@ public class CpApplicationTest {
         String destName = "dest_dir";
         createDirectory(srcName);
         Path destDir = createDirectory(destName);
-        new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out);
+        assertThrows(CpException.class, () -> new CpApplication().run(toArgs(STRING_EMPTY, srcName, destName), System.in, System.out));
         Path destFile = destDir.resolve(srcName);
         assertTrue(Files.notExists(destFile));
     }
