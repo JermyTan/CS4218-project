@@ -104,7 +104,7 @@ public class HackathonTest {
 
     @Test
     @DisplayName("Bug #11 from team 16")
-    void parseAndEvaluate_MvMultipleFilesWithInvalidFiles_ValidFilesPrecedingInvalidFilesMoved() {
+    void parseAndEvaluate_MvMultipleFilesWithInvalidFiles_ValidFilesFilesMoved() {
         Throwable exception = assertThrows(MvException.class, () -> shell.parseAndEvaluate("mv * folder1", stdout));
 
         assertEquals(new MvException(constructRenameErrorMsg("folder1", "folder1/folder1", ERR_INVALID_ARGS)).getMessage(),
@@ -118,9 +118,9 @@ public class HackathonTest {
         assertTrue(Files.notExists(file2));
         assertTrue(Files.exists(folder1.resolve(FILE_2)));
 
-        // folder2 not moved into folder1 (as it is after folder1 after globbing)
-        assertTrue(Files.exists(folder2));
-        assertTrue(Files.notExists(folder1.resolve(FOLDER_2)));
+        // folder2 moved into folder1
+        assertTrue(Files.notExists(folder2));
+        assertTrue(Files.exists(folder1.resolve(FOLDER_2)));
     }
 
     @Test
@@ -140,18 +140,18 @@ public class HackathonTest {
 
     @Test
     @DisplayName("Bug #14 from team 16")
-    void parseAndEvaluate_RmMultipleFilesWithInvalidFiles_ValidFilesPrecedingInvalidFilesRemoved() {
+    void parseAndEvaluate_RmMultipleFilesWithInvalidFiles_ValidFilesRemoved() {
         Throwable exception = assertThrows(RmException.class, () -> shell.parseAndEvaluate("rm file1.txt folder1 file2.txt", stdout));
         assertEquals(new RmException(new InvalidDirectoryException(FOLDER_1, ERR_IS_DIR).getMessage()).getMessage(), exception.getMessage());
 
         // folder1 remains as it is a directory
         assertTrue(Files.exists(folder1));
 
-        // file1 removed as it is before the invalid file (folder 1)
+        // file1 is removed
         assertTrue(Files.notExists(file1));
 
-        // file2 remains as it is after the invalid file (folder 1)
-        assertTrue(Files.exists(file2));
+        // file2 is removed
+        assertTrue(Files.notExists(file2));
     }
 
     @Test
