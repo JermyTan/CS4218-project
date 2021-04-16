@@ -163,4 +163,12 @@ public class HackathonTest {
 
         assertEquals("abc" + STRING_NEWLINE, stdout.toString());
     }
+
+    @Test
+    @DisplayName("Bug #4 from team 16, bug #6 from team 18")
+    void parseAndEvaluate_CpSrcFolderToDestFolderWithoutRecursiveFlag_ThrowsException() {
+        assertThrows(CpException.class, () -> {
+            shell.parseAndEvaluate("cp folder1 folder2;", stdout);
+        });
+    }
 }
