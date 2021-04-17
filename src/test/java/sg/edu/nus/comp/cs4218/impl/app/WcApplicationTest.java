@@ -96,7 +96,7 @@ class WcApplicationTest {
     }
 
     private int getByteCount(int lines) {
-        return lines * 46;
+        return generateString(lines).getBytes().length;
     }
 
     @BeforeEach
